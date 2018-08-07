@@ -1,0 +1,23 @@
+<template name="layout_header">
+    <nav>
+        <ul>
+            <li>
+                <a href="{{pathFor route='dashboard'}}" class="{{isActiveRoute regex='dashboard'}}">
+                    <i class="icon-wallet"></i>
+                    <span>{{i18n 'wallet.app.buttons.wallet'}}</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{goToSend}}" class="{{isActiveRoute regex='send'}}">
+                    <i class="icon-arrow-up"></i>
+                    <span>{{i18n 'wallet.app.buttons.send'}}</span>
+                </a>
+            </li>
+            <li class="wallet-balance">
+                <h3>{{i18n 'wallet.app.texts.balance'}}</h3>
+                {{> elements_balance balance=totalBalance changeUnit=true}}
+            </li>
+
+            </ul>
+    </nav>
+</template>

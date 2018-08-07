@@ -1,0 +1,46 @@
+<template name="views_account_create">
+        <!-- we use a form, which posts into the "dapp-form-helper-iframe" iframe, so that the browser stores inout fields for native autocpmplete -->
+    <form class="container new-account" action="about:blank" target="dapp-form-helper-iframe" autocomplete="on">
+            
+        <h1>{{{i18n 'wallet.newWallet.title'}}}</h1>
+
+        <input type="text" name="accountName" value="{{name}}" placeholder="{{i18n 'wallet.newWallet.accountName'}}" autofocus="true">
+
+        <h2>{{i18n 'wallet.newWallet.accountType.title'}}</h2>
+        
+        <div class="row clear">
+            <label>
+                <input type="radio" name="accountType" value="simple" {{simpleCheck}}>
+                <h3>{{i18n 'wallet.newWallet.accountType.simple.title'}}</h3>
+                <span>{{i18n 'wallet.newWallet.accountType.simple.description'}}</span>
+            </label>
+            {{#if showSection "simple"}}
+                <div class="indented-box">
+                   <br><span>{{i18n 'wallet.newWallet.accountType.simple.warning'}}</span>
+                </div>
+            {{/if}}
+        </div>
+
+        <div class="row clear">
+            <label>
+                <input type="radio" name="accountType" value="import">
+                <h3>{{i18n 'wallet.newWallet.accountType.import.title'}}</h3>
+                <span>{{i18n 'wallet.newWallet.accountType.import.description'}}</span>
+            </label>
+            {{#if showSection "import"}}
+                <div class="indented-box">
+                    <br>
+                    {{> dapp_addressInput placeholder=i18nWalletAddress class="import"}}
+                    <p class="{{importValidClass}}">{{{importInfo}}}</p>
+                </div>
+            {{/if}}
+        </div>
+
+        <hr>
+
+        <!-- button type="submit" will send the form -->
+        <button type="submit" class="dapp-block-button">{{i18n 'buttons.create'}}</button>
+
+    </form>
+
+</template>
