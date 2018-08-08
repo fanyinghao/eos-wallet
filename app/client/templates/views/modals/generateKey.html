@@ -1,0 +1,20 @@
+<template name="generateKey">
+  <h1>{{{i18n 'wallet.newAccount.writedown'}}}</h1>
+  <h2>{{{i18n 'wallet.newAccount.publicKey'}}}</h2>
+  <input type="text" readonly name="publicKey" value="{{publicKey}}" />
+  <h2>{{{i18n 'wallet.newAccount.privateKey'}}}</h2>
+  <input type="text" readonly name="privateKey" value="{{privateKey}}" />
+
+  <hr>
+
+  <h1>{{{i18n 'wallet.newAccount.transfer'}}}</h1>
+  <input type="textarea" readonly name="transfer" value="{{transfer}}" />
+  <p><div id="qrcode"></div></p>
+  <p> {{i18n 'wallet.newAccount.qrCodeLabel'}} </p>
+
+  <hr>
+
+  <!-- button type="submit" will send the form -->
+  <button type="submit" class="dapp-block-button">{{i18n 'buttons.back'}}</button>
+
+</template>
