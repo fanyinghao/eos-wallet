@@ -4,26 +4,26 @@
 # but you can also edit it by hand.
 
 standard-minifiers@1.1.0
-meteor-base@1.3.0
+meteor-base@1.4.0
 mobile-experience@1.0.5
-mongo@1.4.2
+mongo@1.5.0
 blaze-html-templates
 session@1.1.7
 jquery@1.11.10
-tracker@1.1.3
-logging@1.1.19
+tracker@1.2.0
+logging@1.1.20
 reload@1.2.0
 random@1.1.0
 ejson@1.1.0
 spacebars
-check@1.3.0
-http@1.4.0
+check@1.3.1
+http@1.4.1
 
 fastclick
 kadira:flow-router
 kadira:blaze-layout
 arillo:flow-router-helpers
-less@2.7.11
+less@2.7.12
 chuangbo:cookie
 jeeeyul:moment-with-langs
 tap:i18n
@@ -45,11 +45,12 @@ tap:i18n-bundler
 numeral:numeral
 numeral:languages
 hashanp:geopattern
-shell-server
-dynamic-import
+shell-server@0.3.1
+dynamic-import@0.4.0
 ethereum:blocks@1.1.0
 ethereum:accounts@1.1.0
 ethereum:tools@1.1.0
 ethereum:elements@1.1.0
 ethereum:web3@1.0.0-beta.33
 3stack:bignumber
+underscore
