@@ -4,7 +4,17 @@
             
         <h1>{{{i18n 'wallet.newWallet.title'}}}</h1>
 
+        {{#if showSection "simple"}}
         <input type="text" name="accountName" value="{{name}}" placeholder="{{i18n 'wallet.newWallet.accountName'}}" autofocus="true">
+        {{/if}}
+        {{#if errMsg}}
+            <br>
+            <small class="red">
+                <i class="icon-shield"></i> {{ i18n      }}
+            </small>
+        {{/if}}
+        <input type="password" name="password" value="{{password}}" placeholder="{{i18n 'wallet.newWallet.password'}}" autofocus="true">
+        <input type="password" name="rePassword" value="{{rePassword}}" placeholder="{{i18n 'wallet.newWallet.rePassword'}}" autofocus="true">
 
         <h2>{{i18n 'wallet.newWallet.accountType.title'}}</h2>
         
