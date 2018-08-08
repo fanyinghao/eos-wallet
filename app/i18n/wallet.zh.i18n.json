@@ -194,7 +194,9 @@
         },
         "newWallet": {
             "title": "<strong>新增账户</strong>",
-            "accountName": "钱包合约名称",
+            "accountName": "账户名称（必须12位，数字或者字母）",
+            "password": "账户密码",
+            "rePassword": "重复账户密码",
             "selectOwner": "选择拥有者",
             "accountType": {
                 "title": "账户类型",
@@ -217,7 +219,7 @@
                 "import": {
                     "title": "导入账户",
                     "description": "导入已有的账户。",
-                    "walletAddress": "钱包地址",
+                    "walletAddress": "账户私钥",
                     "youreOwner": "您的 \"__account__\" 账户是此钱包合约的所有者。",
                     "watchOnly": "您并未拥有此账号，不过您可以将之加入为\"仅观察\"的账户。",
                     "notWallet": "此地址并未拥有钱包合约。"
