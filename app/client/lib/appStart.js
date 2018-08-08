@@ -69,7 +69,7 @@ var checkSync = function() {
         TemplateVar.setTo('header nav', 'syncing', false);
 
         // re-gain app operation
-        connectToNode();
+        //connectToNode();
       }
     })
     .catch(function(error) {
@@ -127,7 +127,7 @@ var connect = function() {
           .isSyncing()
           .then(function(syncing) {
             if (!syncing) {
-              connectToNode();
+              //connectToNode();
             } else {
               EthAccounts.init();
             }
