@@ -123,7 +123,7 @@
         "viewOnExplorer": "View on Etherscan",
         "copyAddress": "Copy address",
         "scanQRCode": "Show QR-Code",
-        "authorize": "Multi-Signtures",
+        "authorize": "Multi Signatures",
         "showInterface": "Show Interface"
       },
       "modal": {

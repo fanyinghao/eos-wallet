@@ -73,7 +73,7 @@
             }
         },
         "accounts": {
-            "title": "<strong>账户</strong> 总览",
+            "title": "<strong>账户总览</strong>",
             "walletsTitle": "钱包合约",
             "accountsTitle": "账户",
             "defaultName": "未命名",
@@ -193,15 +193,15 @@
             "multisigSigneesTitle": "多签地址"
         },
         "newWallet": {
-            "title": "新<strong>钱包合约</strong>",
+            "title": "<strong>新增账户</strong>",
             "accountName": "钱包合约名称",
             "selectOwner": "选择拥有者",
             "accountType": {
-                "title": "钱包合约类型",
+                "title": "账户类型",
                 "simple": {
                     "title": "单一拥有者账户",
-                    "description": "一个无额外安全防护措施的简单合约。",
-                    "warning": "注：如果使用的账户别攻破，您的钱包将无任何防护。"
+                    "description": "一个属于单一拥有者的简单账户。",
+                    "warning": ""
                 },
                 "multisig": {
                     "title": "多重签名的钱包合约",
@@ -215,8 +215,8 @@
                     "ownerAddress": "所有者地址"
                 },
                 "import": {
-                    "title": "导入钱包",
-                    "description": "导入到既存的（多重签名的）钱包。",
+                    "title": "导入账户",
+                    "description": "导入已有的账户。",
                     "walletAddress": "钱包地址",
                     "youreOwner": "您的 \"__account__\" 账户是此钱包合约的所有者。",
                     "watchOnly": "您并未拥有此账号，不过您可以将之加入为\"仅观察\"的账户。",
