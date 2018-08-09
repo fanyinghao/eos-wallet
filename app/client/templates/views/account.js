@@ -423,7 +423,7 @@ Template['views_account'].events({
       }
     },
     {
-      class: 'multiSig-info'
+      class: 'modal-media'
     });
   },
 
