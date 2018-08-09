@@ -136,12 +136,12 @@ Template['views_account_create'].helpers({
     return TAPi18n.__('wallet.newWallet.accountType.multisig.ownerAddress');
   },
   /**
-    Translates to 'wallet address'
+    Translates to 'private key'
 
-    @method (i18nWalletAddress)
+    @method (i18nPrivateKey)
     */
-  i18nWalletAddress: function () {
-    return TAPi18n.__('wallet.newWallet.accountType.import.walletAddress');
+  i18nPrivateKey: function () {
+    return TAPi18n.__('wallet.newWallet.accountType.import.privateKey');
   },
   /**
     Returns the import info text.
@@ -237,7 +237,7 @@ Template['views_account_create'].helpers({
 
   errMsg: function () {
     return TemplateVar.get('errMsg');
-  },
+  }
 });
 
 Template['views_account_create'].events({
@@ -337,44 +337,57 @@ Template['views_account_create'].events({
 
     // IMPORT
     if (type === 'import') {
-      var owners = _.uniq(
-        _.compact(
-          _.map(TemplateVar.get('importWalletOwners'), function (item) {
-            if (web3.utils.isAddress(item)) return item.toLowerCase();
-          })
-        )
-      );
+      // var owners = _.uniq(
+      //   _.compact(
+      //     _.map(TemplateVar.get('importWalletOwners'), function (item) {
+      //       if (web3.utils.isAddress(item)) return item.toLowerCase();
+      //     })
+      //   )
+      // );
 
-      if (owners.length === 0) return;
+      // if (owners.length === 0) return;
 
-      var address = template.find('input.import').value;
-      address = '0x' + address.replace('0x', '').toLowerCase();
-      if (Wallets.findOne({ address: address }))
-        return GlobalNotification.warning({
-          content: 'i18n:wallet.newWallet.error.alreadyExists',
-          duration: 2
+      // var address = template.find('input.import').value;
+      // address = '0x' + address.replace('0x', '').toLowerCase();
+      // if (Wallets.findOne({ address: address }))
+      //   return GlobalNotification.warning({
+      //     content: 'i18n:wallet.newWallet.error.alreadyExists',
+      //     duration: 2
+      //   });
+
+      // // reorganize owners, so that yourself is at place one
+      // var account = Helpers.getAccountByAddress({ $in: owners || [] });
+      // if (account) {
+      //   owners = _.without(owners, account.address);
+      //   owners.unshift(account.address);
+      // }
+
+      // Wallets.insert({
+      //   owners: owners,
+      //   name:
+      //     template.find('input[name="accountName"]').value ||
+      //     TAPi18n.__('wallet.accounts.defaultName'),
+      //   address: address,
+      //   balance: '0',
+      //   // TODO set to 0
+      //   creationBlock: 300000,
+      //   imported: true
+      // });
+
+      // FlowRouter.go('dashboard');
+
+      let password = template.find('input[name="password"]').value;
+      let privateKey = template.find('input[name="privateKey"]').value;
+      let publicKey = kos.Keygen.privateToPublic(privateKey)
+
+      eos.getKeyAccounts(publicKey).then(accounts => {
+        EthElements.Modal.show({
+          template: 'importKey',
+          data: {
+            accounts: accounts
+          }
         });
-
-      // reorganize owners, so that yourself is at place one
-      var account = Helpers.getAccountByAddress({ $in: owners || [] });
-      if (account) {
-        owners = _.without(owners, account.address);
-        owners.unshift(account.address);
-      }
-
-      Wallets.insert({
-        owners: owners,
-        name:
-          template.find('input[name="accountName"]').value ||
-          TAPi18n.__('wallet.accounts.defaultName'),
-        address: address,
-        balance: '0',
-        // TODO set to 0
-        creationBlock: 300000,
-        imported: true
-      });
-
-      FlowRouter.go('dashboard');
+      })
     }
   }
 });

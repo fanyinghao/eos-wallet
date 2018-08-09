@@ -5,22 +5,22 @@
         <h1>{{{i18n 'wallet.newWallet.title'}}}</h1>
 
         {{#if showSection "simple"}}
-        <input type="text" name="accountName" value="{{name}}" placeholder="{{i18n 'wallet.newWallet.accountName'}}" autofocus="true">
+        <input type="text" name="accountName" placeholder="{{i18n 'wallet.newWallet.accountName'}}" autofocus="true" autocomplete="accountName" />
         {{/if}}
         {{#if errMsg}}
             <br>
             <small class="red">
-                <i class="icon-shield"></i> {{ i18n      }}
+                <i class="icon-shield"></i> {{ i18n errMsg }}
             </small>
         {{/if}}
-        <input type="password" name="password" value="{{password}}" placeholder="{{i18n 'wallet.newWallet.password'}}" autofocus="true">
-        <input type="password" name="rePassword" value="{{rePassword}}" placeholder="{{i18n 'wallet.newWallet.rePassword'}}" autofocus="true">
+        <input type="password" name="password" placeholder="{{i18n 'wallet.newWallet.password'}}" autofocus="true" autocomplete="password"  />
+        <input type="password" name="rePassword" placeholder="{{i18n 'wallet.newWallet.rePassword'}}" autofocus="true" autocomplete="rePassword" />
 
         <h2>{{i18n 'wallet.newWallet.accountType.title'}}</h2>
         
         <div class="row clear">
             <label>
-                <input type="radio" name="accountType" value="simple" {{simpleCheck}}>
+                <input type="radio" name="accountType" value="simple" {{simpleCheck}} />
                 <h3>{{i18n 'wallet.newWallet.accountType.simple.title'}}</h3>
                 <span>{{i18n 'wallet.newWallet.accountType.simple.description'}}</span>
             </label>
@@ -33,14 +33,14 @@
 
         <div class="row clear">
             <label>
-                <input type="radio" name="accountType" value="import">
+                <input type="radio" name="accountType" value="import" />
                 <h3>{{i18n 'wallet.newWallet.accountType.import.title'}}</h3>
                 <span>{{i18n 'wallet.newWallet.accountType.import.description'}}</span>
             </label>
             {{#if showSection "import"}}
                 <div class="indented-box">
                     <br>
-                    {{> dapp_addressInput placeholder=i18nWalletAddress class="import"}}
+                    {{> dapp_addressInput name="privateKey" placeholder=i18nPrivateKey class="import"}}
                     <p class="{{importValidClass}}">{{{importInfo}}}</p>
                 </div>
             {{/if}}

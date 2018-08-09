@@ -254,6 +254,7 @@
           "title": "Import wallet",
           "description": "Import an existing (multisignature) wallet.",
           "walletAddress": "Wallet address",
+          "privateKey": "Private Key",
           "youreOwner":
             "Your \"__account__\" account is an owner of this wallet contract.",
           "watchOnly":

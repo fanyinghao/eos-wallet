@@ -219,7 +219,8 @@
                 "import": {
                     "title": "导入账户",
                     "description": "导入已有的账户。",
-                    "walletAddress": "账户私钥",
+                    "walletAddress": "账户公钥",
+                    "privateKey": "账户私钥",
                     "youreOwner": "您的 \"__account__\" 账户是此钱包合约的所有者。",
                     "watchOnly": "您并未拥有此账号，不过您可以将之加入为\"仅观察\"的账户。",
                     "notWallet": "此地址并未拥有钱包合约。"

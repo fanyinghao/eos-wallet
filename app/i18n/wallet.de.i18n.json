@@ -210,6 +210,7 @@
                     "title": "Wallet importieren",
                     "description": "Ein existierendes (Multisignatur-) Wallet importieren.",
                     "walletAddress": "Walletadresse",
+                    "privateKey": "Private Key",
                     "youreOwner": "Ihr \"__account__\" Konto ist Eigentümer von diesem Wallet-Vertrag.",
                     "watchOnly": "Sie sind nicht Eigentümer von diesem Konto, aber Sie können das Konto \"WATCH ONLY\" hinzufügen.",
                     "notWallet": "Diese Adresse hat keinen Wallet-Vertrag."
