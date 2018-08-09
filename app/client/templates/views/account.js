@@ -423,7 +423,7 @@ Template['views_account'].events({
       }
     },
     {
-      class: 'modal-media'
+      class: 'modal-medium'
     });
   },
 

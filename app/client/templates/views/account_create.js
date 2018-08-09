@@ -327,7 +327,7 @@ Template['views_account_create'].events({
               keys: keys
             }
           }, {
-            class: 'modal-media'
+            class: 'modal-medium'
           });
         })
       })
