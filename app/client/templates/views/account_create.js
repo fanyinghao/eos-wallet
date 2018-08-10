@@ -1,3 +1,5 @@
+let {Keygen} = require('eosjs-keygen')
+const ecc = require('eosjs-ecc')
 /**
 Template Controllers
 
@@ -317,7 +319,7 @@ Template['views_account_create'].events({
       eos.getAccount(accountName).then(account => {
         TemplateVar.set(template, 'errMsg', "error.existsAccount");
       }, err => {
-        kos.Keygen.generateMasterKeys().then(keys => {
+        Keygen.generateMasterKeys().then(keys => {
           // create blockchain account called 'myaccount'
 
           EthElements.Modal.show({
@@ -378,7 +380,7 @@ Template['views_account_create'].events({
 
       let password = template.find('input[name="password"]').value;
       let privateKey = template.find('input[name="privateKey"]').value;
-      let publicKey = kos.Keygen.privateToPublic(privateKey)
+      let publicKey = ecc.privateToPublic(privateKey)
 
       eos.getKeyAccounts(publicKey).then(accounts => {
         EthElements.Modal.show({
