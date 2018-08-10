@@ -1,5 +1,5 @@
-let {Keygen} = require('eosjs-keygen')
 const ecc = require('eosjs-ecc')
+const SecureStorage = require('./../../lib/helpers/eosjs-SecureStorage/secureStorage')
 /**
 Template Controllers
 
@@ -319,14 +319,19 @@ Template['views_account_create'].events({
       eos.getAccount(accountName).then(account => {
         TemplateVar.set(template, 'errMsg', "error.existsAccount");
       }, err => {
-        Keygen.generateMasterKeys().then(keys => {
-          // create blockchain account called 'myaccount'
+        ecc.randomKey().then(privateKey => {
+          // storage private key
+          const storage = new SecureStorage.default({id:'EOS_ACCOUNT'})
+          storage.set(accountName, privateKey, password)
 
           EthElements.Modal.show({
             template: 'generateKey',
             data: {
               accountName: accountName,
-              keys: keys
+              keys: {
+                publicKey: ecc.privateToPublic(privateKey),
+                privateKey
+              }
             }
           }, {
             class: 'modal-medium'

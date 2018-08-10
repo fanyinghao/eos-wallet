@@ -10,10 +10,10 @@ Template["generateKey"].onRendered(function() {
     this.find('input[name="accountName"]').value = this.data.accountName;
     this.find(
       'input[name="publicKey"]'
-    ).value = this.data.keys.publicKeys.owner;
+    ).value = this.data.keys.publicKey;
     this.find(
       'input[name="privateKey"]'
-    ).value = this.data.keys.privateKeys.owner;
+    ).value = this.data.keys.privateKey;
   }
 });
 
