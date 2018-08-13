@@ -99,6 +99,25 @@ var addLogWatching = function(newDocument) {
   return subscription;
 };
 
+Template.views_account.onRendered(function() {
+  let self = this
+  let name = FlowRouter.getParam('name')
+  TemplateVar.set(self, 'account_name', name)
+  eos.getAccount(name).then(account => {
+    account.creating = false;
+    account.publicKey = ''
+    TemplateVar.set(self, 'account', account)
+  }, err => {
+    FlowRouter.go('/notfound');
+  })
+  eos.getCurrencyBalance('eosio.token', name).then(res => {
+    console.log(res)
+      TemplateVar.set(self, 'balance', res);
+    }, err => {
+    console.log(err)
+  })
+})
+
 Template['views_account'].onRendered(function() {
   console.timeEnd('renderAccountPage');
 });
@@ -119,7 +138,7 @@ Template['views_account'].helpers({
     @method (account)
     */
   account: function() {
-    return Helpers.getAccountByAddress(FlowRouter.getParam('address'));
+    return TemplateVar.get('account');
   },
   /**
     Get the current jsonInterface, or use the wallet jsonInterface
@@ -199,6 +218,9 @@ Template['views_account'].helpers({
     @method (formattedTokenBalance)
     */
   formattedTokenBalance: function(e) {
+    var balance = TemplateVar.get('balance');
+    return balance;
+
     var account = Template.parentData(2);
 
     return this.balances && Number(this.balances[account._id]) > 0
@@ -323,58 +345,6 @@ Template['views_account'].events({
       },
       cancel: true
     });
-  },
-  /**
-    Clicking the name, will make it editable
-
-    @event click .edit-name
-    */
-  'click .edit-name': function(e) {
-    // make it editable
-    $(e.currentTarget).attr('contenteditable', 'true');
-  },
-  /**
-    Prevent enter
-
-    @event keypress .edit-name
-    */
-  'keypress .edit-name': function(e) {
-    if (e.keyCode === 13) e.preventDefault();
-  },
-  /**
-    Bluring the name, will save it
-
-    @event blur .edit-name, keyup .edit-name
-    */
-  'blur .edit-name, keyup .edit-name': function(e) {
-    if (!e.keyCode || e.keyCode === 13) {
-      var $el = $(e.currentTarget);
-      var text = $el.text();
-
-      if (_.isEmpty(text)) {
-        text = TAPi18n.__('wallet.accounts.defaultName');
-      }
-
-      // Save new name
-      Wallets.update(this._id, {
-        $set: {
-          name: text
-        }
-      });
-      EthAccounts.update(this._id, {
-        $set: {
-          name: text
-        }
-      });
-      CustomContracts.update(this._id, {
-        $set: {
-          name: text
-        }
-      });
-
-      // make it non-editable
-      $el.attr('contenteditable', null);
-    }
   },
   /**
     Click to copy the code to the clipboard

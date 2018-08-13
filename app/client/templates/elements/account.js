@@ -11,37 +11,40 @@ The account template
 @constructor
 */
 
-/**
-Block required until a transaction is confirmed.
+Template.elements_account.created = function() {
+  let self = this
+  let name = this.data.name
+  TemplateVar.set(self, 'account_name', name)
+  eos.getAccount(name).then(account => {
+    account.creating = false;
+    account.publicKey = this.data.publicKey;
+    TemplateVar.set(self, 'account', account)
+  }, err => {
+    //
+    TemplateVar.set(self, 'account', {creating: true, account_name: name, publicKey: self.data.publicKey})
+  })
+  eos.getCurrencyBalance('eosio.token', name).then(res => {
+    console.log(res)
+      TemplateVar.set(self, 'balance', res);
+    }, err => {
+    console.log(err)
+  })
+};
 
-@property blocksForConfirmation
-@type Number
-*/
-var blocksForConfirmation = 12;
-
-Template['elements_account'].rendered = function() {
+Template.elements_account.rendered = function() {
   // initiate the geo pattern
-  var pattern = GeoPattern.generate(this.data.address);
+  var pattern = GeoPattern.generate(this.data.name);
   this.$('.account-pattern').css('background-image', pattern.toDataUrl());
 };
 
-Template['elements_account'].helpers({
+Template.elements_account.helpers({
   /**
     Get the current account
 
     @method (account)
     */
   account: function() {
-    console.log(this)
-
-    let account = eos.getAccount(this.name)
-    console.log(account)
-
-    eos.getAccount(this.name).then(account => {
-      TemplateVar.set(template, 'errMsg', "error.existsAccount");
-    }, err => {
-      
-    })
+    let account = TemplateVar.get('account')
     return account;
   },
   /**
@@ -60,24 +63,20 @@ Template['elements_account'].helpers({
     @method (formattedTokenBalance)
     */
   formattedTokenBalance: function(e) {
-    var account = Template.parentData(2);
 
-    return this.balances && Number(this.balances[account._id]) > 0
-      ? Helpers.formatNumberByDecimals(
-          this.balances[account._id],
-          this.decimals
-        ) +
-          ' ' +
-          this.symbol
-      : false;
-  },
-  /**
-    Get the name
+    var balance = TemplateVar.get('balance');
+    return balance;
 
-    @method (name)
-    */
-  name: function() {
-    return this.name || TAPi18n.__('wallet.accounts.defaultName');
+    // var account = Template.parentData(2);
+
+    // return this.balances && Number(this.balances[account._id]) > 0
+    //   ? Helpers.formatNumberByDecimals(
+    //       this.balances[account._id],
+    //       this.decimals
+    //     ) +
+    //       ' ' +
+    //       this.symbol
+    //   : false;
   },
   /**
     Account was just added. Return true and remove the "new" field.
@@ -98,51 +97,11 @@ Template['elements_account'].helpers({
     }
   },
   /**
-    Should the wallet show disabled
-
-    @method (creating)
-    */
-  creating: function() {
-    var noAddress = !this.address;
-    var isImported = this.imported;
-    var belowReorgThreshold =
-      blocksForConfirmation >=
-      EthBlocks.latest.number - (this.creationBlock - 1);
-    var blockNumberCheck =
-      EthBlocks.latest.number - (this.creationBlock - 1) >= 0;
-
-    return noAddress || isImported || (belowReorgThreshold && blockNumberCheck);
-  },
-  /**
-    Returns the confirmations
-
-    @method (totalConfirmations)
-    */
-  totalConfirmations: blocksForConfirmation,
-  /**
-    Checks whether the transaction is confirmed ot not.
-
-    @method (unConfirmed)
-    */
-  unConfirmed: function() {
-    if (!this.address || !this.creationBlock || this.createdIdentifier)
-      return false;
-
-    var currentBlockNumber = EthBlocks.latest.number,
-      confirmations = currentBlockNumber - (this.creationBlock - 1);
-    return blocksForConfirmation >= confirmations && confirmations >= 0
-      ? {
-          confirmations: confirmations,
-          percent: confirmations / blocksForConfirmation * 100
-        }
-      : false;
-  },
-  /**
     Displays ENS names with triangles
     @method (nameDisplay)
     */
   displayName: function() {
-    return this.name;
+    return this.account_name;
   },
   /**
     Adds class about ens
@@ -153,7 +112,7 @@ Template['elements_account'].helpers({
   }
 });
 
-Template['elements_account'].events({
+Template.elements_account.events({
   /**
     Field test the speed wallet is rendered
 

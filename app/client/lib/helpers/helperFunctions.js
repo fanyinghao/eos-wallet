@@ -812,3 +812,19 @@ Helpers.getENSName = function(address, callback) {
     }
   });
 };
+
+
+/**
+Returns a string, given an account anme
+
+@method getAccountByName
+**/
+Helpers.getAccountByName = function(name) {
+  return new Promise((resolve, reject) => {
+    eos.getAccount(name).then(account => {
+      resolve(account)
+    }, err => {
+      reject(err)
+    })
+  })
+}

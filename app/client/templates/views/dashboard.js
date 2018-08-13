@@ -1,3 +1,6 @@
+// const SecureStorage = require('../../lib/eosjs-SecureStorage/lib')
+// const {SecureStorage} = require('secure-storage-js')
+import {SecureStorage} from '../../lib/eosjs-SecureStorage/lib'
 /**
 Template Controllers
 
@@ -13,34 +16,28 @@ The dashboard template
 
 Template['views_dashboard'].helpers({
   /**
-    Get all current wallets
-
-    @method (wallets)
-    */
-  wallets: function() {
-    var wallets = Wallets.find(
-      { $or: [{ disabled: { $exists: false } }, { disabled: false }] },
-      { sort: { creationBlock: 1 } }
-    ).fetch();
-
-    // sort wallets by balance
-    wallets.sort(Helpers.sortByBalance);
-
-    return wallets;
-  },
-  /**
     Get all current accounts
 
     @method (accounts)
     */
   accounts: function() {
+    const storage = new SecureStorage({id:'EOS_ACCOUNT'})
+    let accounts = []
+    for (var i = 0; i < localStorage.length; i++) {
+      let key = localStorage.key(i);
+      if(key.indexOf('EOS_ACCOUNT') >= 0) {
+        let name = key.substring(12).split('_')[0];
+        let publicKey = key.substring(12).split('_')[1];
+        accounts.push({name: name, publicKey: publicKey});
+      }
+    }
     // balance need to be present, to show only full inserted accounts (not ones added by mist.requestAccount)
-    var accounts = EthAccounts.find(
-      { name: { $exists: true } },
-      { sort: { name: 1 } }
-    ).fetch();
+    // var accounts = EthAccounts.find(
+    //   { name: { $exists: true } },
+    //   { sort: { name: 1 } }
+    // ).fetch();
 
-    accounts.sort(Helpers.sortByBalance);
+    // accounts.sort(Helpers.sortByBalance);
 
     return accounts;
   },
@@ -50,20 +47,12 @@ Template['views_dashboard'].helpers({
     @method (hasAccounts)
     */
   hasAccounts: function() {
-    return EthAccounts.find().count() > 0;
-  },
-  /**
-    Are there any accounts?
-
-    @method (hasAccounts)
-    */
-  hasMinimumBalance: function() {
-    var enoughBalance = false;
-    _.each(_.pluck(EthAccounts.find({}).fetch(), 'balance'), function(bal) {
-      if (new BigNumber(bal, '10').gt(1000000000000000)) enoughBalance = true;
-    });
-
-    return enoughBalance;
+    for (var i = 0; i < localStorage.length; i++) {
+      let key = localStorage.key(i);
+      if(key.indexOf('EOS_ACCOUNT_') >= 0)
+        return true;
+    }
+    return false;
   },
   /**
     Get all transactions

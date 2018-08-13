@@ -158,7 +158,7 @@ The account route.
 
 @method send
 */
-FlowRouter.route('/account/:address', {
+FlowRouter.route('/account/:name', {
   name: 'account',
   action: function(params, queryParams) {
     BlazeLayout.render('layout_main', {

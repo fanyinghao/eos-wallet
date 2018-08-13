@@ -4,41 +4,34 @@
         <div class="dapp-container accounts-page">
 
             <div class="dapp-sticky-bar dapp-container">
+                
+                {{> dapp_identicon identity=account_name}}
+                <h1 class="{{ensClass}}">
+                    <span>{{account_name}}</span>
 
-                {{#with isVulnerable}}
-                    {{#if vulnerabilities.txorigin}}
-                        {{> elements_vulnerabilities_txorigin}}
+                    {{#if $or owners jsonInterface}}
+                        <button class="dapp-icon-button delete icon-trash"></button>
                     {{/if}}
-                {{else}}
-                    {{> dapp_identicon identity=address}}
-                    <h1 class="{{ensClass}}">
-                        <span>{{displayName}}</span>
-
-                        {{#if $or owners jsonInterface}}
-                            <button class="dapp-icon-button delete icon-trash"></button>
-                        {{/if}}
-                    </h1>
-                    {{> elements_balance balance=balance changeUnit=true showAllDecimals=true}}
-                {{/with}}
+                </h1>
+                {{> elements_balance balance=formattedTokenBalance}}
             </div>
 
             <div class="accounts-page-summary">
-                {{> dapp_identicon identity=address}}
+                {{> dapp_identicon identity=account_name}}
                 <header class="{{ensClass}}">
                     <h1>
                         {{#if ens}}
-                        <span>{{displayName}}</span>
+                        <span>{{account_name}}</span>
                         {{else}}
-                        <em class="edit-name">{{displayName}}</em>
-                        <i class="edit-icon icon-pencil"></i>
+                        <em class="edit-name">{{account_name}}</em>
                         {{/if}}
                     </h1>
                     <h2 class="copyable-address">{{walletIcon}}
                         <!-- <input type="text" value="{{toChecksumAddress address}}" readonly class=""> -->
-                        <span>{{toChecksumAddress address}}</span>
+                        <span>{{publicKey}}</span>
                     </h2>
                     <div class="clear"></div>
-                    {{> elements_balance balance=balance changeUnit=true showAllDecimals=true}}
+                    {{> elements_balance balance=formattedTokenBalance}}
                 </header>
 
 
@@ -47,7 +40,7 @@
                         <tbody>
                             {{#each this}}
                                 <tr>
-                                    <td>{{> dapp_identicon identity=address class="dapp-tiny"}}
+                                    <td>{{> dapp_identicon identity=account_name class="dapp-tiny"}}
                                     <strong>{{name}}</strong></td>
                                     <td>{{formattedTokenBalance}}</td>
                                     <td class="send">
@@ -127,22 +120,10 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://eosmonitor.io/account/{{address}}" target="_blank">
+                            <a href="https://eosmonitor.io/account/{{account_name}}" target="_blank">
                                 <i class="icon-info"></i>
                                 {{i18n "wallet.accounts.buttons.viewOnExplorer"}}
                             </a>
-                        </li>
-                        <li>
-                            <button class="copy-to-clipboard-button">
-                                <i class="icon-docs"></i>
-                                {{i18n "wallet.accounts.buttons.copyAddress"}}
-                            </button>
-                        </li>
-                        <li>
-                            <button class="qrcode-button">
-                                <i class="icon-camera"></i>
-                                {{i18n "wallet.accounts.buttons.scanQRCode"}}
-                            </button>
                         </li>
                         <li>
                             <button class="authorize-button">

@@ -321,16 +321,17 @@ Template['views_account_create'].events({
         TemplateVar.set(template, 'errMsg', "error.existsAccount");
       }, err => {
         ecc.randomKey().then(privateKey => {
+          let publicKey = ecc.privateToPublic(privateKey)
           // storage private key
           const storage = new SecureStorage({id:'EOS_ACCOUNT'})
-          storage.set(accountName, privateKey, password)
+          storage.set(`${accountName}_${publicKey}`, privateKey, password)
 
           EthElements.Modal.show({
             template: 'generateKey',
             data: {
               accountName: accountName,
               keys: {
-                publicKey: ecc.privateToPublic(privateKey),
+                publicKey: publicKey,
                 privateKey
               }
             }
@@ -392,7 +393,7 @@ Template['views_account_create'].events({
         accounts.account_names.forEach(name => {
           // storage private key
           const storage = new SecureStorage({id:'EOS_ACCOUNT'})
-          storage.set(name, privateKey, password)
+          storage.set(`${name}_${publicKey}`, privateKey, password)
         });
 
         EthElements.Modal.show({

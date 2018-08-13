@@ -30,7 +30,6 @@ Template['elements_balance'].helpers({
       if (
         EthTools.getUnit() === 'usd' ||
         EthTools.getUnit() === 'eur' ||
-        EthTools.getUnit() === 'gbp' ||
         EthTools.getUnit() === 'brl'
       )
         return EthTools.formatBalance(balance, '0,0.00');
@@ -56,6 +55,8 @@ Template['elements_balance'].helpers({
     var data = this,
       template = Template.instance(),
       newBalance = _.isFinite(this.balance) ? this.balance : '0';
+
+      return data.balance;
 
     // transform to BigNumber
     newBalance = new BigNumber(newBalance, 10);

@@ -17,14 +17,12 @@
         {{#if hasAccounts}}
 
             <h2>{{i18n "wallet.accounts.accountsTitle"}}</h2>
-            <p>
-                {{i18n "wallet.accounts.accountsDescription"}}
-            </p>
+
             <div class="dapp-clear-fix"></div>
 
             <div class="wallet-box-list">
                 {{#each accounts}}
-                    {{> elements_account account=_id}}
+                    {{> elements_account }}
                 {{/each}}
             </div>
 
