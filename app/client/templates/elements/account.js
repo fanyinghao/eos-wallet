@@ -32,11 +32,17 @@ Template['elements_account'].helpers({
     @method (account)
     */
   account: function() {
-    return (
-      EthAccounts.findOne(this.account) ||
-      Wallets.findOne(this.account) ||
-      CustomContracts.findOne(this.account)
-    );
+    console.log(this)
+
+    let account = eos.getAccount(this.name)
+    console.log(account)
+
+    eos.getAccount(this.name).then(account => {
+      TemplateVar.set(template, 'errMsg', "error.existsAccount");
+    }, err => {
+      
+    })
+    return account;
   },
   /**
     Get all tokens
@@ -136,13 +142,7 @@ Template['elements_account'].helpers({
     @method (nameDisplay)
     */
   displayName: function() {
-    return this.ens
-      ? this.name
-          .split('.')
-          .slice(0, -1)
-          .reverse()
-          .join(' ▸ ')
-      : this.name;
+    return this.name;
   },
   /**
     Adds class about ens

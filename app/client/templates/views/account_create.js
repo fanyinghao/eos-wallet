@@ -1,5 +1,6 @@
 const ecc = require('eosjs-ecc')
-const SecureStorage = require('./../../lib/helpers/eosjs-SecureStorage/secureStorage')
+// const SecureStorage = require('secure-storage-js')
+import {SecureStorage} from '../../lib/eosjs-SecureStorage/lib'
 /**
 Template Controllers
 
@@ -321,7 +322,7 @@ Template['views_account_create'].events({
       }, err => {
         ecc.randomKey().then(privateKey => {
           // storage private key
-          const storage = new SecureStorage.default({id:'EOS_ACCOUNT'})
+          const storage = new SecureStorage({id:'EOS_ACCOUNT'})
           storage.set(accountName, privateKey, password)
 
           EthElements.Modal.show({
@@ -388,6 +389,12 @@ Template['views_account_create'].events({
       let publicKey = ecc.privateToPublic(privateKey)
 
       eos.getKeyAccounts(publicKey).then(accounts => {
+        accounts.account_names.forEach(name => {
+          // storage private key
+          const storage = new SecureStorage({id:'EOS_ACCOUNT'})
+          storage.set(name, privateKey, password)
+        });
+
         EthElements.Modal.show({
           template: 'importKey',
           data: {
