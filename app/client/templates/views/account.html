@@ -26,10 +26,19 @@
                         <em class="edit-name">{{account_name}}</em>
                         {{/if}}
                     </h1>
+
+                    {{#each permissions}}
+                    <h1></h1>
                     <h2 class="copyable-address">{{walletIcon}}
                         <!-- <input type="text" value="{{toChecksumAddress address}}" readonly class=""> -->
-                        <span>{{publicKey}}</span>
+                        <b>{{perm_name}}</b>
+                        <br />
+                        {{#each required_auth.keys}}
+                        <span>{{key}}</span>
+                        {{/each}}
                     </h2>
+                    {{/each}}
+
                     <div class="clear"></div>
                     {{> elements_balance balance=formattedTokenBalance}}
                 </header>
@@ -109,7 +118,6 @@
 
             </div>
 
-            {{#unless isVulnerable}}
             <aside class="dapp-actionbar">
                 <nav>
                     <ul>
@@ -134,8 +142,6 @@
                     </ul>
                 </nav>
             </aside>
-            {{/unless}}
-
 
             <div class="accounts-transactions">
 
