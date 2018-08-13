@@ -31,7 +31,7 @@ Template['layout_header'].helpers({
     return address
       ? FlowRouter.path('sendFrom', { from: address })
       : FlowRouter.path('sendFrom', {
-          from: accounts[0] ? accounts[0].address : null
+          from: accounts[0] ? accounts[0].address : 'xx'
         });
   },
   /**
