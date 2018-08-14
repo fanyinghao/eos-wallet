@@ -77,7 +77,7 @@
             "walletsTitle": "钱包合约",
             "accountsTitle": "账户",
             "defaultName": "未命名",
-            "creating": "创建",
+            "creating": "待转账",
             "importing": "导入",
             "accountNote": "账户没法显示正在进行的交易，但是可以显示余额和送出去的以太币。要看进账的交易，创建 <a href=\"/account/new\">钱包合约</a> 來存储以太币。",
             "walletNote": "大多数交易尚未支持从从合约钱包接受以太币。请务必先把钱转移到一个账户地址！",
@@ -93,9 +93,9 @@
             "accountsDescription": "账户由密码保护，可以存储以太币，保障基于以太坊的代币或货币，也能够控制合约。账户无法显示进账中的交易。",
             "accountsDescription": "Accounts are password protected keys that can hold ether, secure ethereum-based tokens or coins and control contracts. Accounts can't display incoming transactions.",
             "buttons": {
-                "deposit": "存入以太币",
+                "deposit": "存入EOS",
                 "buyEther": "使用比特币做存款",
-                "viewOnExplorer": "View on Etherscan",
+                "viewOnExplorer": "EOS Monitor",
                 "copyAddress": "复制地址",
                 "scanQRCode": "显示二维码",
                 "authorize": "授权多签",
@@ -195,15 +195,18 @@
         "newWallet": {
             "title": "<strong>新增账户</strong>",
             "accountName": "账户名称（必须12位，数字或者字母）",
-            "password": "账户密码",
-            "rePassword": "重复账户密码",
+            "password": {
+              "title": "请记住你的密码",
+              "newPassword": "输入密码",
+              "rePassword": "再输一遍"
+            },
             "selectOwner": "选择拥有者",
             "accountType": {
                 "title": "账户类型",
                 "simple": {
                     "title": "单一拥有者账户",
-                    "description": "一个属于单一拥有者的简单账户。",
-                    "warning": ""
+                    "description": "创建一个属于单一拥有者的简单账户",
+                    "warning": "接下来需要用另一账号协助转账创建"
                 },
                 "multisig": {
                     "title": "多重签名的钱包合约",
@@ -242,6 +245,7 @@
             "from": "从",
             "amount": "数量",
             "tokenAmount": "代币数量",
+            "memo": "附言",
             "sendFunds": "发送资金",
             "deployContract": "发布合约",
             "data": "数据",
@@ -263,7 +267,7 @@
             },
             "texts": {
                 "ownerPaysGas": "瓦斯由钱包合约所有人支付、。",
-                "sendAmount": "您将发送 <strong>__amount__</strong>.",
+                "sendAmount": "您将发送 <strong>__amount__ __symbol__</strong>.",
                 "sendAmountEquivalent": "您将发送 <strong>__amount__</strong> 等值的 以太币,汇率参照 <a href=\"https://www.cryptocompare.com/coins/eth/overview/BTC\" target=\"_blank\">cryptocompare.com</a>.<br>目前等值于 <strong>__etherAmount__</strong>.",
                 "sendToken": "您将发送 <strong>__amount__ __symbol__</strong> 的 <strong> __name__</strong>.",
                 "overDailyLimit": "<p class=\"over-daily\">发送数量将超过今日剩余限额 __limit__ (每日限额总计 __total__)，您需要 __count__ 个其他账户确认。</p>",
