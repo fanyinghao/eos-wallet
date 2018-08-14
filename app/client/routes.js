@@ -95,6 +95,21 @@ The send route.
 
 @method send
 */
+FlowRouter.route('/send-from/', {
+  name: 'sendFrom',
+  action: function(params, queryParams) {
+    BlazeLayout.render('layout_main', {
+      header: 'layout_header',
+      main: 'views_send'
+    });
+  }
+});
+
+/**
+The send route.
+
+@method send
+*/
 FlowRouter.route('/send-from/:from', {
   name: 'sendFrom',
   action: function(params, queryParams) {
