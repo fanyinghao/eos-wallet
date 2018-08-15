@@ -32,11 +32,7 @@ var translateExternalErrorMessage = function(message) {
   // 'setTxStatusRejected' occurs in the stack trace of the error message triggered when
   // the user has rejects a transaction in MetaMask. Show a localised error message
   // instead of the stack trace.
-  if (message.indexOf("setTxStatusRejected") !== -1) {
-    return TAPi18n.__("wallet.send.error.rejectedInMetamask");
-  } else {
-    return message;
-  }
+  return `[${message.code}] - ${message.name} - ${message.what}`
 };
 
 // Set basic variables
@@ -470,6 +466,12 @@ Template["views_send"].events({
           duration: 2
         });
 
+      if (!password || password.length === 0)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.accounts.wrongPassword",
+          duration: 2
+        });
+
       amount =
         amount > 0
           ? `${parseFloat(amount).toFixed(4)} EOS`
@@ -477,7 +479,6 @@ Template["views_send"].events({
 
       // The function to send the transaction
       var sendTransaction = function() {
-        debugger
         // show loading
         TemplateVar.set(template, "sending", true);
 
@@ -490,7 +491,7 @@ Template["views_send"].events({
             signProvider: provider,
             verbose: false
           });
-          _eos.transfer(selectedAccount.name, to, amount, memo, true).then(
+          _eos.transfer(selectedAccount.name, to, amount, memo || "transfer", true).then(
             tr => {
               assert.equal(tr.transaction.signatures.length, 1);
               assert.equal(typeof tr.transaction.signatures[0], "string");
@@ -503,13 +504,12 @@ Template["views_send"].events({
               });
             },
             err => {
-              console.log(err);
               TemplateVar.set(template, "sending", false);
 
               EthElements.Modal.hide();
               GlobalNotification.error({
-                content: translateExternalErrorMessage(err.message),
-                duration: 8
+                content: translateExternalErrorMessage(JSON.parse(err).error),
+                duration: 20
               });
               return;
             }
@@ -517,7 +517,7 @@ Template["views_send"].events({
         } catch (e) {
           console.log(e);
           TemplateVar.set(template, "sending", false);
-          if (e.message === 'wrong password') {
+          if (e.message === "wrong password" || e.message === "gcm: tag doesn't match") {
             GlobalNotification.warning({
               content: "i18n:wallet.accounts.wrongPassword",
               duration: 2
