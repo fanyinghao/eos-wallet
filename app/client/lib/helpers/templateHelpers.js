@@ -132,6 +132,8 @@ Returns a list of accounts and wallets sorted by balance
 @method (latestBlock)
 **/
 Template.registerHelper('selectAccounts', function() {
+  if(Object.keys(ObservableAccounts.accounts).length === 0)
+    FlowRouter.go("dashboard");
   return Object.values(ObservableAccounts.accounts);
 });
 
