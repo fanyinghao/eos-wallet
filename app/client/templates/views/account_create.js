@@ -1,6 +1,5 @@
-const ecc = require('eosjs-ecc')
-// const SecureStorage = require('secure-storage-js')
-import {SecureStorage} from '../../lib/eosjs-SecureStorage/lib'
+const ecc = require("eosjs-ecc");
+const keystore = require("../../lib/eos/keystore");
 /**
 Template Controllers
 
@@ -14,44 +13,44 @@ The account create template
 @constructor
 */
 
-Template['views_account_create'].onCreated(function () {
+Template["views_account_create"].onCreated(function() {
   TemplateVar.set(
-    'selectedSection',
-    Number(FlowRouter.getQueryParam('ownersNum')) > 0 ? 'multisig' : 'simple'
+    "selectedSection",
+    Number(FlowRouter.getQueryParam("ownersNum")) > 0 ? "multisig" : "simple"
   );
 
   // number of owners of the account
-  var walletId = FlowRouter.getQueryParam('walletId');
-  var maxOwners = FlowRouter.getQueryParam('ownersNum');
+  var walletId = FlowRouter.getQueryParam("walletId");
+  var maxOwners = FlowRouter.getQueryParam("ownersNum");
   if (maxOwners && Helpers.isWatchOnly(walletId)) maxOwners++;
-  TemplateVar.set('multisigSignees', maxOwners || 3);
+  TemplateVar.set("multisigSignees", maxOwners || 3);
 
   // number of required signatures
   TemplateVar.set(
-    'multisigSignatures',
-    Number(FlowRouter.getQueryParam('requiredSignatures')) || 2
+    "multisigSignatures",
+    Number(FlowRouter.getQueryParam("requiredSignatures")) || 2
   );
 
   // check if we are still on the correct chain
-  Helpers.checkChain(function (error) {
+  Helpers.checkChain(function(error) {
     if (error && EthAccounts.find().count() > 0) {
       checkForOriginalWallet();
     }
   });
 });
 
-Template['views_account_create'].onRendered(function () {
+Template["views_account_create"].onRendered(function() {
   // focus the input
   this.$('input[name="accountName"]').focus();
 });
 
-Template['views_account_create'].helpers({
+Template["views_account_create"].helpers({
   /**
     Get all accounts, which can become owners.
 
     @method (ownerAccounts)
     */
-  ownerAccounts: function () {
+  ownerAccounts: function() {
     var accounts = EthAccounts.find({}, { sort: { balance: -1 } }).fetch();
     accounts.sort(Helpers.sortByBalance);
     return accounts;
@@ -61,36 +60,36 @@ Template['views_account_create'].helpers({
 
     @method (selectedOwner)
     */
-  selectedOwner: function () {
-    return TemplateVar.getFrom('.dapp-select-account', 'value');
+  selectedOwner: function() {
+    return TemplateVar.getFrom(".dapp-select-account", "value");
   },
   /**
     Return TRUE, if the current section is selected
 
     @method (showSection)
     */
-  showSection: function (section) {
+  showSection: function(section) {
     // reset import wallet
-    TemplateVar.set('importWalletOwners', false);
-    TemplateVar.set('importWalletInfo', '');
+    TemplateVar.set("importWalletOwners", false);
+    TemplateVar.set("importWalletInfo", "");
 
-    return TemplateVar.get('selectedSection') === section;
+    return TemplateVar.get("selectedSection") === section;
   },
   /**
     Pick a default owner for the wallet
     @method (defaultOwner)
     @return (string)
     */
-  defaultOwner: function () {
+  defaultOwner: function() {
     // Load the accounts owned by user and sort by balance
     var accounts = EthAccounts.find({}, { sort: { balance: -1 } }).fetch();
     accounts.sort(Helpers.sortByBalance);
 
-    if (FlowRouter.getQueryParam('owners')) {
-      var owners = FlowRouter.getQueryParam('owners').split(',');
+    if (FlowRouter.getQueryParam("owners")) {
+      var owners = FlowRouter.getQueryParam("owners").split(",");
 
       // Looks for them among the wallet account owner
-      var defaultAccount = _.find(accounts, function (acc) {
+      var defaultAccount = _.find(accounts, function(acc) {
         return owners.indexOf(acc.address) >= 0;
       });
 
@@ -105,27 +104,27 @@ Template['views_account_create'].helpers({
     @method (signees)
     @return {Array} e.g. [1,2,3,4]
     */
-  signees: function () {
+  signees: function() {
     var owners = [];
 
-    if (FlowRouter.getQueryParam('owners')) {
-      owners = FlowRouter.getQueryParam('owners')
-        .split(',')
-        .slice(0, TemplateVar.get('multisigSignees'));
+    if (FlowRouter.getQueryParam("owners")) {
+      owners = FlowRouter.getQueryParam("owners")
+        .split(",")
+        .slice(0, TemplateVar.get("multisigSignees"));
       owners = _.without(
         owners,
-        TemplateVar.getFrom('.dapp-select-account', 'value')
+        TemplateVar.getFrom(".dapp-select-account", "value")
       );
     }
 
     owners = owners.concat(
-      _.range(TemplateVar.get('multisigSignees') - 1 - owners.length)
+      _.range(TemplateVar.get("multisigSignees") - 1 - owners.length)
     );
 
     if (
-      TemplateVar.get('multisigSignatures') > TemplateVar.get('multisigSignees')
+      TemplateVar.get("multisigSignatures") > TemplateVar.get("multisigSignees")
     ) {
-      TemplateVar.set('multisigSignatures', TemplateVar.get('multisigSignees'));
+      TemplateVar.set("multisigSignatures", TemplateVar.get("multisigSignees"));
     }
 
     return owners;
@@ -135,28 +134,28 @@ Template['views_account_create'].helpers({
 
     @method (i18nOwnerAddress)
     */
-  i18nOwnerAddress: function () {
-    return TAPi18n.__('wallet.newWallet.accountType.multisig.ownerAddress');
+  i18nOwnerAddress: function() {
+    return TAPi18n.__("wallet.newWallet.accountType.multisig.ownerAddress");
   },
   /**
     Translates to 'private key'
 
     @method (i18nPrivateKey)
     */
-  i18nPrivateKey: function () {
-    return TAPi18n.__('wallet.newWallet.accountType.import.privateKey');
+  i18nPrivateKey: function() {
+    return TAPi18n.__("wallet.newWallet.accountType.import.privateKey");
   },
   /**
     Returns the import info text.
 
     @method (importInfo)
     */
-  importInfo: function () {
-    var text = TemplateVar.get('importWalletInfo'),
-      owners = TemplateVar.get('importWalletOwners');
+  importInfo: function() {
+    var text = TemplateVar.get("importWalletInfo"),
+      owners = TemplateVar.get("importWalletOwners");
 
     if (!text) {
-      return '';
+      return "";
     } else {
       if (owners) return '<i class="icon-check"></i> ' + text;
       else return '<i class="icon-close"></i> ' + text;
@@ -167,17 +166,17 @@ Template['views_account_create'].helpers({
 
     @method (importValidClass)
     */
-  importValidClass: function () {
-    return TemplateVar.get('importWalletOwners') ? 'valid' : 'invalid';
+  importValidClass: function() {
+    return TemplateVar.get("importWalletOwners") ? "valid" : "invalid";
   },
   /**
     Get the number of required multisignees (account owners)
 
     @method (multisigSignees)
     */
-  multisigSignees: function () {
-    var id = FlowRouter.getQueryParam('walletId');
-    var maxOwners = FlowRouter.getQueryParam('ownersNum');
+  multisigSignees: function() {
+    var id = FlowRouter.getQueryParam("walletId");
+    var maxOwners = FlowRouter.getQueryParam("ownersNum");
     if (maxOwners && Helpers.isWatchOnly(id)) maxOwners++;
     maxOwners = Math.max(maxOwners || 7, 7);
 
@@ -192,8 +191,8 @@ Template['views_account_create'].helpers({
 
     @method (multisigSignatures)
     */
-  multisigSignatures: function () {
-    var signees = TemplateVar.get('multisigSignees');
+  multisigSignatures: function() {
+    var signees = TemplateVar.get("multisigSignees");
     var returnArray = [];
 
     for (i = 2; i <= signees; i++) {
@@ -207,26 +206,26 @@ Template['views_account_create'].helpers({
 
     @method (simpleCheck)
     */
-  simpleCheck: function () {
-    return TemplateVar.get('selectedSection') === 'simple' ? 'checked' : '';
+  simpleCheck: function() {
+    return TemplateVar.get("selectedSection") === "simple" ? "checked" : "";
   },
   /**
     Is multisig checked
 
     @method (multisigCheck)
     */
-  multisigCheck: function () {
-    return TemplateVar.get('selectedSection') === 'multisig' ? 'checked' : '';
+  multisigCheck: function() {
+    return TemplateVar.get("selectedSection") === "multisig" ? "checked" : "";
   },
   /**
     Default dailyLimit
 
     @method (defaultDailyLimit)
     */
-  defaultDailyLimit: function () {
-    var dailyLimit = FlowRouter.getQueryParam('dailyLimit');
-    return typeof dailyLimit != 'undefined'
-      ? web3.utils.fromWei(dailyLimit.toString(), 'eos')
+  defaultDailyLimit: function() {
+    var dailyLimit = FlowRouter.getQueryParam("dailyLimit");
+    return typeof dailyLimit != "undefined"
+      ? web3.utils.fromWei(dailyLimit.toString(), "eos")
       : 10;
   },
   /**
@@ -234,29 +233,29 @@ Template['views_account_create'].helpers({
 
     @method (name)
     */
-  name: function () {
-    return FlowRouter.getQueryParam('name');
+  name: function() {
+    return FlowRouter.getQueryParam("name");
   },
 
-  errMsg: function () {
-    return TemplateVar.get('errMsg');
+  errMsg: function() {
+    return TemplateVar.get("errMsg");
   }
 });
 
-Template['views_account_create'].events({
+Template["views_account_create"].events({
   /**
     Check the owner of the imported wallet.
     
     @event change input.import, input input.import
     */
-  'change input.import, input input.import': function (e, template) {
+  "change input.import, input input.import": function(e, template) {
     checkWalletOwners(e.currentTarget.value).then(
-      function (wallet) {
-        TemplateVar.set(template, 'importWalletOwners', wallet.owners);
-        TemplateVar.set(template, 'importWalletInfo', wallet.info);
+      function(wallet) {
+        TemplateVar.set(template, "importWalletOwners", wallet.owners);
+        TemplateVar.set(template, "importWalletInfo", wallet.info);
         return null;
       },
-      function () { }
+      function() {}
     );
   },
   /**
@@ -264,32 +263,32 @@ Template['views_account_create'].events({
     
     @event change input.owners, input input.owners
     */
-  'change input.owners, input input.owners': function (e, template) {
-    var address = TemplateVar.getFrom(e.currentTarget, 'value');
+  "change input.owners, input input.owners": function(e, template) {
+    var address = TemplateVar.getFrom(e.currentTarget, "value");
   },
   /**
     Select the current section, based on the radio inputs value.
 
     @event change input[type="radio"]
     */
-  'change input[type="radio"]': function (e) {
-    TemplateVar.set('selectedSection', e.currentTarget.value);
+  'change input[type="radio"]': function(e) {
+    TemplateVar.set("selectedSection", e.currentTarget.value);
   },
   /**
     Change the number of signatures
 
     @event click span[name="multisigSignatures"] .simple-modal button
     */
-  'click span[name="multisigSignatures"] .simple-modal button': function (e) {
-    TemplateVar.set('multisigSignatures', $(e.currentTarget).data('value'));
+  'click span[name="multisigSignatures"] .simple-modal button': function(e) {
+    TemplateVar.set("multisigSignatures", $(e.currentTarget).data("value"));
   },
   /**
     Change the number of signees
 
     @event click span[name="multisigSignees"] .simple-modal button
     */
-  'click span[name="multisigSignees"] .simple-modal button': function (e) {
-    TemplateVar.set('multisigSignees', $(e.currentTarget).data('value'));
+  'click span[name="multisigSignees"] .simple-modal button': function(e) {
+    TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
   },
 
   /**
@@ -297,12 +296,12 @@ Template['views_account_create'].events({
 
     @event submit
     */
-  submit: function (e, template) {
+  submit: function(e, template) {
     var code = walletStubABI; // walletStubABI 184 280 walletABI ~1 842 800
-    var type = TemplateVar.get('selectedSection');
+    var type = TemplateVar.get("selectedSection");
 
     // SIMPLE
-    if (type === 'simple') {
+    if (type === "simple") {
       // Wallets.insert({
       //   deployFrom: null,
       //   owners: [deployFrom],
@@ -317,35 +316,45 @@ Template['views_account_create'].events({
       let accountName = template.find('input[name="accountName"]').value;
       let password = template.find('input[name="password"]').value;
 
-      eos.getAccount(accountName).then(account => {
-        TemplateVar.set(template, 'errMsg', "error.existsAccount");
-      }, err => {
-        ecc.randomKey().then(privateKey => {
-          let publicKey = ecc.privateToPublic(privateKey)
-          // storage private key
-          const storage = new SecureStorage({id:'EOS_ACCOUNT'})
-          storage.set(`${accountName}_${publicKey}`, privateKey, password)
+      eos.getAccount(accountName).then(
+        account => {
+          TemplateVar.set(template, "errMsg", "error.existsAccount");
+        },
+        err => {
+          ecc.randomKey().then(privateKey => {
+            let publicKey = ecc.privateToPublic(privateKey);
+            // storage private key
+            keystore.SetKey(
+              accountName,
+              password,
+              privateKey,
+              publicKey
+            );
 
-          EthElements.Modal.show({
-            template: 'generateKey',
-            data: {
-              accountName: accountName,
-              keys: {
-                publicKey: publicKey,
-                privateKey
+            EthElements.Modal.show(
+              {
+                template: "generateKey",
+                data: {
+                  accountName: accountName,
+                  keys: {
+                    publicKey: publicKey,
+                    privateKey
+                  }
+                }
+              },
+              {
+                class: "modal-medium"
               }
-            }
-          }, {
-            class: 'modal-medium'
+            );
           });
-        })
-      })
+        }
+      );
 
       //FlowRouter.go('dashboard');
     }
 
     // IMPORT
-    if (type === 'import') {
+    if (type === "import") {
       // var owners = _.uniq(
       //   _.compact(
       //     _.map(TemplateVar.get('importWalletOwners'), function (item) {
@@ -387,22 +396,26 @@ Template['views_account_create'].events({
 
       let password = template.find('input[name="password"]').value;
       let privateKey = template.find('input[name="privateKey"]').value;
-      let publicKey = ecc.privateToPublic(privateKey)
+      let publicKey = ecc.privateToPublic(privateKey);
 
       eos.getKeyAccounts(publicKey).then(accounts => {
         accounts.account_names.forEach(name => {
           // storage private key
-          const storage = new SecureStorage({id:'EOS_ACCOUNT'})
-          storage.set(`${name}_${publicKey}`, privateKey, password)
+          keystore.SetKey(
+            name,
+            password,
+            privateKey,
+            publicKey
+          );
         });
 
         EthElements.Modal.show({
-          template: 'importKey',
+          template: "importKey",
           data: {
             accounts: accounts
           }
         });
-      })
+      });
     }
   }
 });
