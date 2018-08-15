@@ -1,3 +1,5 @@
+const keystore = require("../../lib/eos/keystore");
+Eos = require("eosjs");
 /**
 Template Controllers
 
@@ -17,28 +19,6 @@ Get the data field of either the byte or source code textarea, depending on the 
 @method getDataField
 */
 var getDataField = function() {
-  // make reactive to the show/hide of the textarea
-  TemplateVar.getFrom(".compile-contract", "byteTextareaShown");
-
-  // send tokens
-  var selectedToken = TemplateVar.get("selectedToken");
-
-  if (selectedToken && selectedToken !== "ether") {
-    var mainRecipient = TemplateVar.getFrom(
-      "div.dapp-address-input input.to",
-      "value"
-    );
-    var amount = TemplateVar.get("amount") || "0";
-    var token = Tokens.findOne({ address: selectedToken });
-    var tokenInstance = TokenContract;
-    tokenInstance.options.address = selectedToken;
-    var txData = tokenInstance.methods
-      .transfer(mainRecipient, amount)
-      .encodeABI();
-
-    return txData;
-  }
-
   return TemplateVar.getFrom(".compile-contract", "txData");
 };
 
@@ -229,9 +209,12 @@ Template["views_send"].helpers({
     ];
   },
   selectedBalance: function() {
-    return ObservableAccounts.accounts[
-      TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-    ].eosBalance;
+    selectedAccount =
+      ObservableAccounts.accounts[
+        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+      ];
+    if (selectedAccount) return selectedAccount.eosBalance;
+    return 0;
   },
   inputAmount: function() {
     return TemplateVar.get("amount");
@@ -241,30 +224,17 @@ Template["views_send"].helpers({
 
     @method (sendTotal)
     */
-   sendTotal: function() {
+  sendTotal: function() {
     var amount = TemplateVar.get("amount"),
       sendAll = TemplateVar.get("sendAll"),
-      balance = ObservableAccounts.accounts[
+      selectedAccount =
+        ObservableAccounts.accounts[
           TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-        ].eosBalance;
+        ];
 
-    if (sendAll) amount = balance.value;
+    if (sendAll && selectedAccount) amount = selectedAccount.eosBalance.value;
     if (!_.isFinite(amount)) return "0";
 
-    return amount;
-  },
-  /**
-    Returns the total amount - the fee paid to send all ether/coins out of the account
-
-    @method (sendAllAmount)
-    */
-  sendAllAmount: function() {
-    var selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-      ];
-    var amount = (amount = selectedAccount.eosBalance.value || 0);
-    TemplateVar.set("amount", amount);
     return amount;
   },
   /**
@@ -368,7 +338,13 @@ Template["views_send"].events({
     */
   "change input.send-all": function(e) {
     TemplateVar.set("sendAll", $(e.currentTarget)[0].checked);
-    TemplateVar.set("amount", 0);
+    selectedAccount =
+      ObservableAccounts.accounts[
+        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+      ];
+
+    if (selectedAccount)
+      TemplateVar.set("amount", selectedAccount.eosBalance.value);
   },
   /**
     Select a token
@@ -405,7 +381,47 @@ Template["views_send"].events({
     e,
     template
   ) {
-    TemplateVar.set("amount", e.currentTarget.value.replace(",", "") || "0");
+    let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, "");
+    if (amount.indexOf(".") == 0) amount = "0" + amount;
+    if (amount.indexOf(".") >= 0)
+      amount = amount.substring(0, amount.indexOf(".") + 5);
+    e.currentTarget.value = amount;
+    TemplateVar.set("amount", amount.replace(",", "") || "0");
+  },
+  /**
+    Set the amount while typing
+
+    @event keyup keyup textarea[name="memo"], change textarea[name="memo"], input textarea[name="memo"]
+    */
+  'keyup textarea[name="memo"], change textarea[name="memo"], input textarea[name="memo"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("memo", e.currentTarget.value);
+  },
+  /**
+    Set the amount while typing
+
+    @event keyup keyup input[name="to"], change input[name="to"], input input[name="to"]
+    */
+  'keyup input[name="to"], change input[name="to"], input input[name="to"]': function(
+    e,
+    template
+  ) {
+    if (e.currentTarget.value.length > 12)
+      e.currentTarget.value = e.currentTarget.value.substring(0, 12);
+    TemplateVar.set("to", e.currentTarget.value);
+  },
+    /**
+    Set the password
+
+    @event keyup keyup input[name="password"], change input[name="password"], input input[name="password"]
+    */
+   'keyup input[name="password"], change input[name="password"], input input[name="password"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("password", e.currentTarget.value);
   },
   /**
     Submit the form and send the transaction!
@@ -414,226 +430,118 @@ Template["views_send"].events({
     */
   "submit form": function(e, template) {
     var amount = TemplateVar.get("amount") || "0",
-      tokenAddress = TemplateVar.get("selectedToken"),
-      to = TemplateVar.getFrom(".dapp-address-input .to", "value"),
+      to = TemplateVar.get("to"),
       selectedAccount =
         ObservableAccounts.accounts[
           TemplateVar.getFrom(".dapp-select-account.send-from", "value")
         ],
-      selectedAction = TemplateVar.get("selectedAction"),
-      data = getDataField(),
-      contract = TemplateVar.getFrom(".compile-contract", "contract"),
+      memo = TemplateVar.get("memo"),
+      password = TemplateVar.get("password"),
       sendAll = TemplateVar.get("sendAll");
-
+    
     if (selectedAccount && !TemplateVar.get("sending")) {
-      // set gas down to 21 000, if its invalid data, to prevent high gas usage.
-
-      // if its a wallet contract and tokens, don't need to remove the gas addition on send-all, as the owner pays
-      if (sendAll && (selectedAccount.owners || tokenAddress !== "ether"))
-        sendAll = false;
-
-      if (TemplateVar.get("selectedAction") === "deploy-contract" && !data)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.contracts.error.noDataProvided",
-          duration: 2
-        });
-
-      if (
-        selectedAccount.eosBalance === "0" &&
-        (!selectedAccount.owners || tokenAddress === "ether")
-      )
+      if (selectedAccount.eosBalance === "0")
         return GlobalNotification.warning({
           content: "i18n:wallet.send.error.emptyWallet",
           duration: 2
         });
 
-      if (!web3.utils.isAddress(to) && !data)
+      if (!to)
         return GlobalNotification.warning({
           content: "i18n:wallet.send.error.noReceiver",
           duration: 2
         });
 
-      if (tokenAddress === "ether") {
-        if (
-          (_.isEmpty(amount) || amount === "0" || !_.isFinite(amount)) &&
-          !data
+      if (sendAll) amount = selectedAccount.eosBalance.value;
+
+      if (_.isEmpty(amount) || amount === "0" || !_.isFinite(amount))
+        return GlobalNotification.warning({
+          content: "i18n:wallet.send.error.noAmount",
+          duration: 2
+        });
+
+      if (
+        new BigNumber(amount, 10).gt(
+          new BigNumber(selectedAccount.eosBalance.value, 10)
         )
-          return GlobalNotification.warning({
-            content: "i18n:wallet.send.error.noAmount",
-            duration: 2
-          });
+      )
+        return GlobalNotification.warning({
+          content: "i18n:wallet.send.error.notEnoughFunds",
+          duration: 2
+        });
 
-        if (
-          new BigNumber(amount, 10).gt(
-            new BigNumber(selectedAccount.balance, 10)
-          )
-        )
-          return GlobalNotification.warning({
-            content: "i18n:wallet.send.error.notEnoughFunds",
-            duration: 2
-          });
-      } else {
-        // Token transfer
-        if (!to) {
-          return GlobalNotification.warning({
-            content: "i18n:wallet.send.error.noReceiver",
-            duration: 2
-          });
-        }
-
-        // Change recipient and amount
-        to = tokenAddress;
-        amount = 0;
-
-        var token = Tokens.findOne({ address: tokenAddress }),
-          tokenBalance = token.balances[selectedAccount._id] || "0";
-
-        if (new BigNumber(amount, 10).gt(new BigNumber(tokenBalance, 10)))
-          return GlobalNotification.warning({
-            content: "i18n:wallet.send.error.notEnoughFunds",
-            duration: 2
-          });
-      }
+      amount =
+        amount > 0
+          ? `${parseFloat(amount).toFixed(4)} EOS`
+          : `${parseFloat(0).toFixed(4)} EOS`;
 
       // The function to send the transaction
       var sendTransaction = function() {
+        debugger
         // show loading
         TemplateVar.set(template, "sending", true);
 
-        // CONTRACT TX
-        if (contracts["ct_" + selectedAccount._id]) {
-          contracts["ct_" + selectedAccount._id].methods
-            .execute(to || "", amount || "", data || "0x00")
-            .send(
-              {
-                from: Helpers.getOwnedAccountFrom(selectedAccount.owners)
-              },
-              function(error, txHash) {
-                TemplateVar.set(template, "sending", false);
+        try {
+          let provider = keystore.SignProvider(selectedAccount.name, password);
+          // let _eos = Object.assign(eos, { keyProvider: provider });
+          const _eos = Eos({
+            httpEndpoint: httpEndpoint,
+            chainId: chain.testnet,
+            signProvider: provider,
+            verbose: false
+          });
+          _eos.transfer(selectedAccount.name, to, amount, memo, true).then(
+            tr => {
+              assert.equal(tr.transaction.signatures.length, 1);
+              assert.equal(typeof tr.transaction.signatures[0], "string");
+              console.log(tr);
+              TemplateVar.set(template, "sending", false);
+              FlowRouter.go("dashboard");
+              GlobalNotification.success({
+                content: "i18n:wallet.send.transactionSent",
+                duration: 2
+              });
+            },
+            err => {
+              console.log(err);
+              TemplateVar.set(template, "sending", false);
 
-                if (error) {
-                  console.log(
-                    "Error from contract sendTransaction: ",
-                    error,
-                    txHash
-                  );
-                  // EthElements.Modal.hide();
-                  GlobalNotification.error({
-                    content: translateExternalErrorMessage(error.message),
-                    duration: 8
-                  });
-                  return;
-                }
-
-                console.log("SEND from contract", amount);
-
-                data =
-                  !to && contract ? { contract: contract, data: data } : data;
-
-                addTransactionAfterSend(
-                  txHash,
-                  amount,
-                  selectedAccount.address,
-                  to,
-                  data
-                );
-
-                localStorage.setItem(
-                  "contractSource",
-                  Helpers.getDefaultContractExample()
-                );
-                localStorage.setItem("compiledContracts", null);
-                localStorage.setItem("selectedContract", null);
-
-                FlowRouter.go("dashboard");
-              }
-            )
-            .on("receipt", function(receipt) {
-              console.log("Transaction receipt: ", receipt);
+              EthElements.Modal.hide();
+              GlobalNotification.error({
+                content: translateExternalErrorMessage(err.message),
+                duration: 8
+              });
+              return;
+            }
+          );
+        } catch (e) {
+          console.log(e);
+          TemplateVar.set(template, "sending", false);
+          if (e.message === 'wrong password') {
+            GlobalNotification.warning({
+              content: "i18n:wallet.accounts.wrongPassword",
+              duration: 2
             });
-
-          // SIMPLE TX
-        } else {
-          console.log("Gas Price: " + gasPrice);
-          console.log("Amount:", amount);
-
-          web3.eth
-            .sendTransaction(
-              {
-                from: selectedAccount.address,
-                to: to,
-                data: data,
-                value: amount
-              },
-              function(error, txHash) {
-                TemplateVar.set(template, "sending", false);
-
-                if (error) {
-                  console.log(
-                    "Error from simple sendTransaction: ",
-                    error,
-                    txHash
-                  );
-                  // EthElements.Modal.hide();
-                  GlobalNotification.error({
-                    content: translateExternalErrorMessage(error.message),
-                    duration: 8
-                  });
-                  return;
-                }
-
-                console.log("SEND simple");
-
-                data =
-                  !to && contract ? { contract: contract, data: data } : data;
-
-                addTransactionAfterSend(
-                  txHash,
-                  amount,
-                  selectedAccount.address,
-                  to,
-                  data
-                );
-
-                localStorage.setItem(
-                  "contractSource",
-                  Helpers.getDefaultContractExample()
-                );
-                localStorage.setItem("compiledContracts", null);
-                localStorage.setItem("selectedContract", null);
-
-                FlowRouter.go("dashboard");
-              }
-            )
-            .on("receipt", function(receipt) {
-              console.log("Transaction receipt: ", receipt);
-            });
+            return;
+          }
         }
       };
-
-      // SHOW CONFIRMATION WINDOW when NOT MIST
-      if (typeof mist === "undefined") {
-        EthElements.Modal.question(
-          {
-            template: "views_modals_sendTransactionInfo",
-            data: {
-              from: selectedAccount.address,
-              to: to,
-              amount: amount,
-              data: data
-            },
-            ok: sendTransaction,
-            cancel: true
+      EthElements.Modal.question(
+        {
+          template: "views_modals_sendTransactionInfo",
+          data: {
+            from: selectedAccount.name,
+            to: to,
+            amount: amount,
+            memo: memo
           },
-          {
-            class: "send-transaction-info"
-          }
-        );
-
-        // LET MIST HANDLE the CONFIRMATION
-      } else {
-        sendTransaction();
-      }
+          ok: sendTransaction,
+          cancel: true
+        },
+        {
+          class: "send-transaction-info"
+        }
+      );
     }
   }
 });

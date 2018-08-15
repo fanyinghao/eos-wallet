@@ -79,6 +79,7 @@
             "defaultName": "未命名",
             "creating": "待转账",
             "importing": "导入",
+            "wrongPassword": "密码不正确",
             "accountNote": "账户没法显示正在进行的交易，但是可以显示余额和送出去的以太币。要看进账的交易，创建 <a href=\"/account/new\">钱包合约</a> 來存储以太币。",
             "walletNote": "大多数交易尚未支持从从合约钱包接受以太币。请务必先把钱转移到一个账户地址！",
             "addressCopiedToClipboard": "已复制到剪贴板",
@@ -198,7 +199,8 @@
             "password": {
               "title": "请记住你的密码",
               "newPassword": "输入密码",
-              "rePassword": "再输一遍"
+              "rePassword": "再输一遍",
+              "input": "请输入密码"
             },
             "selectOwner": "选择拥有者",
             "accountType": {
@@ -248,7 +250,7 @@
             "memo": "附言",
             "sendFunds": "发送资金",
             "deployContract": "发布合约",
-            "data": "数据",
+            "data": "附言",
             "fee": "选择手续费",
             "feeLow": "更便宜",
             "feeHigh": "更快",

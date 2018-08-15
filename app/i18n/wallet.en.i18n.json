@@ -97,6 +97,7 @@
       "defaultName": "Unnamed",
       "creating": "Creating",
       "importing": "Importing",
+      "wrongPassword": "wrong password",
       "accountNote":
         "Accounts can't display incoming transactions, but can receive, hold and send Ether. To see incoming transactions <a href=\"/account/new\">create a wallet contract</a> to store ether.",
       "outOfSyncNote":
@@ -230,7 +231,8 @@
       "password": {
         "title": "Please remember your passwrod",
         "newPassword": "new password",
-        "rePassword": "enter again"
+        "rePassword": "enter again",
+        "input": "enter password"
       },
       "accountName": "Account name",
       "selectOwner": "Select owner",
@@ -288,7 +290,7 @@
       "memo": "Memo",
       "sendFunds": "Send funds",
       "deployContract": "Deploy contract",
-      "data": "Data",
+      "data": "Memo",
       "moreOptions": "More options",
       "showMoreOptions": "Show more options",
       "showLessOptions": "Show fewer options",

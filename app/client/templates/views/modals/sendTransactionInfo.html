@@ -2,48 +2,23 @@
     <h1>
         {{i18n "wallet.send.sendInfoTitle"}}
         <br>
-        {{dapp_formatBalance amount "0,0.00[000000] UNIT"}}
-        {{#if $neq unit 'eos'}}
-            <br>
-            <small>
-                ({{dapp_formatBalance amount "0,0.00[000000] unit" "eis"}})
-            </small>
-        {{/if}}
+        {{amount}}
     </h1>
     <p>
-        {{> elements_account_link address=from}}
+        {{> elements_account_link name=from}}
     </p>
     <i class="icon-arrow-down"></i>
     <p>
-        {{#if to}}
-            {{> elements_account_link address=to}}
-        {{else}}
-            <i class="icon-docs"></i> {{i18n "wallet.send.createContract"}}
-        {{/if}}
+        {{> elements_account_link name=to}}
     </p>
 
-    <hr>
-
-    <p class="tx-info">
-        <small>+ {{i18n "wallet.send.estimatedFee"}}</small> {{estimatedFee}}
-        <br>
-        <small class="gas-price">
-            {{i18n "wallet.transactions.gasPrice"}} {{dapp_formatBalance gasPrice "0,0.0[000000000000000000] unit" "eos"}}
-            <br>
-            {{i18n "wallet.send.texts.estimatedGas"}} {{estimatedGas}}
-        </small>
-        <br>
-        <small>
-            {{i18n "wallet.send.provideGas"}} <input type="number" min="21000" class="gas dapp-tiny" value="{{estimatedGasPlusAddition}}">
-        </small>
-    </p>
-
-    {{#if data}}
+    {{#if memo}}
         <hr>
 
         <p class="tx-info">
             <small>{{i18n "wallet.send.data"}}</small>
-            <pre>{{data}}</pre>
+            <pre>{{memo}}</pre>
         </p>
     {{/if}}
+
 </template>

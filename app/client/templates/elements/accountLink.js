@@ -12,11 +12,7 @@ Template['elements_account_link'].helpers({
     @method (getAccount)
     */
   getAccount: function() {
-    return (
-      Helpers.getAccountByAddress(this.address) || {
-        address: web3.utils.toChecksumAddress(this.address)
-      }
-    );
+    return {name: this.name};
   },
   /**
     Adds class about ens

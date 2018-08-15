@@ -24,7 +24,6 @@ Template.elements_account.created = function() {
     TemplateVar.set(self, 'account', {creating: true, account_name: name, publicKey: self.data.publicKey})
   })
   eos.getCurrencyBalance('eosio.token', name).then(res => {
-    console.log(res)
       TemplateVar.set(self, 'balance', res);
     }, err => {
     console.log(err)

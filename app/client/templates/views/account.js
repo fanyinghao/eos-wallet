@@ -111,7 +111,6 @@ Template.views_account.onRendered(function() {
     FlowRouter.go('/notfound');
   })
   eos.getCurrencyBalance('eosio.token', name).then(res => {
-    console.log(res)
       TemplateVar.set(self, 'balance', res);
     }, err => {
     console.log(err)

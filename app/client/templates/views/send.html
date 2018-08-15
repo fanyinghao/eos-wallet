@@ -11,13 +11,14 @@
                 <h3>{{i18n 'wallet.send.from'}}</h3>
 
                 {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
-
             </div>
 
             <div class="col col-6 mobile-full">
                 <h3>{{i18n 'wallet.send.to'}}</h3>
 
-                {{> dapp_addressInput placeholder="" name="to" autofocus=true class="to"}}
+                <div class="dapp-address-input">
+                    <input type="text" name="to" placeholder="" class="to" autofocus="true">
+                </div>
             </div>
 
             <div class="dapp-clear-fix"></div>
@@ -28,23 +29,17 @@
             <div class="col col-6 mobile-full amount">
                 <h3>{{i18n 'wallet.send.amount'}}</h3>
                 {{#if TemplateVar.get "sendAll"}}
-                    <input type="text" name="amount" class="dapp-large" value="{{selectedBalance.value}}" disabled>
-                {{else}}
-                    <input type="text" min="0" step="any" name="amount" placeholder="0.0000" class="dapp-large" pattern="[0-9\.,]*">
-                {{/if}}
+                <input type="text" name="amount" class="dapp-large" value="{{selectedBalance.value}}" disabled> {{else}}
+                <input type="text" min="0" step="any" name="amount" placeholder="0.0000" class="dapp-large" pattern="[0-9\.,]*" autocomplete="off">                {{/if}}
 
                 <br>
                 <label>
-                    <input type="checkbox" class="send-all">
-                    {{i18n 'wallet.send.sendAll'}}
+                    <input type="checkbox" class="send-all"> {{i18n 'wallet.send.sendAll'}}
                 </label>
 
                 <p class="send-info">
-                    {{#if TemplateVar.get "sendAll"}}
-                        {{{i18n 'wallet.send.texts.sendAmount' amount=selectedBalance.value symbol=selectedBalance.symbol }}}
-                    {{else}}
-                        {{{i18n 'wallet.send.texts.sendAmount' amount=(inputAmount) symbol='EOS' }}}
-                    {{/if}}
+                    {{#if TemplateVar.get "sendAll"}} {{{i18n 'wallet.send.texts.sendAmount' amount=selectedBalance.value symbol=selectedBalance.symbol
+                    }}} {{else}} {{{i18n 'wallet.send.texts.sendAmount' amount=(inputAmount) symbol='EOS' }}} {{/if}}
                 </p>
 
             </div>
@@ -68,7 +63,7 @@
         <div class="row clear compile-contract">
             <div class="col col-8 mobile-full">
                 <h3>{{i18n 'wallet.send.memo'}}</h3>
-                {{> dapp_dataTextarea cols="20" rows="8" value=(TemplateVar.get "txData")}}
+                <textarea name="memo" cols="20" rows="4"></textarea>
             </div>
         </div>
 
@@ -82,20 +77,23 @@
             <div class="dapp-clear-fix"></div>
         </div>
 
+        <div class="row clear">
+            <div class="col col-12 mobile-full">
+
+                <h3>{{i18n 'wallet.newWallet.password.input'}}</h3>
+
+                <input type="password" name="password" autofocus="true" autocomplete="password"/>
+
+            </div>
+
+            <div class="dapp-clear-fix"></div>
+        </div>
         <hr>
 
         <!-- a button type="submit" will send the form -->
 
         <button type="submit" class="dapp-block-button">
-            {{#if TemplateVar.get "sending"}}
-                {{i18n 'buttons.sending'}}
-            {{else}}
-                {{#if deployContract}}
-                    {{i18n 'wallet.app.buttons.deploy'}}
-                {{else}}
-                    {{i18n 'buttons.send'}}
-                {{/if}}
-            {{/if}}
+            {{#if TemplateVar.get "sending"}} {{i18n 'buttons.sending'}} {{else}} {{i18n 'buttons.send'}} {{/if}}
         </button>
 
     </form>
