@@ -32,7 +32,7 @@ var translateExternalErrorMessage = function(message) {
   // 'setTxStatusRejected' occurs in the stack trace of the error message triggered when
   // the user has rejects a transaction in MetaMask. Show a localised error message
   // instead of the stack trace.
-  return `[${message.code}] - ${message.name} - ${message.what}`
+  return `[${message.code}] - ${message.name} - ${message.what}`;
 };
 
 // Set basic variables
@@ -203,6 +203,20 @@ Template["views_send"].helpers({
     return ObservableAccounts.accounts[
       TemplateVar.getFrom(".dapp-select-account.send-from", "value")
     ];
+  },
+  showNotice: function() {
+    let selectedAccount =
+      ObservableAccounts.accounts[
+        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+      ];
+    let multiSig = false;
+    selectedAccount &&
+      selectedAccount.permissions.map(item => {
+        if (item.perm_name === "active") {
+          multiSig = item.required_auth.threshold > 1;
+        }
+      });
+    return multiSig;
   },
   selectedBalance: function() {
     selectedAccount =
@@ -408,12 +422,12 @@ Template["views_send"].events({
       e.currentTarget.value = e.currentTarget.value.substring(0, 12);
     TemplateVar.set("to", e.currentTarget.value);
   },
-    /**
+  /**
     Set the password
 
     @event keyup keyup input[name="password"], change input[name="password"], input input[name="password"]
     */
-   'keyup input[name="password"], change input[name="password"], input input[name="password"]': function(
+  'keyup input[name="password"], change input[name="password"], input input[name="password"]': function(
     e,
     template
   ) {
@@ -434,7 +448,7 @@ Template["views_send"].events({
       memo = TemplateVar.get("memo"),
       password = TemplateVar.get("password"),
       sendAll = TemplateVar.get("sendAll");
-    
+
     if (selectedAccount && !TemplateVar.get("sending")) {
       if (selectedAccount.eosBalance === "0")
         return GlobalNotification.warning({
@@ -491,36 +505,58 @@ Template["views_send"].events({
             signProvider: provider,
             verbose: false
           });
-          _eos.transfer(selectedAccount.name, to, amount, memo || "transfer", true).then(
-            tr => {
-              console.log(tr);
-              TemplateVar.set(template, "sending", false);
-              FlowRouter.go("dashboard");
-              GlobalNotification.success({
-                content: "i18n:wallet.send.transactionSent",
-                duration: 20,
-                ok: function(){
-                  window.open(`https://tools.cryptokylin.io/#/tx/${tr.transaction_id}`);
-                  return true;
-                },
-                okText: TAPi18n.__("wallet.accounts.buttons.viewOnExplorer")
-              });
-            },
-            err => {
-              TemplateVar.set(template, "sending", false);
 
-              EthElements.Modal.hide();
-              GlobalNotification.error({
-                content: translateExternalErrorMessage(JSON.parse(err).error),
-                duration: 20
-              });
-              return;
-            }
-          );
+          let multiSig = false;
+          selectedAccount &&
+            selectedAccount.permissions.map(item => {
+              if (item.perm_name === "active") {
+                multiSig = item.required_auth.threshold > 1;
+              }
+            });
+            
+          _eos
+            .transfer(
+              selectedAccount.name,
+              to,
+              amount,
+              memo || "transfer",
+              true
+            )
+            .then(
+              tr => {
+                console.log(tr);
+                TemplateVar.set(template, "sending", false);
+                FlowRouter.go("dashboard");
+                GlobalNotification.success({
+                  content: "i18n:wallet.send.transactionSent",
+                  duration: 20,
+                  ok: function() {
+                    window.open(
+                      `https://tools.cryptokylin.io/#/tx/${tr.transaction_id}`
+                    );
+                    return true;
+                  },
+                  okText: TAPi18n.__("wallet.accounts.buttons.viewOnExplorer")
+                });
+              },
+              err => {
+                TemplateVar.set(template, "sending", false);
+
+                EthElements.Modal.hide();
+                GlobalNotification.error({
+                  content: translateExternalErrorMessage(JSON.parse(err).error),
+                  duration: 20
+                });
+                return;
+              }
+            );
         } catch (e) {
           console.log(e);
           TemplateVar.set(template, "sending", false);
-          if (e.message === "wrong password" || e.message === "gcm: tag doesn't match") {
+          if (
+            e.message === "wrong password" ||
+            e.message === "gcm: tag doesn't match"
+          ) {
             GlobalNotification.warning({
               content: "i18n:wallet.accounts.wrongPassword",
               duration: 2

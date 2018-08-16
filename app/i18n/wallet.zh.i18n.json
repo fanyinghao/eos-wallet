@@ -244,6 +244,7 @@
             "pickAddress": "选择地址",
             "to": "发送至",
             "from": "从",
+            "showNotice": "此账号需要多重签名",
             "amount": "数量",
             "tokenAmount": "代币数量",
             "memo": "附言",

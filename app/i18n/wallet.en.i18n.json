@@ -250,6 +250,7 @@
       "sendInfoTitle": "Send",
       "pickAddress": "Pick an address",
       "to": "To",
+      "showNotice": "Requires MulitSig",
       "from": "From",
       "amount": "Amount",
       "tokenAmount": "Token amount",

@@ -11,6 +11,11 @@
                 <h3>{{i18n 'wallet.send.from'}}</h3>
 
                 {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
+
+                <div class="indented-box">
+                    <br> {{#if showNotice}} <span>{{i18n 'wallet.send.showNotice'}} </span>
+                    {{else}} <span>&nbsp;</span> {{/if}}
+                </div>
             </div>
 
             <div class="col col-6 mobile-full">
@@ -82,7 +87,7 @@
 
                 <h3>{{i18n 'wallet.newWallet.password.input'}}</h3>
 
-                <input type="password" name="password" autofocus="true" autocomplete="password"/>
+                <input type="password" name="password" autofocus="true" autocomplete="password" />
 
             </div>
 
