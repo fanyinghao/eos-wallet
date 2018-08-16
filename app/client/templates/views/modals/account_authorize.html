@@ -31,10 +31,25 @@
             </div>
         </div>
 
+        <div class="row clear">
+            <div class="indented-box">
+
+                <h2>{{i18n 'wallet.newWallet.password.input'}}</h2>
+
+                <div class="dapp-address-input">
+                    <input type="password" name="password" autofocus="true" autocomplete="password"/>
+                </div>
+
+            </div>
+
+            <div class="dapp-clear-fix"></div>
+        </div>
         <hr>
 
         <!-- button type="submit" will send the form -->
-        <button type="submit" class="dapp-block-button">{{i18n 'buttons.create'}}</button>
+        <button type="submit" class="dapp-block-button">
+            {{#if TemplateVar.get "sending"}} {{i18n 'buttons.sending'}} {{else}} {{i18n 'buttons.save'}} {{/if}}
+        </button>
 
     </form>
 

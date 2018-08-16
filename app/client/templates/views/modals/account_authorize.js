@@ -1,3 +1,4 @@
+const keystore = require("../../../lib/eos/keystore");
 const ecc = require("eosjs-ecc");
 /**
 Template Controllers
@@ -46,11 +47,14 @@ Template["views_account_authorize"].helpers({
     @return {Array} e.g. [1,2,3,4]
     */
   signees: function() {
-    var owners = this.owners;
-
-    owners = owners.concat(
-      new Array(TemplateVar.get("multisigSignees") - owners.length).fill('')
-    );
+    let owners = this.owners;
+    let insert = TemplateVar.get("multisigSignees") - owners.length;
+    if (insert < 0){
+      insert = TemplateVar.get("multisigSignees");
+      owners = new Array(insert).fill("")
+    } else {
+      owners = owners.concat(new Array(insert).fill(""));
+    }
 
     if (
       TemplateVar.get("multisigSignatures") > TemplateVar.get("multisigSignees")
@@ -79,7 +83,7 @@ Template["views_account_authorize"].helpers({
     maxOwners = Math.max(maxOwners || 10, 10);
 
     var returnArray = [];
-    for (i = 2; i <= maxOwners; i++) {
+    for (i = 1; i <= maxOwners; i++) {
       returnArray.push({ value: i, text: i });
     }
     return returnArray;
@@ -93,7 +97,7 @@ Template["views_account_authorize"].helpers({
     var signees = TemplateVar.get("multisigSignees");
     var returnArray = [];
 
-    for (i = 2; i <= signees; i++) {
+    for (i = 1; i <= signees; i++) {
       returnArray.push({ value: i, text: i });
     }
 
@@ -118,34 +122,119 @@ Template["views_account_authorize"].events({
   'click span[name="multisigSignees"] .simple-modal button': function(e) {
     TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
   },
+  /**
+  Set the password
 
+  @event keyup keyup input[name="password"], change input[name="password"], input input[name="password"]
+  */
+  'keyup input[name="password"], change input[name="password"], input input[name="password"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("password", e.currentTarget.value);
+  },
   /**
     Create the account
 
     @event submit
     */
   submit: function(e, template) {
-    var formValues = InlineForm(".inline-form");
+    let formValues = InlineForm(".inline-form");
+    let password = TemplateVar.get("password");
+    let threshold = TemplateVar.get("multisigSignatures");
 
-    var owners = _.uniq(
-      _.compact(
-        _.map(template.findAll("input.owners"), function(item) {
-          if (ecc.isValidPublic(item.value)) return item.value;
-        })
-      )
-    );
+    if (this.account && !TemplateVar.get("sending")) {
+      if (!password || password.length === 0)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.accounts.wrongPassword",
+          duration: 2
+        });
 
-    if (owners.length != formValues.multisigSignees)
-      return GlobalNotification.warning({
-        content: "i18n:wallet.newWallet.error.emptySignees",
-        duration: 2
-      });
+      var owners = _.uniq(
+        _.compact(
+          _.map(template.findAll("input.owners"), function(item) {
+            if (ecc.isValidPublic(item.value)) return item.value;
+          })
+        )
+      );
 
-    GlobalNotification.success({
-      content: "i18n:wallet.authMultiSig.success",
-      duration: 2
-    });
+      if (owners.length != formValues.multisigSignees)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.newWallet.error.emptySignees",
+          duration: 2
+        });
 
-    EthElements.Modal.hide();
+      try {
+        TemplateVar.set(template, "sending", true);
+
+        let provider = keystore.SignProvider(
+          this.account.account_name,
+          password
+        );
+        const _eos = Eos({
+          httpEndpoint: httpEndpoint,
+          chainId: chainId,
+          signProvider: provider,
+          verbose: false
+        });
+
+        let required_auth = {
+          keys: Array.prototype.map.call(owners, function(obj) {
+            return {
+              key: obj,
+              weight: 1
+            };
+          }),
+          threshold: threshold
+        };
+
+        _eos
+          .transaction(tr => {
+            tr.updateauth(
+              {
+                account: this.account.account_name,
+                permission: "active",
+                parent: "owner",
+                auth: required_auth
+              },
+              { authorization: `${this.account.account_name}@owner` }
+            );
+          })
+          .then(
+            tr => {
+              console.log(tr);
+              TemplateVar.set(template, "sending", false);
+              EthElements.Modal.hide();
+
+              GlobalNotification.success({
+                content: "i18n:wallet.authMultiSig.success",
+                duration: 2
+              });
+            },
+            err => {
+              TemplateVar.set(template, "sending", false);
+
+              GlobalNotification.error({
+                content: JSON.parse(err).error.message,
+                duration: 20
+              });
+              return;
+            }
+          );
+      } catch (e) {
+        console.log(e);
+        TemplateVar.set(template, "sending", false);
+        if (
+          e.message === "wrong password" ||
+          e.message === "gcm: tag doesn't match"
+        ) {
+          GlobalNotification.warning({
+            content: "i18n:wallet.accounts.wrongPassword",
+            duration: 2
+          });
+          return;
+        }
+      }
+    }
   }
 });
