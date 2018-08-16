@@ -1,3 +1,4 @@
+const keystore = require("../../lib/eos/keystore");
 /**
 Template Controllers
 
@@ -17,11 +18,13 @@ Template.elements_account.created = function() {
   TemplateVar.set(self, 'account_name', name)
   eos.getAccount(name).then(account => {
     account.creating = false;
-    account.publicKey = this.data.publicKey;
+    let item = keystore.Get(name)
+    account.publicKey = item.publicKey;
     TemplateVar.set(self, 'account', account)
   }, err => {
     //
-    TemplateVar.set(self, 'account', {creating: true, account_name: name, publicKey: self.data.publicKey})
+    let item = keystore.Get(name)
+    TemplateVar.set(self, 'account', {creating: true, account_name: name, publicKey: item.publicKey})
   })
   eos.getCurrencyBalance('eosio.token', name).then(res => {
       TemplateVar.set(self, 'balance', res);

@@ -1,3 +1,4 @@
+const keystore = require("../../lib/eos/keystore");
 /**
 Template Controllers
 
@@ -105,15 +106,17 @@ Template.views_account.onRendered(function() {
   TemplateVar.set(self, 'account_name', name)
   eos.getAccount(name).then(account => {
     account.creating = false;
-    account.publicKey = ''
+    let item = keystore.Get(name)
+    account.publicKey = item.publicKey;
     TemplateVar.set(self, 'account', account)
+
+    eos.getCurrencyBalance('eosio.token', name).then(res => {
+        TemplateVar.set(self, 'balance', res);
+      }, err => {
+      console.log(err)
+    })
   }, err => {
     FlowRouter.go('/notfound');
-  })
-  eos.getCurrencyBalance('eosio.token', name).then(res => {
-      TemplateVar.set(self, 'balance', res);
-    }, err => {
-    console.log(err)
   })
 })
 
@@ -388,11 +391,11 @@ Template['views_account'].events({
     EthElements.Modal.show({
       template: 'views_account_authorize',
       data: {
-        address: this.address
+        account: this
       }
     },
     {
-      class: 'modal-medium'
+      class: 'modal-small'
     });
   },
 

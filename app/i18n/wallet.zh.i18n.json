@@ -191,6 +191,7 @@
         "authMultiSig": {
             "title": "授权多签地址",
             "selectOwner": "选择拥有者",
+            "accountName": "账户名称",
             "multisigSigneesTitle": "多签地址"
         },
         "newWallet": {
@@ -202,7 +203,6 @@
               "rePassword": "再输一遍",
               "input": "请输入密码"
             },
-            "selectOwner": "选择拥有者",
             "accountType": {
                 "title": "账户类型",
                 "simple": {
@@ -213,10 +213,8 @@
                 "multisig": {
                     "title": "多重签名的钱包合约",
                     "description": "一个受多个账户控制的合约。",
-                    "text1": "这是一个联合账户受",
-                    "text2": "个所有者控制。您每天最多可以发送",
-                    "text3": "以太币 。",
-                    "text4": "超过每日提现限制的任何交易，都需要",
+                    "text1": "这是一个多签账户受",
+                    "text2": "个所有者控制。每次合约交易都需要",
                     "text5": "个所有账户确认。",
                     "accountOwnersTitle": "账户所有者们",
                     "ownerAddress": "所有者地址"

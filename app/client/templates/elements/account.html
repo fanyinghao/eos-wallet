@@ -43,6 +43,8 @@
                     {{account_name}}
                 {{/if}}
             </h3>
+            
+            <span class="account-id">{{publicKey}}</span>                
 
             {{#unless creating}}
                 {{> elements_balance balance=formattedTokenBalance}}
@@ -60,7 +62,6 @@
                     {{/if}}
                 {{/each}}
             {{/if}} -->
-            <span class="account-id {{#if creating}}creating{{/if}}">{{publicKey}}</span>                
         </a>
     {{/with}}
 </template>

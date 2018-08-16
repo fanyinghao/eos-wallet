@@ -54,12 +54,13 @@ Template['views_account_authorize'].helpers({
     return accounts;
   },
   /**
-    Return the selectedOwner
+    Return the selectedAccount
 
-    @method (selectedOwner)
+    @method (selectedAccount)
     */
-  selectedOwner: function() {
-    return TemplateVar.getFrom('.dapp-select-account', 'value');
+  selectedAccount: function() {
+    console.log(this);
+    return this.account;
   },
   /**
     Return TRUE, if the current section is selected
