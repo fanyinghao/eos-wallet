@@ -337,6 +337,15 @@
                 "invalidAddress": "无效地址，合约未新增。",
                 "jsonInterfaceParseError": "无法解析JSON 界面。"
             }
+        },
+        "newAccount": {
+            "accountName": "账户名称",
+            "publicKey": "公钥密码",
+            "privateKey": "私钥密码",
+            "writedown": "请牢记以下信息",
+            "transferTitle": "进行以下操作完成创建",
+            "transfer": "转账",
+            "importedTitle": "已导入账号"
         }
     }
 }

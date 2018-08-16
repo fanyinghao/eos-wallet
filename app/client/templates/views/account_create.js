@@ -343,7 +343,7 @@ Template["views_account_create"].events({
                 }
               },
               {
-                class: "modal-medium"
+                class: "modal-small"
               }
             );
           });

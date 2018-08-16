@@ -16,7 +16,8 @@
         "sending": "发送中...",
         "create": "创建",
         "select": "选择",
-        "tryToReconnect": "尝试重新连接"
+        "tryToReconnect": "尝试重新连接",
+        "back": "返回"
     },
     "commonWords": {
         "you": "您",
