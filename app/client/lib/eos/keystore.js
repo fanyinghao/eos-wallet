@@ -9,6 +9,11 @@ export function SetKey(accountName, password, privateKey, publicKey) {
   storage.set(accountName, { publicKey, sensitive: { privateKey } }, password);
 }
 
+export function Get(accountName, password) {
+  const storage = new SecureStorage({ id: STORGE_ID });
+  return storage.get(accountName, password);
+}
+
 export function SignProvider(accountName, password) {
   const storage = new SecureStorage({ id: STORGE_ID });
   let sensitive = storage.get(accountName, password).sensitive;
