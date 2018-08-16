@@ -487,20 +487,23 @@ Template["views_send"].events({
           // let _eos = Object.assign(eos, { keyProvider: provider });
           const _eos = Eos({
             httpEndpoint: httpEndpoint,
-            chainId: chain.testnet,
+            chainId: chainId,
             signProvider: provider,
             verbose: false
           });
           _eos.transfer(selectedAccount.name, to, amount, memo || "transfer", true).then(
             tr => {
-              assert.equal(tr.transaction.signatures.length, 1);
-              assert.equal(typeof tr.transaction.signatures[0], "string");
               console.log(tr);
               TemplateVar.set(template, "sending", false);
               FlowRouter.go("dashboard");
               GlobalNotification.success({
                 content: "i18n:wallet.send.transactionSent",
-                duration: 2
+                duration: 20,
+                ok: function(){
+                  window.open(`https://tools.cryptokylin.io/#/tx/${tr.transaction_id}`);
+                  return true;
+                },
+                okText: TAPi18n.__("wallet.accounts.buttons.viewOnExplorer")
               });
             },
             err => {
