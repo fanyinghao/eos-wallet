@@ -189,7 +189,7 @@
             }
         },
         "authMultiSig": {
-            "title": "授权多签地址",
+            "title": "授权多签",
             "selectOwner": "选择拥有者",
             "accountName": "账户名称",
             "multisigSigneesTitle": "多签地址"
