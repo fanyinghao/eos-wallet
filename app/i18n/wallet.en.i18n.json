@@ -199,7 +199,8 @@
       "title": "Authorize MultiSigture",
       "selectOwner": "Select owner",
       "multisigSigneesTitle": "Multisig Signees",
-      "accountName": "Account name"
+      "accountName": "Account name",
+      "success": "账户授权多重签名成功"
     },
     "newWallet": {
       "title": "New <strong>Account</strong>",

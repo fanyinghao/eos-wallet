@@ -386,12 +386,23 @@ Template['views_account'].events({
     */
    'click .authorize-button': function(e) {
     e.preventDefault();
+    var owners = [];
+    let account = this;
+    account.permissions.forEach((item) => {
+      if(item.perm_name === "active"){
+        owners = Array.prototype.map.call(item.required_auth.keys, function(obj) {
+          return obj.key;
+        });
+        return;
+      }
+    })
 
     // Open a modal showing the QR Code
     EthElements.Modal.show({
       template: 'views_account_authorize',
       data: {
-        account: this
+        account: this,
+        owners: owners
       }
     },
     {

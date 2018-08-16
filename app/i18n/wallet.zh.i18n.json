@@ -217,7 +217,8 @@
                     "text2": "个所有者控制。每次合约交易都需要",
                     "text5": "个所有账户确认。",
                     "accountOwnersTitle": "账户所有者们",
-                    "ownerAddress": "所有者地址"
+                    "ownerAddress": "所有者地址",
+                    "success": "账户授权多重签名成功"
                 },
                 "import": {
                     "title": "导入账户",

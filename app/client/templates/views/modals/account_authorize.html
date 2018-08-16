@@ -25,9 +25,8 @@
 
                 <h4>{{i18n 'wallet.newWallet.accountType.multisig.accountOwnersTitle'}}</h4>
 
-                {{> dapp_addressInput placeholder=i18nOwnerAddress class="owners" value=(selectedAccount.publicKey) disabled=true}} 
                 {{#each signees}} 
-                    {{> dapp_addressInput placeholder=i18nOwnerAddress class="owners" value=(toChecksumAddress this)}} 
+                    {{> dapp_addressInput placeholder=i18nOwnerAddress class="owners" value=(this)}} 
                 {{/each}}
             </div>
         </div>
