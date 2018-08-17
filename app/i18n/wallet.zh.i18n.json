@@ -347,7 +347,8 @@
             "publicKey": "公钥密码",
             "privateKey": "私钥密码",
             "writedown": "请牢记以下信息",
-            "transferTitle": "进行以下操作完成创建",
+            "transferTitle": "请邀请协助或者点击以下链接完成创建",
+            "sendNewAccount": "去发送创建账号事务",
             "transfer": "转账",
             "importedTitle": "已导入账号"
         }

@@ -30,7 +30,7 @@ Template['layout_header'].helpers({
     // For some reason the path /send/ doesn't show tokens anymore
     return address
       ? FlowRouter.path('sendFrom', { from: address })
-      : FlowRouter.path('sendFrom', {
+      : FlowRouter.path('send', {
           from: accounts[0] ? accounts[0].address : ''
         });
   },

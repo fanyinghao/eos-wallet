@@ -367,7 +367,8 @@
       "publicKey": "Public Key",
       "privateKey": "Private Key",
       "writedown": "Please Remember This Information",
-      "transferTitle": "Follow below to complete creation",
+      "transferTitle": "Ask assistant or follow below to complete creation",
+      "sendNewAccount": "Go to send transaction",
       "transfer": "transfer",
       "importedTitle": "Imported Account"
     }

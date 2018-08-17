@@ -188,7 +188,6 @@ Template["views_send"].helpers({
   },
   proposeContent: function() {
     console.log("res");
-    debugger;
     eos
       .abiBinToJson(
         "eosio.msig",

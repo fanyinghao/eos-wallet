@@ -1,8 +1,8 @@
 Eos = require('eosjs')
 const {observableAccounts} = require('./observableAccounts')
 
-// httpEndpoint = 'http://192.168.2.192:10053';
-httpEndpoint = 'https://api-kylin.eosasia.one';
+httpEndpoint = 'http://192.168.2.192:10053';
+// httpEndpoint = 'https://api-kylin.eosasia.one';
 
 chain = {
     mainnet: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',

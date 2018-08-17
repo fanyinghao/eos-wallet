@@ -61,16 +61,16 @@ FlowRouter.route('/send', {
 });
 
 /**
-The Coins route.
+The send newaccount.
 
 @method tokens
 */
-FlowRouter.route('/tokens', {
-  name: 'tokens',
+FlowRouter.route('/send-newaccount/:name/:address', {
+  name: 'newaccount',
   action: function(params, queryParams) {
     BlazeLayout.render('layout_main', {
       header: 'layout_header',
-      main: 'views_tokens'
+      main: 'views_send'
     });
   }
 });

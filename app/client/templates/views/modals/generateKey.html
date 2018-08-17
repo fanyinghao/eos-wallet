@@ -11,7 +11,12 @@
   <hr>
 
   <h1>{{{i18n 'wallet.newAccount.transferTitle'}}}</h1>
-  <p> {{i18n 'wallet.newAccount.transfer' accountName }} </p>
+  <p> 
+    <a href="/send-newaccount/{{accountName}}/{{publicKey}}" >
+      <i class="icon-arrow-up"></i>
+      <span>{{{i18n 'wallet.newAccount.sendNewAccount'}}}</span>
+    </a>
+  </p>
 
   <hr>
 
