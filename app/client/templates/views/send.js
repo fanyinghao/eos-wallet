@@ -14,15 +14,6 @@ The add user template
 */
 
 /**
-Get the data field of either the byte or source code textarea, depending on the selectedType
-
-@method getDataField
-*/
-var getDataField = function() {
-  return TemplateVar.getFrom(".compile-contract", "txData");
-};
-
-/**
 Translate an external error message into the user's language if possible. Otherwise return
 the old error message.
 
@@ -135,62 +126,6 @@ Template["views_send"].onRendered(function() {
     selectedAddress = address;
   });
 
-  // ->> GAS PRICE ESTIMATION
-  template.autorun(function(c) {
-    var address = TemplateVar.getFrom(
-        ".dapp-select-account.send-from",
-        "value"
-      ),
-      to = TemplateVar.getFrom(".dapp-address-input .to", "value"),
-      amount = TemplateVar.get("amount") || "0",
-      data = getDataField(),
-      tokenAddress = TemplateVar.get("selectedToken");
-
-    // if(_.isString(address))
-    //     address = address.toLowerCase();
-
-    // Ether tx estimation
-    if (tokenAddress === "ether") {
-      if (EthAccounts.findOne({ address: address }, { reactive: false })) {
-        web3.eth.estimateGas(
-          {
-            from: address,
-            to: to,
-            value: amount,
-            data: data,
-            gas: defaultEstimateGas
-          },
-          estimationCallback.bind(template)
-        );
-
-        // Wallet tx estimation
-      } else if (
-        (wallet = Wallets.findOne({ address: address }, { reactive: false }))
-      ) {
-        if (contracts["ct_" + wallet._id])
-          contracts["ct_" + wallet._id].methods
-            .execute(to || "", amount || "", data || "0x00")
-            .estimateGas(
-              {
-                from: wallet.owners[0],
-                gas: defaultEstimateGas
-              },
-              estimationCallback.bind(template)
-            );
-      }
-
-      // Custom coin estimation
-    } else {
-      TokenContract.options.address = tokenAddress;
-      TokenContract.methods.transfer(to, amount).estimateGas(
-        {
-          from: address,
-          gas: defaultEstimateGas
-        },
-        estimationCallback.bind(template)
-      );
-    }
-  });
 });
 
 Template["views_send"].helpers({
@@ -246,97 +181,6 @@ Template["views_send"].helpers({
     if (!_.isFinite(amount)) return "0";
 
     return amount;
-  },
-  /**
-    Returns the decimals of the current token
-
-    @method (tokenDecimals)
-    */
-  tokenDecimals: function() {
-    var token = Tokens.findOne({ address: TemplateVar.get("selectedToken") });
-    return token ? token.decimals : 0;
-  },
-  /**
-    Returns the right time text for the "sendText".
-
-    @method (timeText)
-    */
-  timeText: function() {
-    return TAPi18n.__(
-      "wallet.send.texts.timeTexts." +
-        (
-          (Number(
-            TemplateVar.getFrom(".dapp-select-gas-price", "feeMultiplicator")
-          ) +
-            5) /
-          2
-        ).toFixed(0)
-    );
-  },
-  /**
-
-    Shows correct explanation for token type
-
-    @method (sendExplanation)
-    */
-  sendExplanation: function() {
-    var amount = TemplateVar.get("amount") || "0",
-      selectedAccount =
-        ObservableAccounts.accounts[
-          TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-        ];
-
-    if (!token || !selectedAccount) return;
-
-    return Spacebars.SafeString(
-      TAPi18n.__("wallet.send.texts.sendToken", {
-        amount: Helpers.formatNumberByDecimals(amount, token.decimals),
-        name: token.name,
-        symbol: token.symbol
-      })
-    );
-  },
-  /**
-    Get Balance of a token
-
-    @method (formattedCoinBalance)
-    */
-  formattedCoinBalance: function(e) {
-    var selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-      ];
-
-    return this.balances && Number(this.balances[selectedAccount._id]) > 0
-      ? Helpers.formatNumberByDecimals(
-          this.balances[selectedAccount._id],
-          this.decimals
-        ) +
-          " " +
-          this.symbol
-      : false;
-  },
-  /**
-    Checks if the current selected account is a wallet contract
-
-    @method (selectedAccountIsWalletContract)
-    */
-  selectedAccountIsWalletContract: function() {
-    var selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-      ];
-    return selectedAccount ? !!selectedAccount.owners : false;
-  },
-  /**
-    Clear amount from characters
-
-    @method (clearAmountFromChars)
-    */
-  clearAmountFromChars: function(amount) {
-    amount = ~amount.indexOf(".") ? amount.replace(/\,/g, "") : amount;
-
-    return amount.replace(/ /g, "");
   }
 });
 
@@ -357,32 +201,6 @@ Template["views_send"].events({
       TemplateVar.set("amount", selectedAccount.eosBalance.value);
   },
   /**
-    Select a token
-
-    @event click .token-ether
-    */
-  "click .token-ether": function(e, template) {
-    TemplateVar.set("selectedToken", "ether");
-
-    // trigger amount box change
-    template.$('input[name="amount"]').trigger("change");
-  },
-  /**
-    Select a token
-
-    @event click .select-token
-    */
-  "click .select-token input": function(e, template) {
-    var value = e.currentTarget.value;
-    TemplateVar.set("selectedToken", value);
-
-    if (value === "ether")
-      TemplateVar.setTo(".dapp-data-textarea", "value", "");
-
-    // trigger amount box change
-    template.$('input[name="amount"]').trigger("change");
-  },
-  /**
     Set the amount while typing
 
     @event keyup input[name="amount"], change input[name="amount"], input input[name="amount"]
@@ -399,7 +217,7 @@ Template["views_send"].events({
     TemplateVar.set("amount", amount.replace(",", "") || "0");
   },
   /**
-    Set the amount while typing
+    Set the memo while typing
 
     @event keyup keyup textarea[name="memo"], change textarea[name="memo"], input textarea[name="memo"]
     */
@@ -410,7 +228,7 @@ Template["views_send"].events({
     TemplateVar.set("memo", e.currentTarget.value);
   },
   /**
-    Set the amount while typing
+    Set the to while typing
 
     @event keyup keyup input[name="to"], change input[name="to"], input input[name="to"]
     */
@@ -513,7 +331,7 @@ Template["views_send"].events({
                 multiSig = item.required_auth.threshold > 1;
               }
             });
-            
+
           _eos
             .transfer(
               selectedAccount.name,
