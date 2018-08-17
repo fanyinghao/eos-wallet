@@ -34,6 +34,8 @@ Template["views_send"].onCreated(function() {
   if (keys.length > 0)
     ObservableAccounts.accounts[keys[0]].selected = "selected";
 
+  TemplateVar.set("send_type", "funds");
+
   // SET THE DEFAULT VARIABLES
   TemplateVar.set("amount", "0");
   TemplateVar.set("sendAll", false);
@@ -125,7 +127,6 @@ Template["views_send"].onRendered(function() {
 
     selectedAddress = address;
   });
-
 });
 
 Template["views_send"].helpers({
@@ -146,6 +147,7 @@ Template["views_send"].helpers({
       ];
     let multiSig = false;
     selectedAccount &&
+      selectedAccount.permissions &&
       selectedAccount.permissions.map(item => {
         if (item.perm_name === "active") {
           multiSig = item.required_auth.threshold > 1;
@@ -170,6 +172,8 @@ Template["views_send"].helpers({
     @method (sendTotal)
     */
   sendTotal: function() {
+    if (TemplateVar.get("send_type") === "newaccount") return "0.6745";
+
     var amount = TemplateVar.get("amount"),
       sendAll = TemplateVar.get("sendAll"),
       selectedAccount =
@@ -181,6 +185,24 @@ Template["views_send"].helpers({
     if (!_.isFinite(amount)) return "0";
 
     return amount;
+  },
+  proposeContent: function() {
+    console.log("res");
+    debugger;
+    eos
+      .abiBinToJson(
+        "eosio.msig",
+        "proposal",
+        "c0f3735b000000000000000000000100a6823403ea3055000000572d3ccdcd01200273d8e5a8a59700000000a8ed32323c200273d8e5a8a597104208574d95afa990d003000000000004454f53000000001b5061792070617274656e65723131313120736f6d65206d6f6e657900"
+      )
+      .then(
+        res => {
+          console.log(res);
+        },
+        err => {
+          console.log(err);
+        }
+      );
   }
 });
 
@@ -241,6 +263,19 @@ Template["views_send"].events({
     TemplateVar.set("to", e.currentTarget.value);
   },
   /**
+    Set the to while typing
+
+    @event keyup keyup input[name="proposer"], change input[name="proposer"], input input[name="proposer"]
+    */
+  'keyup input[name="proposer"], change input[name="proposer"], input input[name="proposer"]': function(
+    e,
+    template
+  ) {
+    if (e.currentTarget.value.length > 12)
+      e.currentTarget.value = e.currentTarget.value.substring(0, 12);
+    TemplateVar.set("proposer", e.currentTarget.value);
+  },
+  /**
     Set the password
 
     @event keyup keyup input[name="password"], change input[name="password"], input input[name="password"]
@@ -252,49 +287,71 @@ Template["views_send"].events({
     TemplateVar.set("password", e.currentTarget.value);
   },
   /**
+    Select the current section, based on the radio inputs value.
+
+    @event change input[type="radio"]
+    */
+  'change input[type="radio"]': function(e) {
+    TemplateVar.set("send_type", e.currentTarget.value);
+  },
+  /**
+    Set the to while typing
+
+    @event keyup keyup input[name="proposeName"], change input[name="proposeName"], input input[name="proposeName"]
+    */
+  'keyup input[name="proposeName"], change input[name="proposeName"], input input[name="proposeName"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("proposeName", e.currentTarget.value);
+  },
+  /**
+    Set the to while typing
+
+    @event keyup keyup input[name="accountName"], change input[name="accountName"], input input[name="accountName"]
+    */
+  'keyup input[name="accountName"], change input[name="accountName"], input input[name="accountName"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("accountName", e.currentTarget.value);
+  },
+  /**
+    Set the to while typing
+
+    @event keyup keyup input[name="publicKey"], change input[name="publicKey"], input input[name="publicKey"]
+    */
+  'keyup input[name="publicKey"], change input[name="publicKey"], input input[name="publicKey"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("publicKey", e.currentTarget.value);
+  },
+  /**
     Submit the form and send the transaction!
 
     @event submit form
     */
   "submit form": function(e, template) {
-    var amount = TemplateVar.get("amount") || "0",
-      to = TemplateVar.get("to"),
-      selectedAccount =
-        ObservableAccounts.accounts[
-          TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-        ],
-      memo = TemplateVar.get("memo"),
-      password = TemplateVar.get("password"),
-      sendAll = TemplateVar.get("sendAll");
+    let send_type = TemplateVar.get("send_type");
+    let selectedAccount =
+      ObservableAccounts.accounts[
+        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+      ];
+    let password = TemplateVar.get("password");
+
+    let provider = keystore.SignProvider(selectedAccount.name, password);
+    const _eos = Eos({
+      httpEndpoint: httpEndpoint,
+      chainId: chainId,
+      signProvider: provider,
+      verbose: false
+    });
 
     if (selectedAccount && !TemplateVar.get("sending")) {
-      if (selectedAccount.eosBalance === "0")
+      if (selectedAccount.eosBalance == 0)
         return GlobalNotification.warning({
           content: "i18n:wallet.send.error.emptyWallet",
-          duration: 2
-        });
-
-      if (!to)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.send.error.noReceiver",
-          duration: 2
-        });
-
-      if (sendAll) amount = selectedAccount.eosBalance.value;
-
-      if (_.isEmpty(amount) || amount === "0" || !_.isFinite(amount))
-        return GlobalNotification.warning({
-          content: "i18n:wallet.send.error.noAmount",
-          duration: 2
-        });
-
-      if (
-        new BigNumber(amount, 10).gt(
-          new BigNumber(selectedAccount.eosBalance.value, 10)
-        )
-      )
-        return GlobalNotification.warning({
-          content: "i18n:wallet.send.error.notEnoughFunds",
           duration: 2
         });
 
@@ -304,28 +361,43 @@ Template["views_send"].events({
           duration: 2
         });
 
-      amount =
-        amount > 0
-          ? `${parseFloat(amount).toFixed(4)} EOS`
-          : `${parseFloat(0).toFixed(4)} EOS`;
+      var onSuccess = tr => {
+        console.log(tr);
+        TemplateVar.set(template, "sending", false);
+        FlowRouter.go("dashboard");
+        GlobalNotification.success({
+          content: "i18n:wallet.send.transactionSent",
+          duration: 20,
+          ok: function() {
+            window.open(
+              `https://tools.cryptokylin.io/#/tx/${tr.transaction_id}`
+            );
+            return true;
+          },
+          okText: TAPi18n.__("wallet.accounts.buttons.viewOnExplorer")
+        });
+      };
+
+      var onError = err => {
+        TemplateVar.set(template, "sending", false);
+
+        EthElements.Modal.hide();
+        GlobalNotification.error({
+          content: translateExternalErrorMessage(JSON.parse(err).error),
+          duration: 20
+        });
+        return;
+      };
 
       // The function to send the transaction
-      var sendTransaction = function() {
+      var sendTransaction = function(_to, _amount, _memo) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
         try {
-          let provider = keystore.SignProvider(selectedAccount.name, password);
-          // let _eos = Object.assign(eos, { keyProvider: provider });
-          const _eos = Eos({
-            httpEndpoint: httpEndpoint,
-            chainId: chainId,
-            signProvider: provider,
-            verbose: false
-          });
-
           let multiSig = false;
           selectedAccount &&
+            selectedAccount.permissions &&
             selectedAccount.permissions.map(item => {
               if (item.perm_name === "active") {
                 multiSig = item.required_auth.threshold > 1;
@@ -335,39 +407,12 @@ Template["views_send"].events({
           _eos
             .transfer(
               selectedAccount.name,
-              to,
-              amount,
-              memo || "transfer",
+              _to,
+              _amount,
+              _memo || "transfer",
               true
             )
-            .then(
-              tr => {
-                console.log(tr);
-                TemplateVar.set(template, "sending", false);
-                FlowRouter.go("dashboard");
-                GlobalNotification.success({
-                  content: "i18n:wallet.send.transactionSent",
-                  duration: 20,
-                  ok: function() {
-                    window.open(
-                      `https://tools.cryptokylin.io/#/tx/${tr.transaction_id}`
-                    );
-                    return true;
-                  },
-                  okText: TAPi18n.__("wallet.accounts.buttons.viewOnExplorer")
-                });
-              },
-              err => {
-                TemplateVar.set(template, "sending", false);
-
-                EthElements.Modal.hide();
-                GlobalNotification.error({
-                  content: translateExternalErrorMessage(JSON.parse(err).error),
-                  duration: 20
-                });
-                return;
-              }
-            );
+            .then(onSuccess, onError);
         } catch (e) {
           console.log(e);
           TemplateVar.set(template, "sending", false);
@@ -383,22 +428,94 @@ Template["views_send"].events({
           }
         }
       };
-      EthElements.Modal.question(
-        {
-          template: "views_modals_sendTransactionInfo",
-          data: {
-            from: selectedAccount.name,
-            to: to,
-            amount: amount,
-            memo: memo
+
+      var createAccount = function(_name, _owner, _active) {
+        // show loading
+        TemplateVar.set(template, "sending", true);
+
+        _eos
+          .transaction(tr => {
+            tr.newaccount({
+              creator: selectedAccount.name,
+              name: _name,
+              owner: _owner,
+              active: _active
+            });
+
+            tr.buyram({
+              payer: selectedAccount.name,
+              receiver: _name,
+              quant: "0.6295 EOS"
+            });
+
+            tr.delegatebw({
+              from: selectedAccount.name,
+              receiver: _name,
+              stake_net_quantity: "0.0050 EOS",
+              stake_cpu_quantity: "0.0400 EOS",
+              transfer: 0
+            });
+          })
+          .then(onSuccess, onError);
+      };
+
+      if (send_type === "funds") {
+        var amount = TemplateVar.get("amount") || "0",
+          to = TemplateVar.get("to"),
+          memo = TemplateVar.get("memo"),
+          sendAll = TemplateVar.get("sendAll");
+
+        if (!to)
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.noReceiver",
+            duration: 2
+          });
+
+        if (sendAll) amount = selectedAccount.eosBalance.value;
+
+        if (_.isEmpty(amount) || amount === "0" || !_.isFinite(amount))
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.noAmount",
+            duration: 2
+          });
+
+        if (
+          new BigNumber(amount, 10).gt(
+            new BigNumber(selectedAccount.eosBalance.value, 10)
+          )
+        )
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.notEnoughFunds",
+            duration: 2
+          });
+
+        amount =
+          amount > 0
+            ? `${parseFloat(amount).toFixed(4)} EOS`
+            : `${parseFloat(0).toFixed(4)} EOS`;
+
+        EthElements.Modal.question(
+          {
+            template: "views_modals_sendTransactionInfo",
+            data: {
+              from: selectedAccount.name,
+              to: to,
+              amount: amount,
+              memo: memo
+            },
+            ok: () => sendTransaction(to, amount, memo),
+            cancel: true
           },
-          ok: sendTransaction,
-          cancel: true
-        },
-        {
-          class: "send-transaction-info"
-        }
-      );
+          {
+            class: "send-transaction-info"
+          }
+        );
+      } else if(send_type === "newaccount") {
+        let accountName = TemplateVar.get("accountName");
+        let publicKey = TemplateVar.get("publicKey");
+
+        createAccount(accountName, publicKey, publicKey)
+      }
     }
   }
 });

@@ -4,10 +4,31 @@
     <form class="account-send-form" action="about:blank" target="dapp-form-helper-iframe" autocomplete="on">
 
         <h1>{{{i18n 'wallet.send.title'}}}</h1>
+        <div class="row clear new-account">
+            <div class="col col-3 mobile-full">
+                <label>
+                    <input type="radio" value="funds" name="choose-type" checked />
+                    <h3>{{{i18n 'wallet.send.funds'}}}</h3>
+                </label>
+            </div>
+            <div class="col col-3 mobile-full">
+                <label>
+                    <input type="radio" value="propose" name="choose-type" />
+                    <h3>{{{i18n 'wallet.send.propose'}}}</h3>
+                </label>
+            </div>
+            <div class="col col-3 mobile-full">
+                <label>
+                    <input type="radio" value="newaccount" name="choose-type" />
+                    <h3>{{{i18n 'wallet.send.newaccount'}}}</h3>
+                </label>
+            </div>
+        </div>
 
+        {{#if $eq (TemplateVar.get "send_type") "funds" }}
         <!-- from/to -->
         <div class="row clear from-to">
-            <div class="col col-6 mobile-full from">
+            <div class="col col-4 mobile-full from">
                 <h3>{{i18n 'wallet.send.from'}}</h3>
 
                 {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
@@ -18,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="col col-6 mobile-full">
+            <div class="col col-4 mobile-full">
                 <h3>{{i18n 'wallet.send.to'}}</h3>
 
                 <div class="dapp-address-input">
@@ -55,12 +76,13 @@
                 <div class="token-ether">
                     <span class="ether-symbol">
                         <div style="margin-top:1px">
-                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAYAAAAvf+5AAAABrElEQVQoU22RTYsTQRCG+2s0YZcEdhTBg3tw41dAMt0zE4MIXhX8B/5M8a7sQdLTPYEgfuzqogdRRBTFzG53T7VUTCSuFvShqaeq3nqLklMxHo8vxBj70+n09WaKnuJYURQ3QwgpY+ypMcav83+BUsrrvV7vqGmacwDQ11o//wfEkYvFwqVp2iAYQvgBAFt1XX9AeNlRKZUQQi4ZY96MRqOBEIJVVfVKKXWZEPIeJSxBKeUda+3+cDhMkiTZTZLkGAC+GGMapdRtY8z+Eszz/CoAtJzzs2tdWZbdEEJgwRljzMt1x70Y43khxJHW+iMWZ1mG/4H3/vNsNjugk8lkBxPe+1tVVT3etCvP83uMsalzrqUonnN+wjn/6b3fruv63arjxU6nc9y2bb9tW0bLsrwSQuDW2heoFbddLbhnrT1USl2LMQYqpXxgrX1ECIn/A9FCpdR9BB8SQp5hF875dgihyxg7AQBGKf22NJvSu7hM1zm365z7NJ/Pv66kAI4tyzINIQwA4Lc9GHhC7/0OpTSuXpcQ8l1r/fbPCTctKYqiiDFuVVX1BHWvc78Aao3gqJS0p1gAAAAASUVORK5CYII=" style="padding-top: 2px;" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAYAAAAvf+5AAAABrElEQVQoU22RTYsTQRCG+2s0YZcEdhTBg3tw41dAMt0zE4MIXhX8B/5M8a7sQdLTPYEgfuzqogdRRBTFzG53T7VUTCSuFvShqaeq3nqLklMxHo8vxBj70+n09WaKnuJYURQ3QwgpY+ypMcav83+BUsrrvV7vqGmacwDQ11o//wfEkYvFwqVp2iAYQvgBAFt1XX9AeNlRKZUQQi4ZY96MRqOBEIJVVfVKKXWZEPIeJSxBKeUda+3+cDhMkiTZTZLkGAC+GGMapdRtY8z+Eszz/CoAtJzzs2tdWZbdEEJgwRljzMt1x70Y43khxJHW+iMWZ1mG/4H3/vNsNjugk8lkBxPe+1tVVT3etCvP83uMsalzrqUonnN+wjn/6b3fruv63arjxU6nc9y2bb9tW0bLsrwSQuDW2heoFbddLbhnrT1USl2LMQYqpXxgrX1ECIn/A9FCpdR9BB8SQp5hF875dgihyxg7AQBGKf22NJvSu7hM1zm365z7NJ/Pv66kAI4tyzINIQwA4Lc9GHhC7/0OpTSuXpcQ8l1r/fbPCTctKYqiiDFuVVX1BHWvc78Aao3gqJS0p1gAAAAASUVORK5CYII="
+                                style="padding-top: 2px;" />
                         </div>
                     </span>
                     <span class="token-name">EOS</span>
                     <span class="balance">
-                       {{i18n 'wallet.app.texts.balance'}} {{selectedBalance.value}} {{selectedBalance.symbol}}
+                        {{i18n 'wallet.app.texts.balance'}} {{selectedBalance.value}} {{selectedBalance.symbol}}
                     </span>
                 </div>
             </div>
@@ -74,7 +96,67 @@
                 <h3>{{i18n 'wallet.send.memo'}}</h3>
                 <textarea name="memo" cols="20" rows="4"></textarea>
             </div>
+            <div class="dapp-clear-fix"></div>
         </div>
+        {{/if}} {{#if $eq (TemplateVar.get "send_type") "propose" }}
+        <!-- from/to -->
+        <div class="row clear from-to">
+            <div class="col col-4 mobile-full from">
+                <h3>{{i18n 'wallet.send.from'}}</h3>
+
+                {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
+
+            </div>
+
+            <div class="col col-4 mobile-full">
+                <h3>{{i18n 'wallet.send.proposer'}}</h3>
+
+                <div class="dapp-address-input">
+                    <input type="text" name="proposer" placeholder="" class="to" autofocus="true">
+                </div>
+            </div>
+
+            <div class="col col-4 mobile-full">
+                <h3>{{i18n 'wallet.send.proposeName'}}</h3>
+                <div class="dapp-address-input">
+                    <input type="text" name="proposeName" placeholder="" class="to" autofocus="true">
+                </div>
+            </div>
+
+            <div class="dapp-clear-fix"></div>
+        </div>
+
+        <div class="row clear compile-contract">
+            <div class="col col-8 mobile-full">
+                <h3>{{i18n 'wallet.send.proposeContent'}}</h3>
+                <textarea name="proposeContent" cols="20" rows="4" readonly value="{{proposeContent}}"></textarea>
+            </div>
+            <div class="dapp-clear-fix"></div>
+        </div>
+        {{/if}} {{#if $eq (TemplateVar.get "send_type") "newaccount" }}
+        <div class="row clear from-to">
+            <div class="col col-4 mobile-full from">
+                <h3>{{i18n 'wallet.send.from'}}</h3>
+
+                {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
+
+            </div>
+            <div class="dapp-clear-fix"></div>
+        </div>
+        <div class="row clear compile-contract">
+
+            <div class="col col-6 mobile-full">
+                <h2>{{{i18n 'wallet.newAccount.create'}}}</h2>
+                <h3>{{{i18n 'wallet.newAccount.accountName'}}}</h3>
+                <input type="text" name="accountName" value="{{accountName}}" autocomplete="accountName" />
+                <h3>{{{i18n 'wallet.newAccount.publicKey'}}}</h3>
+                <input type="text" name="publicKey" value="{{publicKey}}" />
+            </div>
+            <div class="dapp-clear-fix"></div>
+        </div>
+
+        {{/if}}
+
 
         <!-- Total -->
         <div class="row clear total">
@@ -87,6 +169,7 @@
         </div>
 
         <div class="row clear">
+
             <div class="col col-12 mobile-full">
 
                 <h3>{{i18n 'wallet.newWallet.password.input'}}</h3>

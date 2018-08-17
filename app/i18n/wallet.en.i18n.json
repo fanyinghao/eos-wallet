@@ -246,8 +246,11 @@
       }
     },
     "send": {
-      "title": "<strong>Send</strong> funds",
+      "title": "<strong>Send</strong>",
       "sendInfoTitle": "Send",
+      "funds": "Transfer Fund",
+      "propose": "Sign Propose",
+      "newaccount": "New Account",
       "pickAddress": "Pick an address",
       "to": "To",
       "showNotice": "Requires MulitSig",
@@ -359,6 +362,7 @@
       }
     },
     "newAccount": {
+      "create":"Create",
       "accountName": "Account Name",
       "publicKey": "Public Key",
       "privateKey": "Private Key",
