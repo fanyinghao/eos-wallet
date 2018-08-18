@@ -349,6 +349,9 @@ Template["views_send"].events({
                 ) {
                   for (let i = 0; i < accounts.account_names.length; i++) {
                     let name = accounts.account_names[i];
+                    if(name === selectedAccount.account_name)
+                      continue;
+
                     permissions[name] = {
                       name: name,
                       actor: name,
@@ -469,6 +472,14 @@ Template["views_send"].events({
               )
               .then(onSuccess, onError);
           } else {
+            provider = keystore.SignProvider(selectedProposer, password);
+            const propose_eos = Eos({
+              httpEndpoint: httpEndpoint,
+              chainId: chainId,
+              signProvider: provider,
+              verbose: false
+            });
+
             permissions = Object.values(
               TemplateVar.get(template, "permissions")
             );
@@ -480,8 +491,8 @@ Template["views_send"].events({
             if (!permissions || permissions.length === 0)
               throw new Error("not ready");
 
-            _eos.contract("eosio.msig").then(msig => {
-              _eos
+            propose_eos.contract("eosio.msig").then(msig => {
+              propose_eos
                 .transfer(
                   selectedAccount.name,
                   _to,
@@ -500,7 +511,7 @@ Template["views_send"].events({
                     .propose(
                       _proposer,
                       `tr${randomWord(false, 10)}`,
-                      permissions,
+                      Array.prototype.map.call(permissions, item => {return {actor: item.actor, permission: item.permission}}),
                       transfer.transaction.transaction
                     )
                     .then(onSuccess, onError);

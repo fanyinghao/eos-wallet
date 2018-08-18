@@ -26,7 +26,9 @@
                 <h4>{{i18n 'wallet.newWallet.accountType.multisig.accountOwnersTitle'}}</h4>
 
                 {{#each signees}} 
-                    {{> dapp_addressInput placeholder=i18nOwnerAddress class="owners" value=(this)}} 
+                    <div class="dapp-address-input">
+                        <input type="text" value="{{this}}" class="owners" />
+                    </div>
                 {{/each}}
             </div>
         </div>
