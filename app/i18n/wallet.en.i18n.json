@@ -253,7 +253,7 @@
       "newaccount": "New Account",
       "pickAddress": "Pick an address",
       "to": "To",
-      "showNotice": "Requires MulitSig",
+      "showNotice": "Requires Propose MulitSig, Proposer:",
       "from": "From",
       "amount": "Amount",
       "tokenAmount": "Token amount",

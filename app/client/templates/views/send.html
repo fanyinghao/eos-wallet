@@ -34,8 +34,15 @@
                 {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
 
                 <div class="indented-box">
-                    <br> {{#if showNotice}} <span>{{i18n 'wallet.send.showNotice'}} </span>
-                    {{else}} <span>&nbsp;</span> {{/if}}
+                    <br> 
+                    {{#if isMultiSig}} 
+                        <span>{{i18n 'wallet.send.showNotice'}} </span>
+                        <br> 
+                        {{> dapp_selectAccount accounts=(proposers) class='send-proposer'}}
+
+                    {{else}} 
+                        <span>&nbsp;</span> 
+                    {{/if}}
                 </div>
             </div>
 

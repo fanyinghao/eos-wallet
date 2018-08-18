@@ -140,20 +140,9 @@ Template["views_send"].helpers({
       TemplateVar.getFrom(".dapp-select-account.send-from", "value")
     ];
   },
-  showNotice: function() {
-    let selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
-      ];
-    let multiSig = false;
-    selectedAccount &&
-      selectedAccount.permissions &&
-      selectedAccount.permissions.map(item => {
-        if (item.perm_name === "active") {
-          multiSig = item.required_auth.threshold > 1;
-        }
-      });
-    return multiSig;
+  isMultiSig: function() {
+    let isMultiSig = TemplateVar.get("isMultiSig");
+    return isMultiSig;
   },
   selectedBalance: function() {
     selectedAccount =
@@ -202,6 +191,14 @@ Template["views_send"].helpers({
           console.log(err);
         }
       );
+  },
+  proposers: function() {
+    let permissions = Object.values(TemplateVar.get("permissions"));
+    // if (permissions && permissions.length > 0){
+    //   permissions[0].selected = "selected";
+
+    // }
+    return permissions;
   }
 });
 
@@ -326,6 +323,47 @@ Template["views_send"].events({
   ) {
     TemplateVar.set("publicKey", e.currentTarget.value);
   },
+  'change select[name="dapp-select-account"].send-from': function(e, template) {
+    let selectedAccount = ObservableAccounts.accounts[e.target.value];
+    let isMultiSig = false;
+    let permissionCount = 0;
+
+    let permissions = [];
+    TemplateVar.set(template, "permissions", permissions);
+
+    selectedAccount &&
+      selectedAccount.permissions &&
+      selectedAccount.permissions.map(item => {
+        if (item.perm_name === "active") {
+          isMultiSig = item.required_auth.threshold > 1;
+          permissionCount = item.required_auth.keys.length;
+          TemplateVar.set("isMultiSig", isMultiSig);
+          TemplateVar.set("permissionCount", permissionCount);
+
+          if (isMultiSig) {
+            item.required_auth.keys.map(obj => {
+              eos.getKeyAccounts(obj.key).then(accounts => {
+                if (
+                  accounts.account_names &&
+                  accounts.account_names.length > 0
+                ) {
+                  for (let i = 0; i < accounts.account_names.length; i++) {
+                    let name = accounts.account_names[i];
+                    permissions[name] = {
+                      name: name,
+                      actor: name,
+                      permission: "active"
+                    };
+                    if (i === 0) permissions[name].selected = "selected";
+                  }
+                  TemplateVar.set(template, "permissions", permissions);
+                }
+              });
+            });
+          }
+        }
+      });
+  },
   /**
     Submit the form and send the transaction!
 
@@ -337,6 +375,10 @@ Template["views_send"].events({
       ObservableAccounts.accounts[
         TemplateVar.getFrom(".dapp-select-account.send-from", "value")
       ];
+    let selectedProposer = TemplateVar.getFrom(
+      ".dapp-select-account.send-proposer",
+      "value"
+    );
     let password = TemplateVar.get("password");
 
     let provider = keystore.SignProvider(selectedAccount.name, password);
@@ -388,30 +430,83 @@ Template["views_send"].events({
         return;
       };
 
+      function randomWord(randomFlag, min, max) {
+        var str = "",
+          range = min,
+          arr = [
+            "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"
+          ];
+
+        // 随机产生
+        if (randomFlag) {
+          range = Math.round(Math.random() * (max - min)) + min;
+        }
+        for (var i = 0; i < range; i++) {
+          pos = Math.round(Math.random() * (arr.length - 1));
+          str += arr[pos];
+        }
+        return str;
+      }
+
       // The function to send the transaction
-      var sendTransaction = function(_to, _amount, _memo) {
+      var sendTransaction = async function(_to, _amount, _memo, _proposer) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
         try {
-          let multiSig = false;
-          selectedAccount &&
-            selectedAccount.permissions &&
-            selectedAccount.permissions.map(item => {
-              if (item.perm_name === "active") {
-                multiSig = item.required_auth.threshold > 1;
-              }
-            });
+          let isMultiSig = TemplateVar.get(template, "isMultiSig");
+          let permissions = [];
+          let permissionCount = 0;
 
-          _eos
-            .transfer(
-              selectedAccount.name,
-              _to,
-              _amount,
-              _memo || "transfer",
-              true
-            )
-            .then(onSuccess, onError);
+          if (!isMultiSig) {
+            _eos
+              .transfer(
+                selectedAccount.name,
+                _to,
+                _amount,
+                _memo || "transfer",
+                true
+              )
+              .then(onSuccess, onError);
+          } else {
+            permissions = Object.values(
+              TemplateVar.get(template, "permissions")
+            );
+            permissionCount = TemplateVar.get(template, "permissionCount");
+
+            if (!selectedProposer)
+              throw new Error("i18n:wallet.accounts.noProposer");
+
+            if (!permissions || permissions.length === 0)
+              throw new Error("not ready");
+
+            _eos.contract("eosio.msig").then(msig => {
+              _eos
+                .transfer(
+                  selectedAccount.name,
+                  _to,
+                  _amount,
+                  _memo || "transfer",
+                  { broadcast: false, sign: false }
+                )
+                .then(transfer => {
+                  transfer.transaction.transaction.max_net_usage_words = 0;
+                  transfer.transaction.transaction.expiration = new Date(
+                    Date.parse(new Date()) + 1000 * 60 * 60 //60mins
+                  );
+                  console.log(transfer.transaction.transaction);
+
+                  msig
+                    .propose(
+                      _proposer,
+                      `tr${randomWord(false, 10)}`,
+                      permissions,
+                      transfer.transaction.transaction
+                    )
+                    .then(onSuccess, onError);
+                });
+            });
+          }
         } catch (e) {
           console.log(e);
           TemplateVar.set(template, "sending", false);
@@ -421,6 +516,12 @@ Template["views_send"].events({
           ) {
             GlobalNotification.warning({
               content: "i18n:wallet.accounts.wrongPassword",
+              duration: 2
+            });
+            return;
+          } else {
+            GlobalNotification.warning({
+              content: e.message,
               duration: 2
             });
             return;
@@ -456,6 +557,20 @@ Template["views_send"].events({
             });
           })
           .then(onSuccess, onError);
+      };
+
+      var approveProposal = function(_proposer, _name) {
+        // show loading
+        TemplateVar.set(template, "sending", true);
+
+        _eos.contract("eosio.msig").then(msig => {
+          msig
+            .approve(_proposer, _name, {
+              actor: selectedAccount.name,
+              permission: "active"
+            })
+            .then(onSuccess, onError);
+        });
       };
 
       if (send_type === "funds") {
@@ -502,18 +617,23 @@ Template["views_send"].events({
               amount: amount,
               memo: memo
             },
-            ok: () => sendTransaction(to, amount, memo),
+            ok: () => sendTransaction(to, amount, memo, selectedProposer),
             cancel: true
           },
           {
             class: "send-transaction-info"
           }
         );
-      } else if(send_type === "newaccount") {
+      } else if (send_type === "newaccount") {
         let accountName = TemplateVar.get("accountName");
         let publicKey = TemplateVar.get("publicKey");
 
-        createAccount(accountName, publicKey, publicKey)
+        createAccount(accountName, publicKey, publicKey);
+      } else if (send_type === "propose") {
+        let proposer = TemplateVar.get("proposer");
+        let proposeName = TemplateVar.get("proposeName");
+
+        approveProposal(proposer, proposeName);
       }
     }
   }
