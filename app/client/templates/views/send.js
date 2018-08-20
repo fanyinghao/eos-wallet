@@ -193,11 +193,10 @@ Template["views_send"].helpers({
       );
   },
   proposers: function() {
-    let permissions = Object.values(TemplateVar.get("permissions"));
-    // if (permissions && permissions.length > 0){
-    //   permissions[0].selected = "selected";
-
-    // }
+    let permissions = TemplateVar.get("permissions");
+    if (permissions && permissions.length > 0) {
+      permissions[0].selected = "selected";
+    }
     return permissions;
   }
 });
@@ -336,33 +335,40 @@ Template["views_send"].events({
       selectedAccount.permissions.map(item => {
         if (item.perm_name === "active") {
           isMultiSig = item.required_auth.threshold > 1;
-          permissionCount = item.required_auth.keys.length;
+          permissionCount = item.required_auth.accounts.length;
           TemplateVar.set("isMultiSig", isMultiSig);
           TemplateVar.set("permissionCount", permissionCount);
 
           if (isMultiSig) {
-            item.required_auth.keys.map(obj => {
-              eos.getKeyAccounts(obj.key).then(accounts => {
-                if (
-                  accounts.account_names &&
-                  accounts.account_names.length > 0
-                ) {
-                  for (let i = 0; i < accounts.account_names.length; i++) {
-                    let name = accounts.account_names[i];
-                    if(name === selectedAccount.account_name)
-                      continue;
+            // item.required_auth.keys.map(obj => {
+            //   eos.getKeyAccounts(obj.key).then(accounts => {
+            //     if (
+            //       accounts.account_names &&
+            //       accounts.account_names.length > 0
+            //     ) {
+            //       for (let i = 0; i < accounts.account_names.length; i++) {
+            //         let name = accounts.account_names[i];
+            //         if (name === selectedAccount.account_name) continue;
 
-                    permissions[name] = {
-                      name: name,
-                      actor: name,
-                      permission: "active"
-                    };
-                    if (i === 0) permissions[name].selected = "selected";
-                  }
-                  TemplateVar.set(template, "permissions", permissions);
-                }
-              });
-            });
+            //         permissions[name] = {
+            //           name: name,
+            //           actor: name,
+            //           permission: "active"
+            //         };
+            //         if (i === 0) permissions[name].selected = "selected";
+            //       }
+            //       TemplateVar.set(template, "permissions", permissions);
+            //     }
+            //   });
+            // });
+            permissions = Array.prototype.map.call(
+              item.required_auth.accounts,
+              item => {
+                item.permission.name = item.permission.actor;
+                return item.permission;
+              }
+            );
+            TemplateVar.set(template, "permissions", permissions);
           }
         }
       });
@@ -383,14 +389,6 @@ Template["views_send"].events({
       "value"
     );
     let password = TemplateVar.get("password");
-
-    let provider = keystore.SignProvider(selectedAccount.name, password);
-    const _eos = Eos({
-      httpEndpoint: httpEndpoint,
-      chainId: chainId,
-      signProvider: provider,
-      verbose: false
-    });
 
     if (selectedAccount && !TemplateVar.get("sending")) {
       if (selectedAccount.eosBalance == 0)
@@ -418,7 +416,7 @@ Template["views_send"].events({
             );
             return true;
           },
-          okText: TAPi18n.__("wallet.accounts.buttons.viewOnExplorer")
+          okText: `#${tr.transaction_id.substr(0, 10)}..`
         });
       };
 
@@ -437,7 +435,32 @@ Template["views_send"].events({
         var str = "",
           range = min,
           arr = [
-            "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o",
+            "p",
+            "q",
+            "r",
+            "s",
+            "t",
+            "u",
+            "v",
+            "w",
+            "x",
+            "y",
+            "z"
           ];
 
         // 随机产生
@@ -462,6 +485,17 @@ Template["views_send"].events({
           let permissionCount = 0;
 
           if (!isMultiSig) {
+            let provider = keystore.SignProvider(
+              selectedAccount.name,
+              password
+            );
+            const _eos = Eos({
+              httpEndpoint: httpEndpoint,
+              chainId: chainId,
+              signProvider: provider,
+              verbose: false
+            });
+
             _eos
               .transfer(
                 selectedAccount.name,
@@ -472,11 +506,14 @@ Template["views_send"].events({
               )
               .then(onSuccess, onError);
           } else {
-            provider = keystore.SignProvider(selectedProposer, password);
+            let propose_provider = keystore.SignProvider(
+              selectedProposer,
+              password
+            );
             const propose_eos = Eos({
               httpEndpoint: httpEndpoint,
               chainId: chainId,
-              signProvider: provider,
+              signProvider: propose_provider,
               verbose: false
             });
 
@@ -492,7 +529,7 @@ Template["views_send"].events({
               throw new Error("not ready");
 
             propose_eos.contract("eosio.msig").then(msig => {
-              propose_eos
+              eos
                 .transfer(
                   selectedAccount.name,
                   _to,
@@ -506,15 +543,35 @@ Template["views_send"].events({
                     Date.parse(new Date()) + 1000 * 60 * 60 //60mins
                   );
                   console.log(transfer.transaction.transaction);
-
+                  const proposal_name = `tr${randomWord(false, 10)}`;
                   msig
                     .propose(
                       _proposer,
-                      `tr${randomWord(false, 10)}`,
-                      Array.prototype.map.call(permissions, item => {return {actor: item.actor, permission: item.permission}}),
-                      transfer.transaction.transaction
+                      proposal_name,
+                      Array.prototype.map.call(permissions, item => {
+                        return {
+                          actor: item.actor,
+                          permission: item.permission
+                        };
+                      }),
+                      transfer.transaction.transaction,
+                      { authorization: `${selectedProposer}@active` }
                     )
-                    .then(onSuccess, onError);
+                    .then(tx => {
+                      EthElements.Modal.question(
+                        {
+                          text: TAPi18n.__("wallet.send.proposeResp", {
+                            proposeName: proposal_name
+                          }),
+                          ok: function() {
+                            onSuccess(tx);
+                          }
+                        },
+                        {
+                          closeable: false
+                        }
+                      );
+                    }, onError);
                 });
             });
           }
@@ -543,6 +600,14 @@ Template["views_send"].events({
       var createAccount = function(_name, _owner, _active) {
         // show loading
         TemplateVar.set(template, "sending", true);
+
+        let provider = keystore.SignProvider(selectedAccount.name, password);
+        const _eos = Eos({
+          httpEndpoint: httpEndpoint,
+          chainId: chainId,
+          signProvider: provider,
+          verbose: false
+        });
 
         _eos
           .transaction(tr => {
@@ -574,13 +639,46 @@ Template["views_send"].events({
         // show loading
         TemplateVar.set(template, "sending", true);
 
-        _eos.contract("eosio.msig").then(msig => {
+        let signProvider = keystore.SignProvider(
+          selectedAccount.name,
+          password
+        );
+        const _eos_app = Eos({
+          httpEndpoint: httpEndpoint,
+          chainId: chainId,
+          signProvider: signProvider,
+          verbose: false
+        });
+
+        _eos_app.contract("eosio.msig").then(msig => {
           msig
-            .approve(_proposer, _name, {
-              actor: selectedAccount.name,
-              permission: "active"
-            })
-            .then(onSuccess, onError);
+            .approve(
+              _proposer,
+              _name,
+              {
+                actor: selectedAccount.name,
+                permission: "active"
+              },
+              {
+                broadcast: true,
+                authorization: `${selectedAccount.name}@active`
+              }
+            )
+            .then(tx => {
+              msig
+                .exec(_proposer, _name, selectedAccount.name, {
+                  broadcast: true,
+                  authorization: `${selectedAccount.name}@active`
+                })
+                .then(
+                  exec_tx => {
+                    onSuccess(exec_tx);
+                  },
+                  () => {
+                    onSuccess(tx);
+                  }
+                );
+            }, onError);
         });
       };
 

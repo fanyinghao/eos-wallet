@@ -105,7 +105,9 @@
             </div>
             <div class="dapp-clear-fix"></div>
         </div>
-        {{/if}} {{#if $eq (TemplateVar.get "send_type") "propose" }}
+        {{/if}} 
+        
+        {{#if $eq (TemplateVar.get "send_type") "propose" }}
         <!-- from/to -->
         <div class="row clear from-to">
             <div class="col col-4 mobile-full from">
@@ -132,15 +134,17 @@
 
             <div class="dapp-clear-fix"></div>
         </div>
-
+<!-- 
         <div class="row clear compile-contract">
             <div class="col col-8 mobile-full">
                 <h3>{{i18n 'wallet.send.proposeContent'}}</h3>
                 <textarea name="proposeContent" cols="20" rows="4" readonly value="{{proposeContent}}"></textarea>
             </div>
             <div class="dapp-clear-fix"></div>
-        </div>
-        {{/if}} {{#if $eq (TemplateVar.get "send_type") "newaccount" }}
+        </div> -->
+        {{/if}} 
+        
+        {{#if $eq (TemplateVar.get "send_type") "newaccount" }}
         <div class="row clear from-to">
             <div class="col col-4 mobile-full from">
                 <h3>{{i18n 'wallet.send.from'}}</h3>
@@ -164,6 +168,7 @@
 
         {{/if}}
 
+        {{#if $neq (TemplateVar.get "send_type") "propose" }}
 
         <!-- Total -->
         <div class="row clear total">
@@ -174,6 +179,7 @@
 
             <div class="dapp-clear-fix"></div>
         </div>
+        {{/if}}
 
         <div class="row clear">
 
