@@ -616,12 +616,16 @@ Template["views_send"].events({
               name: _name,
               owner: _owner,
               active: _active
+            }, {
+              authorization: `${selectedAccount.name}@active`
             });
 
             tr.buyram({
               payer: selectedAccount.name,
               receiver: _name,
               quant: "0.6295 EOS"
+            }, {
+              authorization: `${selectedAccount.name}@active`
             });
 
             tr.delegatebw({
@@ -630,6 +634,8 @@ Template["views_send"].events({
               stake_net_quantity: "0.0050 EOS",
               stake_cpu_quantity: "0.0400 EOS",
               transfer: 0
+            }, {
+              authorization: `${selectedAccount.name}@active`
             });
           })
           .then(onSuccess, onError);
