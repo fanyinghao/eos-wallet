@@ -31,11 +31,16 @@
                     <h1></h1>
                     <h2 class="copyable-address">{{walletIcon}}
                         <!-- <input type="text" value="{{toChecksumAddress address}}" readonly class=""> -->
-                        <b>{{perm_name}}</b>
+                        <b>{{perm_name}}</b><span>(threshold {{required_auth.threshold}})</span>
                         <br />
                         {{#each required_auth.keys}}
                         <span>{{key}}</span>
                         {{/each}}
+                        <ul>
+                            {{#each required_auth.accounts}}
+                            <li><a href="{{pathFor route='account' name=(permission.actor)}}" >{{permission.actor}}</a> (weight {{weight}})</li>
+                            {{/each}}
+                        </ul>
                     </h2>
                     {{/each}}
 
