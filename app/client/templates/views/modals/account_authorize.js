@@ -49,9 +49,9 @@ Template["views_account_authorize"].helpers({
   signees: function() {
     let owners = this.owners;
     let insert = TemplateVar.get("multisigSignees") - owners.length;
-    if (insert < 0){
+    if (insert < 0) {
       insert = TemplateVar.get("multisigSignees");
-      owners = new Array(insert).fill("")
+      owners = new Array(insert).fill("");
     } else {
       owners = owners.concat(new Array(insert).fill(""));
     }
@@ -142,6 +142,7 @@ Template["views_account_authorize"].events({
     let formValues = InlineForm(".inline-form");
     let password = TemplateVar.get("password");
     let threshold = TemplateVar.get("multisigSignatures");
+    let self = this;
 
     if (this.account && !TemplateVar.get("sending")) {
       if (!password || password.length === 0)
@@ -153,7 +154,7 @@ Template["views_account_authorize"].events({
       var owners = _.uniq(
         _.compact(
           _.map(template.findAll("input.owners"), function(item) {
-            if (ecc.isValidPublic(item.value)) return item.value;
+            return item.value;
           })
         )
       );
@@ -179,9 +180,9 @@ Template["views_account_authorize"].events({
         });
 
         let required_auth = {
-          keys: Array.prototype.map.call(owners, function(obj) {
+          accounts: Array.prototype.map.call(owners, function(obj) {
             return {
-              key: obj,
+              permission: { actor: obj, permission: "active" },
               weight: 1
             };
           }),
@@ -210,15 +211,24 @@ Template["views_account_authorize"].events({
                 content: "i18n:wallet.authMultiSig.success",
                 duration: 2
               });
+
+              FlowRouter.go('/dashboard/');
             },
             err => {
               TemplateVar.set(template, "sending", false);
 
-              GlobalNotification.error({
-                content: JSON.parse(err).error.message,
-                duration: 20
-              });
-              return;
+              let error = JSON.parse(err)
+              if(error && error.error) {
+                GlobalNotification.error({
+                  content: JSON.parse(err).error.message,
+                  duration: 20
+                });
+              } else {
+                GlobalNotification.error({
+                  content: err.message,
+                  duration: 20
+                });
+              }
             }
           );
       } catch (e) {

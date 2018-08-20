@@ -390,8 +390,8 @@ Template['views_account'].events({
     let account = this;
     account.permissions.forEach((item) => {
       if(item.perm_name === "active"){
-        owners = Array.prototype.map.call(item.required_auth.keys, function(obj) {
-          return obj.key;
+        owners = Array.prototype.map.call(item.required_auth.accounts, function(obj) {
+          return obj.permission.actor;
         });
         return;
       }
