@@ -283,7 +283,11 @@
         "notEnoughFunds": "You don't have enough funds in the account.",
         "noReceiver": "You didn't specify a receiver.",
         "noAmount": "You didn't specify an amount to send.",
-        "rejectedInMetamask": "You have rejected the transaction in MetaMask."
+        "rejectedInMetamask": "You have rejected the transaction in MetaMask.",
+        "noAccountName": "You didn't specify the account name",
+        "noPublicKey": "You didn't specify the public key",
+        "noProposer": "You didn't specify the propser",
+        "noProposeName": "You didn't specify the proposal name"
       },
       "texts": {
         "ownerPaysGas": "Gas is paid by the owner of the wallet contract",

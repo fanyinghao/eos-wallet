@@ -23,7 +23,10 @@ var translateExternalErrorMessage = function(message) {
   // 'setTxStatusRejected' occurs in the stack trace of the error message triggered when
   // the user has rejects a transaction in MetaMask. Show a localised error message
   // instead of the stack trace.
-  return `[${message.code}] - ${message.name} - ${message.what}`;
+  let ret = `[${message.code}] - [${message.name}] - ${message.what}`;
+  if(message.details && message.details.length > 0) 
+    ret += ` - ${message.details[0].message}`
+  return ret;
 };
 
 // Set basic variables
@@ -424,10 +427,18 @@ Template["views_send"].events({
         TemplateVar.set(template, "sending", false);
 
         EthElements.Modal.hide();
-        GlobalNotification.error({
-          content: translateExternalErrorMessage(JSON.parse(err).error),
-          duration: 20
-        });
+        if (err.message) {
+          GlobalNotification.error({
+            content: err.message,
+            duration: 20
+          });
+        } else {
+          let error = JSON.parse(err);
+          GlobalNotification.error({
+            content: translateExternalErrorMessage(error.error),
+            duration: 20
+          });
+        }
         return;
       };
 
@@ -474,8 +485,29 @@ Template["views_send"].events({
         return str;
       }
 
+      var handleError = function(e) {
+        console.log(e);
+        TemplateVar.set(template, "sending", false);
+        if (
+          e.message === "wrong password" ||
+          e.message === "gcm: tag doesn't match"
+        ) {
+          GlobalNotification.warning({
+            content: "i18n:wallet.accounts.wrongPassword",
+            duration: 2
+          });
+          return;
+        } else {
+          GlobalNotification.warning({
+            content: e.message,
+            duration: 2
+          });
+          return;
+        }
+      };
+
       // The function to send the transaction
-      var sendTransaction = async function(_to, _amount, _memo, _proposer) {
+      var sendTransaction = function(_to, _amount, _memo, _proposer) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
@@ -576,24 +608,7 @@ Template["views_send"].events({
             });
           }
         } catch (e) {
-          console.log(e);
-          TemplateVar.set(template, "sending", false);
-          if (
-            e.message === "wrong password" ||
-            e.message === "gcm: tag doesn't match"
-          ) {
-            GlobalNotification.warning({
-              content: "i18n:wallet.accounts.wrongPassword",
-              duration: 2
-            });
-            return;
-          } else {
-            GlobalNotification.warning({
-              content: e.message,
-              duration: 2
-            });
-            return;
-          }
+          handleError(e);
         }
       };
 
@@ -601,91 +616,108 @@ Template["views_send"].events({
         // show loading
         TemplateVar.set(template, "sending", true);
 
-        let provider = keystore.SignProvider(selectedAccount.name, password);
-        const _eos = Eos({
-          httpEndpoint: httpEndpoint,
-          chainId: chainId,
-          signProvider: provider,
-          verbose: false
-        });
+        try {
+          let provider = keystore.SignProvider(selectedAccount.name, password);
+          const _eos = Eos({
+            httpEndpoint: httpEndpoint,
+            chainId: chainId,
+            signProvider: provider,
+            verbose: false
+          });
 
-        _eos
-          .transaction(tr => {
-            tr.newaccount({
-              creator: selectedAccount.name,
-              name: _name,
-              owner: _owner,
-              active: _active
-            }, {
-              authorization: `${selectedAccount.name}@active`
-            });
+          _eos
+            .transaction(tr => {
+              tr.newaccount(
+                {
+                  creator: selectedAccount.name,
+                  name: _name,
+                  owner: _owner,
+                  active: _active
+                },
+                {
+                  authorization: `${selectedAccount.name}@active`
+                }
+              );
 
-            tr.buyram({
-              payer: selectedAccount.name,
-              receiver: _name,
-              quant: "0.6295 EOS"
-            }, {
-              authorization: `${selectedAccount.name}@active`
-            });
+              tr.buyram(
+                {
+                  payer: selectedAccount.name,
+                  receiver: _name,
+                  quant: "0.6295 EOS"
+                },
+                {
+                  authorization: `${selectedAccount.name}@active`
+                }
+              );
 
-            tr.delegatebw({
-              from: selectedAccount.name,
-              receiver: _name,
-              stake_net_quantity: "0.0050 EOS",
-              stake_cpu_quantity: "0.0400 EOS",
-              transfer: 0
-            }, {
-              authorization: `${selectedAccount.name}@active`
-            });
-          })
-          .then(onSuccess, onError);
+              tr.delegatebw(
+                {
+                  from: selectedAccount.name,
+                  receiver: _name,
+                  stake_net_quantity: "0.0050 EOS",
+                  stake_cpu_quantity: "0.0400 EOS",
+                  transfer: 0
+                },
+                {
+                  authorization: `${selectedAccount.name}@active`
+                }
+              );
+            })
+            .then(onSuccess, onError);
+        } catch (e) {
+          handleError(e);
+        }
       };
 
       var approveProposal = function(_proposer, _name) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
-        let signProvider = keystore.SignProvider(
-          selectedAccount.name,
-          password
-        );
-        const _eos_app = Eos({
-          httpEndpoint: httpEndpoint,
-          chainId: chainId,
-          signProvider: signProvider,
-          verbose: false
-        });
+        try {
+          let signProvider = keystore.SignProvider(
+            selectedAccount.name,
+            password
+          );
+          const _eos_app = Eos({
+            httpEndpoint: httpEndpoint,
+            chainId: chainId,
+            signProvider: signProvider,
+            verbose: false
+          });
 
-        _eos_app.contract("eosio.msig").then(msig => {
-          msig
-            .approve(
-              _proposer,
-              _name,
-              {
-                actor: selectedAccount.name,
-                permission: "active"
-              },
-              {
-                broadcast: true,
-                authorization: `${selectedAccount.name}@active`
-              }
-            )
-            .then(tx => {
-              msig
-                .exec(_proposer, _name, selectedAccount.name, {
+          _eos_app.contract("eosio.msig").then(msig => {
+            msig
+              .approve(
+                _proposer,
+                _name,
+                {
+                  actor: selectedAccount.name,
+                  permission: "active"
+                },
+                {
                   broadcast: true,
                   authorization: `${selectedAccount.name}@active`
-                })
-                .then(
-                  exec_tx => {
-                    onSuccess(exec_tx);
-                  },
-                  () => {
-                    onSuccess(tx);
-                  }
-                );
-            }, onError);
-        });
+                }
+              )
+              .then(tx => {
+                msig
+                  .exec(_proposer, _name, selectedAccount.name, {
+                    broadcast: true,
+                    authorization: `${selectedAccount.name}@active`
+                  })
+                  .then(
+                    exec_tx => {
+                      onSuccess(exec_tx);
+                    },
+                    () => {
+                      onSuccess(tx);
+                    }
+                  );
+              }, onError);
+          });
+        } catch (e) {
+          handleError(e);
+        }
       };
 
       if (send_type === "funds") {
@@ -743,11 +775,33 @@ Template["views_send"].events({
         let accountName = TemplateVar.get("accountName");
         let publicKey = TemplateVar.get("publicKey");
 
+        if (!accountName)
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.noAccountName",
+            duration: 2
+          });
+
+        if (!publicKey)
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.noPublicKey",
+            duration: 2
+          });
+
         createAccount(accountName, publicKey, publicKey);
       } else if (send_type === "propose") {
         let proposer = TemplateVar.get("proposer");
         let proposeName = TemplateVar.get("proposeName");
 
+        if (!proposer)
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.noProposer",
+            duration: 2
+          });
+        if (!proposeName)
+          return GlobalNotification.warning({
+            content: "i18n:wallet.send.error.noProposeName",
+            duration: 2
+          });
         approveProposal(proposer, proposeName);
       }
     }

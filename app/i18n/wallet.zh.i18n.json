@@ -272,7 +272,11 @@
                 "emptyWallet": "您的账号钱包是空的。",
                 "notEnoughFunds": "您此账户并没有足够的资金。",
                 "noReceiver": "您并未指定接收人。",
-                "noAmount": "您并未指定发送数量。"
+                "noAmount": "您并未指定发送数量。",
+                "noAccountName": "您并未指定账户名称。",
+                "noPublicKey": "您并未指定公钥地址。",
+                "noProposer": "您并未指定提案人。",
+                "noProposeName": "您并未指定提案名称。"
             },
             "texts": {
                 "ownerPaysGas": "瓦斯由钱包合约所有人支付、。",
