@@ -38,8 +38,16 @@
                     {{#if isMultiSig}} 
                         <span>{{i18n 'wallet.send.showNotice'}} </span>
                         <br> 
-                        {{> dapp_selectAccount accounts=(proposers) class='send-proposer'}}
-
+                        <!-- {{> dapp_selectAccount accounts=(TemplateVar.get "permissions") class='send-proposer'}} -->
+                        <div class="dapp-select-account send-proposer">
+                            <select name="dapp-select-account" class="send-proposer">
+                                {{#each proposers }}
+                                    <option value="{{name}}" {{isSelected selected}} >
+                                        {{name}}
+                                    </option>
+                                    {{/each}}
+                            </select>
+                        </div>
                     {{else}} 
                         <span>&nbsp;</span> 
                     {{/if}}

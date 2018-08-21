@@ -134,7 +134,9 @@ Returns a list of accounts and wallets sorted by balance
 Template.registerHelper('selectAccounts', function() {
   if(Object.keys(ObservableAccounts.accounts).length === 0)
     FlowRouter.go("dashboard");
-  return Object.values(ObservableAccounts.accounts);
+  return Object.values(ObservableAccounts.accounts).filter((item) => {
+    return !item.creating;
+  });
 });
 
 /**

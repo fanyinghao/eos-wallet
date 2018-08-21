@@ -70,6 +70,14 @@ Template["views_send"].onRendered(function() {
   }
 });
 
+Template.views_send.rendered = function() {
+  console.log("rendered");
+
+  if (TemplateVar.get("isMultiSig")) {
+    console.log("here");
+  }
+};
+
 Template["views_send"].helpers({
   checked: function(type) {
     return TemplateVar.get("send_type") === type;
@@ -93,8 +101,13 @@ Template["views_send"].helpers({
       ObservableAccounts.accounts[
         TemplateVar.getFrom(".dapp-select-account.send-from", "value")
       ];
-    if (selectedAccount) return selectedAccount.eosBalance;
-    return { value: "0.0000", symbal: "EOS" };
+
+    let empty = { value: "0.0000", symbol: "EOS" };
+    if (!selectedAccount) return empty;
+
+    if (!selectedAccount.eosBalance) selectedAccount.eosBalance = empty;
+
+    return selectedAccount.eosBalance;
   },
   inputAmount: function() {
     return TemplateVar.get("amount");
@@ -139,9 +152,13 @@ Template["views_send"].helpers({
   proposers: function() {
     let permissions = TemplateVar.get("permissions");
     if (permissions && permissions.length > 0) {
-      permissions[0].selected = "selected";
+      permissions[0].selected = true;
     }
     return permissions;
+  },
+    isSelected: function(selected) {
+    debugger;
+    return selected ? "selected" : "";
   }
 });
 
@@ -284,27 +301,6 @@ Template["views_send"].events({
           TemplateVar.set("permissionCount", permissionCount);
 
           if (isMultiSig) {
-            // item.required_auth.keys.map(obj => {
-            //   eos.getKeyAccounts(obj.key).then(accounts => {
-            //     if (
-            //       accounts.account_names &&
-            //       accounts.account_names.length > 0
-            //     ) {
-            //       for (let i = 0; i < accounts.account_names.length; i++) {
-            //         let name = accounts.account_names[i];
-            //         if (name === selectedAccount.account_name) continue;
-
-            //         permissions[name] = {
-            //           name: name,
-            //           actor: name,
-            //           permission: "active"
-            //         };
-            //         if (i === 0) permissions[name].selected = "selected";
-            //       }
-            //       TemplateVar.set(template, "permissions", permissions);
-            //     }
-            //   });
-            // });
             permissions = Array.prototype.map.call(
               item.required_auth.accounts,
               item => {
@@ -328,10 +324,7 @@ Template["views_send"].events({
       ObservableAccounts.accounts[
         TemplateVar.getFrom(".dapp-select-account.send-from", "value")
       ];
-    let selectedProposer = TemplateVar.getFrom(
-      ".dapp-select-account.send-proposer",
-      "value"
-    );
+    let selectedProposer = template.find('.dapp-select-account .send-proposer').value;
     let password = TemplateVar.get("password");
 
     if (selectedAccount && !TemplateVar.get("sending")) {
