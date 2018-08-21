@@ -32,6 +32,7 @@ var translateExternalErrorMessage = function(message) {
 // Set basic variables
 Template["views_send"].onCreated(function() {
   var template = this;
+  EthElements.Modal.hide();
 
   let keys = Object.keys(ObservableAccounts.accounts);
   if (keys.length > 0)

@@ -342,6 +342,13 @@ Template["views_account_create"].events({
           duration: 2
         });
 
+      let exists = keystore.Get(accountName);
+      if (exists)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.newWallet.error.alreadyExists",
+          duration: 2
+        });
+
       eos.getAccount(accountName).then(
         account => {
           TemplateVar.set(template, "errMsg", "error.existsAccount");

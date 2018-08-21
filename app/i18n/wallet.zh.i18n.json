@@ -233,7 +233,7 @@
             },
             "error": {
                 "emptySignees": "您并未输入全部所有者。",
-                "alreadyExists": "账好已经存在。",
+                "alreadyExists": "账号已经存在。",
                 "stubHasNoOrigWalletAddress": "您的 存根合约的原始账户地址并未设定，请重新启动你的应用！",
                 "contractsCantBeOwners": "合约不能是所有者。",
                 "checkOwnerAddress": "请变更合约地址 __address__为一个账户。"
