@@ -7,19 +7,19 @@
         <div class="row clear new-account">
             <div class="col col-3 mobile-full">
                 <label>
-                    <input type="radio" value="funds" name="choose-type" checked />
+                    <input type="radio" value="funds" name="choose-type" checked="{{checked 'funds' }}" />
                     <h3>{{{i18n 'wallet.send.funds'}}}</h3>
                 </label>
             </div>
             <div class="col col-3 mobile-full">
                 <label>
-                    <input type="radio" value="propose" name="choose-type" />
+                    <input type="radio" value="propose" name="choose-type" checked="{{checked 'propose' }}" />
                     <h3>{{{i18n 'wallet.send.propose'}}}</h3>
                 </label>
             </div>
             <div class="col col-3 mobile-full">
                 <label>
-                    <input type="radio" value="newaccount" name="choose-type" />
+                    <input type="radio" value="newaccount" name="choose-type" checked="{{checked 'newaccount' }}" />
                     <h3>{{{i18n 'wallet.send.newaccount'}}}</h3>
                 </label>
             </div>

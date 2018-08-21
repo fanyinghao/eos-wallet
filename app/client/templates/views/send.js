@@ -24,8 +24,8 @@ var translateExternalErrorMessage = function(message) {
   // the user has rejects a transaction in MetaMask. Show a localised error message
   // instead of the stack trace.
   let ret = `[${message.code}] - [${message.name}] - ${message.what}`;
-  if(message.details && message.details.length > 0) 
-    ret += ` - ${message.details[0].message}`
+  if (message.details && message.details.length > 0)
+    ret += ` - ${message.details[0].message}`;
   return ret;
 };
 
@@ -38,102 +38,42 @@ Template["views_send"].onCreated(function() {
   if (keys.length > 0)
     ObservableAccounts.accounts[keys[0]].selected = "selected";
 
-  TemplateVar.set("send_type", "funds");
-
   // SET THE DEFAULT VARIABLES
   TemplateVar.set("amount", "0");
   TemplateVar.set("sendAll", false);
 
-  // Deploy contract
-  if (FlowRouter.getRouteName() === "deployContract") {
-    TemplateVar.set("selectedAction", "deploy-contract");
-    TemplateVar.set("selectedToken", "ether");
-
-    // Send funds
+  if (FlowRouter.getRouteName() === "newaccount") {
+    TemplateVar.set("send_type", "newaccount");
   } else {
-    TemplateVar.set("selectedAction", "send-funds");
-    TemplateVar.set("selectedToken", FlowRouter.getParam("token") || "ether");
+    TemplateVar.set("send_type", "funds");
   }
-
-  // check if we are still on the correct chain
-  Helpers.checkChain(function(error) {
-    if (error && EthAccounts.find().count() > 0) {
-      checkForOriginalWallet();
-    }
-  });
-
-  // check daily limit again, when the account was switched
-  template.autorun(function(c) {
-    var address = TemplateVar.getFrom(
-        ".dapp-select-account.send-from",
-        "value"
-      ),
-      amount = TemplateVar.get("amount") || "0";
-  });
-
-  // change the amount when the currency unit is changed
-  template.autorun(function(c) {
-    var unit = EthTools.getUnit();
-
-    if (!c.firstRun && TemplateVar.get("selectedToken") === "ether") {
-      TemplateVar.set(
-        "amount",
-        EthTools.toWei(
-          template.find('input[name="amount"]').value.replace(",", "."),
-          unit
-        )
-      );
-    }
-  });
 });
 
 Template["views_send"].onRendered(function() {
   var template = this;
 
-  // focus address input field
-  if (FlowRouter.getParam("address")) {
-    this.find('input[name="to"]').value = FlowRouter.getParam("address");
-    this.$('input[name="to"]').trigger("input");
-  } else if (!this.data) {
-    this.$('input[name="to"]').focus();
+  if (FlowRouter.getRouteName() === "newaccount") {
+    template.autorun(function(c) {
+      var newaccount = FlowRouter.getParam("newaccount");
+      var publickey = FlowRouter.getParam("publickey");
+      if (newaccount && publickey) {
+        template.find('input[name="accountName"]').value = newaccount;
+        template.find('input[name="publicKey"]').value = publickey;
+        template.$('input[name="accountName"]').trigger("input");
+        template.$('input[name="publicKey"]').trigger("input");
+        TemplateVar.set("accountName", newaccount);
+        TemplateVar.set("publicKey", publickey);
+      } else if (!template.data) {
+        template.$('input[name="accountName"]').focus();
+      }
+    });
   }
-
-  // set the from
-  var from = FlowRouter.getParam("from");
-  if (from)
-    TemplateVar.setTo(
-      'select[name="dapp-select-account"].send-from',
-      "value",
-      FlowRouter.getParam("from")
-    );
-
-  // initialize send view correctly when directly switching from deploy view
-  template.autorun(function(c) {
-    if (FlowRouter.getRouteName() === "send") {
-      TemplateVar.set("selectedAction", "send");
-      TemplateVar.setTo(".dapp-data-textarea", "value", "");
-    }
-  });
-
-  // change the token type when the account is changed
-  var selectedAddress;
-  template.autorun(function(c) {
-    address = TemplateVar.getFrom(".dapp-select-account.send-from", "value");
-
-    if (c.firstRun) {
-      selectedAddress = address;
-      return;
-    }
-
-    if (selectedAddress !== address) {
-      TemplateVar.set("selectedToken", "ether");
-    }
-
-    selectedAddress = address;
-  });
 });
 
 Template["views_send"].helpers({
+  checked: function(type) {
+    return TemplateVar.get("send_type") === type;
+  },
   /**
     Get the current selected account
 
@@ -288,9 +228,9 @@ Template["views_send"].events({
   /**
     Select the current section, based on the radio inputs value.
 
-    @event change input[type="radio"]
+    @event change input[name="choose-type"]
     */
-  'change input[type="radio"]': function(e) {
+  'change input[name="choose-type"]': function(e) {
     TemplateVar.set("send_type", e.currentTarget.value);
   },
   /**
