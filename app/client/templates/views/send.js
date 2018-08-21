@@ -94,7 +94,7 @@ Template["views_send"].helpers({
         TemplateVar.getFrom(".dapp-select-account.send-from", "value")
       ];
     if (selectedAccount) return selectedAccount.eosBalance;
-    return 0;
+    return { value: "0.0000", symbal: "EOS" };
   },
   inputAmount: function() {
     return TemplateVar.get("amount");

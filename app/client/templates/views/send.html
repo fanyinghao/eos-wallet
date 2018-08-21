@@ -68,6 +68,10 @@
                 <br>
                 <label>
                     <input type="checkbox" class="send-all"> {{i18n 'wallet.send.sendAll'}}
+
+                    <label class="balance">
+                        {{i18n 'wallet.app.texts.balance'}} {{selectedBalance.value}} {{selectedBalance.symbol}}
+                    </label>
                 </label>
 
                 <p class="send-info">
@@ -88,9 +92,6 @@
                         </div>
                     </span>
                     <span class="token-name">EOS</span>
-                    <span class="balance">
-                        {{i18n 'wallet.app.texts.balance'}} {{selectedBalance.value}} {{selectedBalance.symbol}}
-                    </span>
                 </div>
             </div>
 
