@@ -84,6 +84,7 @@
       "creating": "Creating",
       "importing": "Importing",
       "wrongPassword": "wrong password",
+      "matchPassword": "Your passwords don't match",
       "accountNote": "Accounts can't display incoming transactions, but can receive, hold and send Ether. To see incoming transactions <a href=\"/account/new\">create a wallet contract</a> to store ether.",
       "outOfSyncNote": "If your balance doesn't seem updated, make sure that you are in sync with the network.",
       "walletNote": "Most exchanges don't support receiving ether from a contract wallet yet. Be sure to move your balance to an account address first!",
@@ -200,7 +201,7 @@
       "selectOwner": "Select owner",
       "multisigSigneesTitle": "Multisig Signees",
       "accountName": "Account name",
-      "success": "账户授权多重签名成功"
+      "success": "Authorize MultSig success"
     },
     "newWallet": {
       "title": "New <strong>Account</strong>",
@@ -210,7 +211,7 @@
         "rePassword": "enter again",
         "input": "enter password"
       },
-      "accountName": "Account name",
+      "accountName": "Account name(requires 12 charactors)",
       "accountType": {
         "title": "Import type",
         "simple": {

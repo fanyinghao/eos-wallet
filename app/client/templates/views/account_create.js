@@ -290,7 +290,20 @@ Template["views_account_create"].events({
   'click span[name="multisigSignees"] .simple-modal button': function(e) {
     TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
   },
+  /**
+    input password, based on the password inputs value.
 
+    @event change input[type="password"]
+    */
+  "change input[name=rePassword]": function(e, template) {
+    let password = template.find('input[name="password"]').value;
+    let rePassword = e.currentTarget.value;
+    if (password !== rePassword)
+      return GlobalNotification.warning({
+        content: "i18n:wallet.accounts.matchPassword",
+        duration: 2
+      });
+  },
   /**
     Create the account
 
@@ -315,6 +328,19 @@ Template["views_account_create"].events({
       // Open a modal showing the QR Code
       let accountName = template.find('input[name="accountName"]').value;
       let password = template.find('input[name="password"]').value;
+      let rePassword = template.find('input[name="rePassword"]').value;
+
+      if (password.length === 0 || password !== rePassword)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.accounts.matchPassword",
+          duration: 2
+        });
+
+      if (accountName.trim().length !== 12)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.newWallet.accountName",
+          duration: 2
+        });
 
       eos.getAccount(accountName).then(
         account => {
@@ -324,12 +350,7 @@ Template["views_account_create"].events({
           ecc.randomKey().then(privateKey => {
             let publicKey = ecc.privateToPublic(privateKey);
             // storage private key
-            keystore.SetKey(
-              accountName,
-              password,
-              privateKey,
-              publicKey
-            );
+            keystore.SetKey(accountName, password, privateKey, publicKey);
 
             EthElements.Modal.show(
               {
@@ -401,12 +422,7 @@ Template["views_account_create"].events({
       eos.getKeyAccounts(publicKey).then(accounts => {
         accounts.account_names.forEach(name => {
           // storage private key
-          keystore.SetKey(
-            name,
-            password,
-            privateKey,
-            publicKey
-          );
+          keystore.SetKey(name, password, privateKey, publicKey);
         });
 
         EthElements.Modal.show({
