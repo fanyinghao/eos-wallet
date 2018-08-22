@@ -465,8 +465,11 @@ Template["views_send"].events({
                 selectedAccount.name,
                 _to,
                 _amount,
-                _memo || "transfer",
-                true
+                _memo || "transfer", {
+                  authorization: `${selectedAccount.name}@active`,
+                  broadcast: true,
+                  sign: true
+                }
               )
               .then(onSuccess, onError);
           } else {
