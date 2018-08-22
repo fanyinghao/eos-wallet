@@ -473,7 +473,7 @@ Template["views_send"].events({
               )
               .then(onSuccess, onError);
           } else {
-            let selectedProposer = template.find('.dapp-select-account .send-proposer').value;
+            let selectedProposer = TemplateVar.getFrom(".dapp-select-account.send-proposer", "value");
             let propose_provider = keystore.SignProvider(
               selectedProposer,
               password
