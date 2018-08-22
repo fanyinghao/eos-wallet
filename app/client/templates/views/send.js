@@ -157,7 +157,6 @@ Template["views_send"].helpers({
     return permissions;
   },
     isSelected: function(selected) {
-    debugger;
     return selected ? "selected" : "";
   }
 });
@@ -324,7 +323,6 @@ Template["views_send"].events({
       ObservableAccounts.accounts[
         TemplateVar.getFrom(".dapp-select-account.send-from", "value")
       ];
-    let selectedProposer = template.find('.dapp-select-account .send-proposer').value;
     let password = TemplateVar.get("password");
 
     if (selectedAccount && !TemplateVar.get("sending")) {
@@ -472,6 +470,7 @@ Template["views_send"].events({
               )
               .then(onSuccess, onError);
           } else {
+            let selectedProposer = template.find('.dapp-select-account .send-proposer').value;
             let propose_provider = keystore.SignProvider(
               selectedProposer,
               password
@@ -512,7 +511,7 @@ Template["views_send"].events({
                   const proposal_name = `tr${randomWord(false, 10)}`;
                   msig
                     .propose(
-                      _proposer,
+                      selectedProposer,
                       proposal_name,
                       Array.prototype.map.call(permissions, item => {
                         return {
@@ -698,7 +697,7 @@ Template["views_send"].events({
               amount: amount,
               memo: memo
             },
-            ok: () => sendTransaction(to, amount, memo, selectedProposer),
+            ok: () => sendTransaction(to, amount, memo),
             cancel: true
           },
           {

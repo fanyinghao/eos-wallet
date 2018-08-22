@@ -24,7 +24,7 @@ Install npm dependencies:
 
 Run dev server:
 
-    $ cd meteor-dapp-wallet/app
+    $ cd eos-wallet/app
     $ meteor
 
 Navigate to http://localhost:3000
