@@ -17,7 +17,7 @@ Block required until a transaction is confirmed.
 @property blocksForConfirmation
 @type Number
 */
-var blocksForConfirmation = ethereumConfig.requiredConfirmations;
+var blocksForConfirmation = [];
 
 /**
 The default limit, of none is given.

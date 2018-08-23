@@ -226,7 +226,7 @@ Formats address to a CaseChecksum
 @return {String} checksumAddress    The returned, checksummed address
 **/
 Template.registerHelper('toChecksumAddress', function(address) {
-  return _.isString(address) ? web3.utils.toChecksumAddress(address) : '';
+  return address;
 });
 
 /**

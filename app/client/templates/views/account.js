@@ -151,26 +151,6 @@ Template['views_account'].helpers({
     return this.owners ? _.clone(walletInterface) : _.clone(this.jsonInterface);
   },
   /**
-    Return the daily limit available today.
-
-    @method (availableToday)
-    */
-  availableToday: function() {
-    return new BigNumber(this.dailyLimit || '0', 10)
-      .minus(new BigNumber(this.dailyLimitSpent || '0', '10'))
-      .toString(10);
-  },
-  /**
-    Show dailyLimit section
-
-    @method (showDailyLimit)
-    */
-  showDailyLimit: function() {
-    return (
-      this.dailyLimit && this.dailyLimit !== ethereumConfig.dailyLimitDefault
-    );
-  },
-  /**
     Show requiredSignatures section
 
     @method (showRequiredSignatures)
