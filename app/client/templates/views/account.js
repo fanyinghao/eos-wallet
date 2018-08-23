@@ -81,20 +81,9 @@ Template['views_account'].helpers({
     */
   formattedBalance: function(e) {
     var balance = TemplateVar.get('balance'); 
-    if(balance.length === 0) 
+    if(!balance || balance.length === 0) 
       balance = ["0.0000 EOS"]
     return balance[0];
-
-    var account = Template.parentData(2);
-
-    return this.balances && Number(this.balances[account._id]) > 0
-      ? Helpers.formatNumberByDecimals(
-          this.balances[account._id],
-          this.decimals
-        ) +
-          ' ' +
-          this.symbol
-      : false;
   },
   refundBalance: function(e) {
     let account = TemplateVar.get('account');
