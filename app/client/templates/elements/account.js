@@ -29,7 +29,7 @@ Template.elements_account.created = function() {
   eos.getCurrencyBalance('eosio.token', name).then(res => {
       TemplateVar.set(self, 'balance', res);
     }, err => {
-    console.log(err)
+    //console.log(err)
   })
 };
 
@@ -55,9 +55,10 @@ Template.elements_account.helpers({
     @method (formattedTokenBalance)
     */
   formattedTokenBalance: function(e) {
-
-    var balance = TemplateVar.get('balance');
-    return balance;
+    var balance = TemplateVar.get('balance'); 
+    if(balance.length === 0) 
+      balance = ["0.0000 EOS"]
+    return balance[0];
 
     // var account = Template.parentData(2);
 

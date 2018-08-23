@@ -99,8 +99,11 @@
                 "buyEther": "使用比特币做存款",
                 "viewOnExplorer": "EOS Monitor",
                 "copyAddress": "复制地址",
-                "scanQRCode": "显示二维码",
+                "exportKey": "导出私钥",
+                "buyRAM": "买卖RAM",
+                "stake": "抵押CPU/NET",
                 "authorize": "授权多签",
+                "remove": "移除账户",
                 "showInterface": "显示界面"
             },
             "modal": {

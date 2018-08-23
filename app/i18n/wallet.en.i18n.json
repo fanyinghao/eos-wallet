@@ -103,8 +103,11 @@
         "buyEther": "Buy ether",
         "viewOnExplorer": "EOS Monitor",
         "copyAddress": "Copy address",
-        "scanQRCode": "Show QR-Code",
+        "exportKey": "Export Private Key",
         "authorize": "Multi Signatures",
+        "buyRAM": "Buy & Sell RAM",
+        "stake": "Stake & Unstake",
+        "remove": "Remove Account",
         "showInterface": "Show Interface"
       },
       "modal": {

@@ -1,124 +1,176 @@
 <template name="views_account">
     {{#with account}}
 
-        <div class="dapp-container accounts-page">
-
-            <div class="dapp-sticky-bar dapp-container">
-                
-                {{> dapp_identicon identity=account_name}}
-                <h1 class="{{ensClass}}">
+    <div class="dapp-container accounts-page">
+        <div class="accounts-page-summary">
+            {{> dapp_identicon identity=account_name}}
+            <header class="{{ensClass}}">
+                <h1>
+                    {{#if ens}}
                     <span>{{account_name}}</span>
-
-                    {{#if $or owners jsonInterface}}
-                        <button class="dapp-icon-button delete icon-trash"></button>
+                    {{else}}
+                    <em class="edit-name">{{account_name}}</em>
                     {{/if}}
                 </h1>
-                {{> elements_balance balance=formattedTokenBalance}}
+
+                {{#each permissions}}
+                <h1></h1>
+                <h2 class="copyable-address">{{walletIcon}}
+                    <!-- <input type="text" value="{{toChecksumAddress address}}" readonly class=""> -->
+                    <b>{{perm_name}}</b><span>(threshold {{required_auth.threshold}})</span>
+                    <br /> {{#each required_auth.keys}}
+                    <span>{{key}}</span>
+                    {{/each}}
+                    <ul>
+                        {{#each required_auth.accounts}}
+                        <li><a href="{{pathFor route='account' name=(permission.actor)}}">{{permission.actor}}</a> (weight
+                            {{weight}})
+                        </li>
+                        {{/each}}
+                    </ul>
+                </h2>
+                {{/each}}
+
+            </header>
+            {{#if owners}}
+            <!-- Wallet infos -->
+
+            <div class="row clear wallet-info">
+                {{#if showRequiredSignatures}}
+                <div class="col col-4 mobile-full">
+                    <h3>{{i18n "wallet.accounts.requiredSignatures"}}</h3> {{requiredSignatures}}
+                </div>
+                {{/if}}
+                <div class="col col-4 mobile-full">
+                    <h3>{{i18n "wallet.accounts.owners"}}</h3>
+                    {{#each owners}}
+                    <span data-tooltip="{{accountNameOrAddress this}}" class="simptip-position-bottom simptip-movable">
+                        {{> dapp_identicon identity=this class="dapp-tiny" link=ownerLink}}
+                    </span>
+                    {{/each}}
+                </div>
             </div>
 
-            <div class="accounts-page-summary">
-                {{> dapp_identicon identity=account_name}}
-                <header class="{{ensClass}}">
-                    <h1>
-                        {{#if ens}}
-                        <span>{{account_name}}</span>
-                        {{else}}
-                        <em class="edit-name">{{account_name}}</em>
-                        {{/if}}
-                    </h1>
-
-                    {{#each permissions}}
-                    <h1></h1>
-                    <h2 class="copyable-address">{{walletIcon}}
-                        <!-- <input type="text" value="{{toChecksumAddress address}}" readonly class=""> -->
-                        <b>{{perm_name}}</b><span>(threshold {{required_auth.threshold}})</span>
-                        <br />
-                        {{#each required_auth.keys}}
-                        <span>{{key}}</span>
-                        {{/each}}
-                        <ul>
-                            {{#each required_auth.accounts}}
-                            <li><a href="{{pathFor route='account' name=(permission.actor)}}" >{{permission.actor}}</a> (weight {{weight}})</li>
-                            {{/each}}
-                        </ul>
-                    </h2>
-                    {{/each}}
-
-                    <div class="clear"></div>
-                    {{> elements_balance balance=formattedTokenBalance}}
-                </header>
+            <!-- Account infos -->
+            <div class="account-info">
+                <h3>{{i18n "wallet.app.texts.note"}}</h3>
+                <p>{{i18n "wallet.accounts.walletNote"}}</p>
+            </div>
+            {{/if}} {{#if $eq type "account"}}
+            <!-- Account infos -->
+            <div class="account-info">
+                <h3>{{i18n "wallet.app.texts.note"}}</h3>
+                <p>{{{i18n "wallet.accounts.accountNote"}}}</p>
+                <p><strong>{{i18n "wallet.accounts.outOfSyncNote"}}</strong></p>
+            </div>
+            {{/if}}
 
 
-                {{#if owners}}
-                    <!-- Wallet infos -->
-
-                    <div class="row clear wallet-info">
-                        {{#if showDailyLimit}}
-                            <div class="col col-4 mobile-full">
-                                {{#if $gte version 1}}
-                                    <h3>{{i18n "wallet.accounts.dailyLimit"}} <span style="font-weight: 200;">{{dapp_formatBalance dailyLimit "0,0.00 unit"}}</span></h3>
-                                    {{dapp_formatBalance availableToday "0,0.00 unit"}} {{i18n "wallet.accounts.dailyLimitRemaining"}}
-                                {{else}}
-                                    <h3>{{i18n "wallet.accounts.dailyLimit"}}</h3>
-                                    {{dapp_formatBalance dailyLimit "0,0.00 unit"}}
-                                {{/if}}
-                            </div>
-                        {{/if}}
-                        {{#if showRequiredSignatures}}
-                            <div class="col col-4 mobile-full">
-                                <h3>{{i18n "wallet.accounts.requiredSignatures"}}</h3> {{requiredSignatures}}
-                            </div>
-                        {{/if}}
-                        <div class="col col-4 mobile-full">
-                            <h3>{{i18n "wallet.accounts.owners"}}</h3>
-                            {{#each owners}}
-                                <span data-tooltip="{{accountNameOrAddress this}}" class="simptip-position-bottom simptip-movable">
-                                    {{> dapp_identicon identity=this class="dapp-tiny" link=ownerLink}}
-                                </span>
-                            {{/each}}
+        <div class="accounts-items">
+                <div class="data-table">
+                    <div class="data-flex">
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                {{> eos_amount amount=formattedBalance }}
+                            </div><label>Unstaked Balance</label>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                {{> eos_amount amount=refundBalance }}
+                            </div><label>Refund Balance</label>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                {{> eos_amount amount=(total_resources.cpu_weight) }}
+                            </div><label>CPU Stake</label>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                {{> eos_amount amount=(total_resources.net_weight) }}
+                            </div><label>NET Stake</label>
                         </div>
                     </div>
-
-                    <!-- Account infos -->
-                    <div class="account-info">
-                        <h3>{{i18n "wallet.app.texts.note"}}</h3>
-                        <p>{{i18n "wallet.accounts.walletNote"}}</p>
+                    <div class="data-flex">
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                <div title="{{ progress ram_usage ram_quota 2 }}" class="progress">
+                                    <div role="progressbar" class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress ram_usage ram_quota 3 }};"></div>
+                                </div>{{ ramToString ram_usage }}<span class="light"> / {{ ramToString ram_quota }}</span>
+                            </div>
+                            <label>RAM Usage</label>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                <div title="{{ progress cpu_limit.used cpu_limit.max 2 }}" class="progress">
+                                    <div role="progressbar" class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress cpu_limit.used cpu_limit.max 3 }};"></div>
+                                </div>
+                                <span data-full-string="cpu_limit.used">{{cpu_limit.used}}</span> µs
+                                <span class="light"> / <span data-full-string="cpu_limit.max">{{cpu_limit.max}}</span> µs</span>
+                            </div>
+                            <label>CPU Usage</label>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-value medium">
+                                <div title="{{ progress net_limit.used net_limit.max 2 }}" class="progress">
+                                    <div role="progressbar" class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress net_limit.used net_limit.max 3 }};"></div>
+                                </div>
+                                <span data-full-string="net_limit.used">{{ net_limit.used }}</span> KB
+                                <span class="light"> / <span data-full-string="net_limit.max">{{ net_limit.max }}</span> KB</span>
+                            </div>
+                            <label>NET Usage</label>
+                        </div>
                     </div>
-                {{/if}}
-
-                {{#if $eq type "account"}}
-                    <!-- Account infos -->
-                    <div class="account-info">
-                        <h3>{{i18n "wallet.app.texts.note"}}</h3>
-                        <p>{{{i18n "wallet.accounts.accountNote"}}}</p>
-                        <p><strong>{{i18n "wallet.accounts.outOfSyncNote"}}</strong></p>
-                    </div>
-                {{/if}}
-
+                </div>
             </div>
 
-            <aside class="dapp-actionbar">
-                <nav>
-                    <ul>
-                        <li>
-                            <button class="authorize-button">
-                                <i class="icon-note"></i>
-                                {{i18n "wallet.accounts.buttons.authorize"}}
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <div class="accounts-transactions">
-
-                {{#if transactions}}
-                    <h2>{{i18n 'wallet.transactions.latest'}}</h2>
-
-                    {{> elements_transactions_table ids=transactions account=_id}}
-                {{/if}}
-
-            </div>
         </div>
+
+        <aside class="dapp-actionbar">
+            <nav>
+                <ul>
+                    <li>
+                        <button class="buy-button">
+                            <i class="icon-directions"></i>
+                            {{i18n "wallet.accounts.buttons.buyRAM"}}
+                        </button>
+                    </li>
+                    <li>
+                        <button class="stake-button">
+                            <i class="icon-layers"></i>
+                            {{i18n "wallet.accounts.buttons.stake"}}
+                        </button>
+                    </li>
+                    <li>
+                        <button class="authorize-button">
+                            <i class="icon-note"></i>
+                            {{i18n "wallet.accounts.buttons.authorize"}}
+                        </button>
+                    </li>
+                    <li>
+                        <button class="exportKey-button">
+                            <i class="icon-key"></i>
+                            {{i18n "wallet.accounts.buttons.exportKey"}}
+                        </button>
+                    </li>
+                    <li>
+                        <button class="remove-button">
+                            <i class="icon-trash"></i>
+                            {{i18n "wallet.accounts.buttons.remove"}}
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+
+        <div class="accounts-transactions">
+
+            {{#if transactions}}
+            <h2>{{i18n 'wallet.transactions.latest'}}</h2>
+
+            {{> elements_transactions_table ids=transactions account=_id}} {{/if}}
+
+        </div>
+    </div>
     {{/with}}
 </template>

@@ -79,9 +79,11 @@ Template['views_account'].helpers({
 
     @method (formattedTokenBalance)
     */
-  formattedTokenBalance: function(e) {
-    var balance = TemplateVar.get('balance');
-    return balance;
+  formattedBalance: function(e) {
+    var balance = TemplateVar.get('balance'); 
+    if(balance.length === 0) 
+      balance = ["0.0000 EOS"]
+    return balance[0];
 
     var account = Template.parentData(2);
 
@@ -93,6 +95,23 @@ Template['views_account'].helpers({
           ' ' +
           this.symbol
       : false;
+  },
+  refundBalance: function(e) {
+    let account = TemplateVar.get('account');
+    if(!account.refund_request)
+      return "0.0000 EOS";
+    let total = 
+    Number(account.refund_request.cpu_amount.replace('EOS', '').trim()) +
+    Number(account.refund_request.net_amount.replace('EOS', '').trim())
+    return total.toFixed(4) + ' EOS'
+  },
+  ramToString: function(e) {
+    
+    return (e / 1024).toFixed(3) + ' KB'
+  },
+  progress: function(e, v, a) {
+    
+    return (e/v *100).toFixed(a) + '%'
   },
   /**
     Checks if this is Owned
@@ -223,11 +242,11 @@ Template['views_account'].events({
   'copy .copyable-address': accountClipboardEventHandler,
 
   /**
-    Click to reveal QR Code
+    Click to export private Key
 
-    @event click a.create.account
+    @event click a.export private Key
     */
-  'click .qrcode-button': function(e) {
+  'click .exportKey-button': function(e) {
     e.preventDefault();
 
     // Open a modal showing the QR Code
