@@ -347,7 +347,7 @@ Template["views_send"].events({
           duration: 20,
           ok: function() {
             window.open(
-              `https://tools.cryptokylin.io/#/tx/${tr.transaction_id}`
+              `${transactionMonitor}/${tr.transaction_id}`
             );
             return true;
           },
