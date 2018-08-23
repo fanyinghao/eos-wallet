@@ -25,38 +25,11 @@ Template['layout_header'].helpers({
   goToSend: function() {
     FlowRouter.watchPathChange();
     var address = FlowRouter.getParam('address');
-    var accounts = EthAccounts.find({}).fetch();
 
     // For some reason the path /send/ doesn't show tokens anymore
     return address
       ? FlowRouter.path('sendFrom', { from: address })
-      : FlowRouter.path('send', {
-          from: accounts[0] ? accounts[0].address : ''
-        });
-  },
-  /**
-    Calculates the total balance of all accounts + wallets.
-
-    @method (totalBalance)
-    @return {String}
-    */
-  totalBalance: function() {
-    var accounts = EthAccounts.find({}).fetch();
-    var wallets = Wallets.find({
-      owners: { $in: _.pluck(accounts, 'address') }
-    }).fetch();
-
-    var balance = _.reduce(
-      _.pluck(_.union(accounts, wallets), 'balance'),
-      function(memo, num) {
-        return memo + Number(num);
-      },
-      0
-    );
-
-    updateMistBadge();
-
-    return balance;
+      : FlowRouter.path('send');
   },
   /**
     Formats the last block number

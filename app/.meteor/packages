@@ -6,7 +6,6 @@
 
 meteor-base@1.4.0             # Packages every Meteor app needs to have
 mobile-experience@1.0.5       # Packages for a great mobile UX
-mongo@1.5.0                   # The database Meteor supports right now
 blaze-html-templates@1.0.4 # Compile .html files into Meteor Blaze views
 reactive-var@1.0.11            # Reactive variable for tracker
 tracker@1.2.0                 # Meteor's client-side reactive programming library
@@ -23,7 +22,6 @@ standard-minifiers@1.1.0
 session@1.1.7
 jquery@1.11.10
 logging@1.1.20
-reload@1.2.0
 random@1.1.0
 ejson@1.1.0
 spacebars
@@ -41,9 +39,7 @@ tap:i18n
 raix:handlebar-helpers
 frozeman:animation-helper
 frozeman:template-var
-frozeman:persistent-minimongo2
 frozeman:reactive-timer
-frozeman:storage
 markdown@1.0.12
 frozeman:inline-form
 mrt:qrcodesvg
@@ -57,10 +53,6 @@ numeral:numeral
 numeral:languages
 hashanp:geopattern
 dynamic-import@0.4.0
-ethereum:blocks@1.1.0
-ethereum:accounts@1.1.0
-ethereum:tools@1.1.0
 ethereum:elements@1.1.0
-ethereum:web3@1.0.0-beta.33
 3stack:bignumber
 underscore

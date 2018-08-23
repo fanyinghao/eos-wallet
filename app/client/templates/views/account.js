@@ -5,101 +5,6 @@ Template Controllers
 @module Templates
 */
 
-/**
-Watches custom events
-
-@param {Object} newDocument  the account object with .jsonInterface
-*/
-var addLogWatching = function(newDocument) {
-  var contractInstance = new web3.eth.Contract(
-    newDocument.jsonInterface,
-    newDocument.address
-  );
-  var blockToCheckBack =
-    (newDocument.checkpointBlock || 0) - ethereumConfig.rollBackBy;
-
-  if (blockToCheckBack < 0) blockToCheckBack = 0;
-
-  console.log(
-    'EVENT LOG:  Checking Custom Contract Events for ' +
-      newDocument.address +
-      ' (_id: ' +
-      newDocument._id +
-      ') from block # ' +
-      blockToCheckBack
-  );
-
-  // delete the last logs until block -500
-  _.each(
-    Events.find({
-      _id: { $in: newDocument.contractEvents || [] },
-      blockNumber: { $exists: true, $gt: blockToCheckBack }
-    }).fetch(),
-    function(log) {
-      if (log) Events.remove({ _id: log._id });
-    }
-  );
-
-  var subscription = contractInstance.events.allEvents({
-    fromBlock: blockToCheckBack,
-    toBlock: 'latest'
-  });
-  // get past logs, to set the new blockNumber
-  var currentBlock = EthBlocks.latest.number;
-
-  contractInstance.getPastEvents('allEvents', function(error, logs) {
-    if (!error) {
-      // update last checkpoint block
-      CustomContracts.update(
-        { _id: newDocument._id },
-        {
-          $set: {
-            checkpointBlock:
-              (currentBlock || EthBlocks.latest.number) -
-              ethereumConfig.rollBackBy
-          }
-        }
-      );
-    }
-  });
-
-  subscription.on('data', function(log) {
-    var id = Helpers.makeId(
-      'log',
-      web3.utils.sha3(
-        log.logIndex + 'x' + log.transactionHash + 'x' + log.blockHash
-      )
-    );
-
-    if (log.removed) {
-      Events.remove(id);
-    } else {
-      _.each(log.returnValues, function(value, key) {
-        // if bignumber
-        if (
-          (_.isObject(value) || value instanceof BigNumber) &&
-          value.toFormat
-        ) {
-          value = value.toString(10);
-          log.returnValues[key] = value;
-        }
-      });
-
-      // store right now, so it could be removed later on, if removed: true
-      Events.upsert(id, log);
-
-      // update events timestamp
-      web3.eth.getBlock(log.blockHash, function(err, block) {
-        if (!err) {
-          Events.update(id, { $set: { timestamp: block.timestamp } });
-        }
-      });
-    }
-  });
-
-  return subscription;
-};
-
 Template.views_account.onRendered(function() {
   let self = this
   let name = FlowRouter.getParam('name')
@@ -402,7 +307,6 @@ Template['views_account'].events({
       template.customEventSubscription = null;
       TemplateVar.set('watchEvents', false);
     } else {
-      template.customEventSubscription = addLogWatching(this);
       TemplateVar.set('watchEvents', true);
     }
   }

@@ -30,13 +30,6 @@ Template["views_account_create"].onCreated(function() {
     "multisigSignatures",
     Number(FlowRouter.getQueryParam("requiredSignatures")) || 2
   );
-
-  // check if we are still on the correct chain
-  Helpers.checkChain(function(error) {
-    if (error && EthAccounts.find().count() > 0) {
-      checkForOriginalWallet();
-    }
-  });
 });
 
 Template["views_account_create"].onRendered(function() {
@@ -45,16 +38,6 @@ Template["views_account_create"].onRendered(function() {
 });
 
 Template["views_account_create"].helpers({
-  /**
-    Get all accounts, which can become owners.
-
-    @method (ownerAccounts)
-    */
-  ownerAccounts: function() {
-    var accounts = EthAccounts.find({}, { sort: { balance: -1 } }).fetch();
-    accounts.sort(Helpers.sortByBalance);
-    return accounts;
-  },
   /**
     Return the selectedOwner
 
@@ -74,29 +57,6 @@ Template["views_account_create"].helpers({
     TemplateVar.set("importWalletInfo", "");
 
     return TemplateVar.get("selectedSection") === section;
-  },
-  /**
-    Pick a default owner for the wallet
-    @method (defaultOwner)
-    @return (string)
-    */
-  defaultOwner: function() {
-    // Load the accounts owned by user and sort by balance
-    var accounts = EthAccounts.find({}, { sort: { balance: -1 } }).fetch();
-    accounts.sort(Helpers.sortByBalance);
-
-    if (FlowRouter.getQueryParam("owners")) {
-      var owners = FlowRouter.getQueryParam("owners").split(",");
-
-      // Looks for them among the wallet account owner
-      var defaultAccount = _.find(accounts, function(acc) {
-        return owners.indexOf(acc.address) >= 0;
-      });
-
-      return defaultAccount ? defaultAccount.address : null;
-    } else {
-      return accounts[0].address;
-    }
   },
   /**
     Return the number of signees fields
@@ -216,17 +176,6 @@ Template["views_account_create"].helpers({
     */
   multisigCheck: function() {
     return TemplateVar.get("selectedSection") === "multisig" ? "checked" : "";
-  },
-  /**
-    Default dailyLimit
-
-    @method (defaultDailyLimit)
-    */
-  defaultDailyLimit: function() {
-    var dailyLimit = FlowRouter.getQueryParam("dailyLimit");
-    return typeof dailyLimit != "undefined"
-      ? web3.utils.fromWei(dailyLimit.toString(), "eos")
-      : 10;
   },
   /**
     Default Name
