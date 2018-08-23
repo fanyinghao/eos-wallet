@@ -1,4 +1,7 @@
 const keystore = require("../../lib/eos/keystore");
+import {
+  extend
+} from '../../lib/utils'
 /**
 Template Controllers
 
@@ -15,21 +18,28 @@ The account template
 Template.elements_account.created = function() {
   let self = this
   let name = this.data.name
-  TemplateVar.set(self, 'account_name', name)
-  eos.getAccount(name).then(account => {
-    account.creating = false;
-    let item = keystore.Get(name)
-    account.publicKey = item.publicKey;
-    TemplateVar.set(self, 'account', account)
-  }, err => {
-    //
-    let item = keystore.Get(name)
-    TemplateVar.set(self, 'account', {creating: true, account_name: name, publicKey: item.publicKey})
-  })
-  eos.getCurrencyBalance('eosio.token', name).then(res => {
-      TemplateVar.set(self, 'balance', res);
+  let account = {
+    loading: true,
+    account_name: name,
+    publicKey: keystore.Get(name).publicKey
+  }
+  TemplateVar.set(self, 'account', account)
+
+  Tracker.autorun(() => {
+    eos.getAccount(name).then(_account => {
+      account = extend({}, account, _account)
+      account.loading = false;
+      account.creating = false;
+      TemplateVar.set(self, 'account', account)
     }, err => {
-    //console.log(err)
+      account = extend({}, account, {creating: true, loading: false})
+      TemplateVar.set(self, 'account', account)
+    })
+    eos.getCurrencyBalance('eosio.token', name).then(res => {
+        TemplateVar.set(self, 'balance', res);
+      }, err => {
+      //console.log(err)
+    })
   })
 };
 
@@ -56,20 +66,9 @@ Template.elements_account.helpers({
     */
   formattedTokenBalance: function(e) {
     var balance = TemplateVar.get('balance'); 
-    if(balance.length === 0) 
+    if(!balance || balance.length === 0) 
       balance = ["0.0000 EOS"]
     return balance[0];
-
-    // var account = Template.parentData(2);
-
-    // return this.balances && Number(this.balances[account._id]) > 0
-    //   ? Helpers.formatNumberByDecimals(
-    //       this.balances[account._id],
-    //       this.decimals
-    //     ) +
-    //       ' ' +
-    //       this.symbol
-    //   : false;
   },
   /**
     Account was just added. Return true and remove the "new" field.
@@ -77,17 +76,7 @@ Template.elements_account.helpers({
     @method (new)
     */
   new: function() {
-    if (this.new) {
-      // remove the "new" field
-      var id = this._id;
-      Meteor.setTimeout(function() {
-        EthAccounts.update(id, { $unset: { new: '' } });
-        Wallets.update(id, { $unset: { new: '' } });
-        CustomContracts.update(id, { $unset: { new: '' } });
-      }, 1000);
-
-      return true;
-    }
+    return false
   },
   /**
     Displays ENS names with triangles
@@ -95,13 +84,6 @@ Template.elements_account.helpers({
     */
   displayName: function() {
     return this.account_name;
-  },
-  /**
-    Adds class about ens
-    @method (ensClass)
-    */
-  ensClass: function() {
-    return this.ens ? 'ens-name' : 'not-ens-name';
   }
 });
 

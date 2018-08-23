@@ -22,6 +22,6 @@ Template["generateKey"].events({
       back to dashboard
     */
   'click button.dapp-block-button[name="btn_back"]': function(e) {
-    FlowRouter.go("dashboard");
+    FlowRouter.go("dashboard", { new: this.accountName });
   }
 });

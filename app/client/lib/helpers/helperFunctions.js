@@ -111,3 +111,8 @@ Helpers.getAccountByName = function(name) {
     })
   })
 }
+
+
+Template.registerHelper('or',(a,b)=>{
+  return a || b;
+})

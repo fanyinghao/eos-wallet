@@ -23,8 +23,12 @@ Template['views_dashboard'].helpers({
       let key = localStorage.key(i);
       if(key.indexOf('EOS_ACCOUNT') >= 0) {
         let name = key.substring(12);
-        let publicKey = localStorage[key].publicKey;
-        accounts.push({name: name, publicKey: publicKey});
+        let account = {
+          name: name,
+          publicKey: localStorage[key].publicKey,
+          new: this.new === name
+        }
+        accounts.push(account);
       }
     }
     return accounts;
@@ -48,7 +52,7 @@ Template['views_dashboard'].helpers({
     @method (allTransactions)
     */
   allTransactions: function() {
-    return Transactions.find({}, { sort: { timestamp: -1 } }).count();
+    return [];
   },
   /**
     Returns an array of pending confirmations, from all accounts
@@ -69,25 +73,5 @@ Template['views_dashboard'].events({
     */
   'click .create.account': function(e) {
     e.preventDefault();
-
-    mist.requestAccount(function(e, accounts) {
-      if (!e) {
-        if (!_.isArray(accounts)) {
-          accounts = [accounts];
-        }
-        accounts.forEach(function(account) {
-          account = account.toLowerCase();
-          EthAccounts.upsert(
-            { address: account },
-            {
-              $set: {
-                address: account,
-                new: true
-              }
-            }
-          );
-        });
-      }
-    });
   }
 });

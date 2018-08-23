@@ -259,22 +259,11 @@ Template["views_account_create"].events({
     @event submit
     */
   submit: function(e, template) {
-    var code = walletStubABI; // walletStubABI 184 280 walletABI ~1 842 800
     var type = TemplateVar.get("selectedSection");
 
     // SIMPLE
     if (type === "simple") {
-      // Wallets.insert({
-      //   deployFrom: null,
-      //   owners: [deployFrom],
-      //   name:
-      //     template.find('input[name="accountName"]').value ||
-      //     TAPi18n.__('wallet.accounts.defaultName'),
-      //   balance: '0',
-      //   creationBlock: EthBlocks.latest.number,
-      //   code: code
-      // });
-      // Open a modal showing the QR Code
+      
       let accountName = template.find('input[name="accountName"]').value;
       let password = template.find('input[name="password"]').value;
       let rePassword = template.find('input[name="rePassword"]').value;
@@ -326,51 +315,10 @@ Template["views_account_create"].events({
           });
         }
       );
-
-      //FlowRouter.go('dashboard');
     }
 
     // IMPORT
     if (type === "import") {
-      // var owners = _.uniq(
-      //   _.compact(
-      //     _.map(TemplateVar.get('importWalletOwners'), function (item) {
-      //       if (web3.utils.isAddress(item)) return item.toLowerCase();
-      //     })
-      //   )
-      // );
-
-      // if (owners.length === 0) return;
-
-      // var address = template.find('input.import').value;
-      // address = '0x' + address.replace('0x', '').toLowerCase();
-      // if (Wallets.findOne({ address: address }))
-      //   return GlobalNotification.warning({
-      //     content: 'i18n:wallet.newWallet.error.alreadyExists',
-      //     duration: 2
-      //   });
-
-      // // reorganize owners, so that yourself is at place one
-      // var account = Helpers.getAccountByAddress({ $in: owners || [] });
-      // if (account) {
-      //   owners = _.without(owners, account.address);
-      //   owners.unshift(account.address);
-      // }
-
-      // Wallets.insert({
-      //   owners: owners,
-      //   name:
-      //     template.find('input[name="accountName"]').value ||
-      //     TAPi18n.__('wallet.accounts.defaultName'),
-      //   address: address,
-      //   balance: '0',
-      //   // TODO set to 0
-      //   creationBlock: 300000,
-      //   imported: true
-      // });
-
-      // FlowRouter.go('dashboard');
-
       let password = template.find('input[name="password"]').value;
       let privateKey = template.find('input[name="privateKey"]').value;
       let publicKey = ecc.privateToPublic(privateKey);

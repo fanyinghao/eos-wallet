@@ -1,6 +1,6 @@
 <template name="elements_account">
     {{#with account}}
-        <a href="{{pathFor route='account' name=account_name}}" class="wallet-box {{#if creating}}creating{{/if}} {{#if disabled}}disabled{{/if}} {{#if new}}new{{/if}}">
+        <a href="{{pathFor route='account' name=account_name}}" class="wallet-box {{#if or creating loading}}creating{{/if}} {{#if disabled}}disabled{{/if}} {{#if new}}new{{/if}}">
             {{#unless ../main}}
                 <!-- <div class="account-pattern"> -->
                 {{#if account_name}}
@@ -19,7 +19,7 @@
                 </div>
             {{/unless}}
 
-            <h3 class="{{ensClass}}">
+            <h3 class="not-ens-name">
                 <span class="red">
                     <i class="icon-user"></i>
                     {{account_name}}

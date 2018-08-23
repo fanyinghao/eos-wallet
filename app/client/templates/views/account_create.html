@@ -31,7 +31,9 @@
             {{#if showSection "import"}}
                 <div class="indented-box">
                     <br>
-                    {{> dapp_addressInput name="privateKey" placeholder=i18nPrivateKey class="import"}}
+                    <div class="dapp-address-input">
+                        <input type="text" name="privateKey" placeholder="{{i18nPrivateKey}}" class="import">
+                    </div>
                     <p class="{{importValidClass}}">{{{importInfo}}}</p>
                 </div>
             {{/if}}
