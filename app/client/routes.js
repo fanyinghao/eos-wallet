@@ -121,39 +121,6 @@ FlowRouter.route('/send-from/:from', {
 });
 
 /**
-The send route.
-
-@method send
-*/
-FlowRouter.route('/send-token/:from/:token', {
-  name: 'sendToken',
-  action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send'
-    });
-  }
-});
-
-/**
-The send route.
-
-@method send
-*/
-FlowRouter.route('/deploy-contract', {
-  name: 'deployContract',
-  action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send',
-      data: {
-        deployContract: true
-      }
-    });
-  }
-});
-
-/**
 The create account route.
 
 @method send
