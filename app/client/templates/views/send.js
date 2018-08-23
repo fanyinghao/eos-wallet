@@ -70,14 +70,6 @@ Template["views_send"].onRendered(function() {
   }
 });
 
-Template.views_send.rendered = function() {
-  console.log("rendered");
-
-  if (TemplateVar.get("isMultiSig")) {
-    console.log("here");
-  }
-};
-
 Template["views_send"].helpers({
   checked: function(type) {
     return TemplateVar.get("send_type") === type;

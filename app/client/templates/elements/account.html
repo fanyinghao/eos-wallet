@@ -29,19 +29,10 @@
             {{/with}}
 
             <h3 class="{{ensClass}}">
-                {{#if isVulnerable}}
-                    <span class="red">
-                        <i class="icon-info"></i>
-                        {{account_name}}
-                    </span>
-                {{else}}
-                    {{#if ../isContract}}
-                        <i class="icon-doc"></i>
-                    {{else}}
-                        {{walletIcon}}
-                    {{/if}}
+                <span class="red">
+                    <i class="icon-user"></i>
                     {{account_name}}
-                {{/if}}
+                </span>
             </h3>
             
             <span class="account-id">{{publicKey}}</span>                
