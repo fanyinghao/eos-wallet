@@ -34,10 +34,6 @@ Template["views_send"].onCreated(function() {
   var template = this;
   EthElements.Modal.hide();
 
-  let keys = Object.keys(ObservableAccounts.accounts);
-  if (keys.length > 0)
-    ObservableAccounts.accounts[keys[0]].selected = "selected";
-
   // SET THE DEFAULT VARIABLES
   TemplateVar.set("amount", "0");
   TemplateVar.set("sendAll", false);
@@ -68,6 +64,20 @@ Template["views_send"].onRendered(function() {
       }
     });
   }
+
+  let keys = Object.keys(ObservableAccounts.accounts);
+  if (keys.length > 0) {
+    
+    Tracker.autorun(() => {
+      TemplateVar.setTo(
+        'select[name="dapp-select-account"].send-from',
+        'value',
+        ObservableAccounts.accounts[keys[0]].name
+      );
+      template.$('select.send-from').trigger('change')
+    });
+  }
+
 });
 
 Template["views_send"].helpers({
