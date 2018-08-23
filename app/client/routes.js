@@ -25,7 +25,6 @@ FlowRouter.triggers.enter([
     EthElements.Modal.hide();
     $(window).scrollTop(0);
   },
-  updateMistMenu
 ]);
 
 // ROUTES
