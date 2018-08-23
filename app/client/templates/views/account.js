@@ -151,21 +151,6 @@ Template['views_account'].helpers({
     return this.owners ? _.clone(walletInterface) : _.clone(this.jsonInterface);
   },
   /**
-    Get the pending confirmations of this account.
-
-    @method (pendingConfirmations)
-    */
-  pendingConfirmations: function() {
-    return _.pluck(
-      PendingConfirmations.find({
-        operation: { $exists: true },
-        confirmedOwners: { $ne: [] },
-        from: this.address
-      }).fetch(),
-      '_id'
-    );
-  },
-  /**
     Return the daily limit available today.
 
     @method (availableToday)
@@ -203,16 +188,6 @@ Template['views_account'].helpers({
     if (Helpers.getAccountByAddress(owner))
       return FlowRouter.path('account', { address: owner });
     else return FlowRouter.path('sendTo', { address: owner });
-  },
-  /**
-    Get all tokens
-
-    @method (tokens)
-    */
-  tokens: function() {
-    var query = {};
-    query['balances.' + this._id] = { $exists: true };
-    return Tokens.find(query, { sort: { name: 1 } });
   },
   /**
     Get the tokens balance

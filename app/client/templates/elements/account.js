@@ -50,16 +50,6 @@ Template.elements_account.helpers({
     return account;
   },
   /**
-    Get all tokens
-
-    @method (tokens)
-    */
-  tokens: function() {
-    var query = {};
-    query['balances.' + this._id] = { $exists: true };
-    return Tokens.find(query, { limit: 5, sort: { name: 1 } });
-  },
-  /**
     Get the tokens balance
 
     @method (formattedTokenBalance)

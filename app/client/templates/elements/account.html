@@ -19,15 +19,6 @@
                 </div>
             {{/unless}}
 
-
-            {{#with tokens}}
-                <ul class="token-list">
-                    {{#each this}}
-                        <li data-tooltip="{{account_name}} ({{formattedTokenBalance}})" class="simptip-position-right simptip-movable">{{> dapp_identicon identity=account_name class="dapp-tiny"}}</li>
-                    {{/each}}
-                </ul>
-            {{/with}}
-
             <h3 class="{{ensClass}}">
                 <span class="red">
                     <i class="icon-user"></i>

@@ -49,26 +49,6 @@
                 </header>
 
 
-                {{#with tokens}}
-                    <table class="token-list dapp-zebra">
-                        <tbody>
-                            {{#each this}}
-                                <tr>
-                                    <td>{{> dapp_identicon identity=account_name class="dapp-tiny"}}
-                                    <strong>{{name}}</strong></td>
-                                    <td>{{formattedTokenBalance}}</td>
-                                    <td class="send">
-                                        <a href="{{pathFor route='sendToken' from=../../address token=address}}">
-                                            <i class="icon-arrow-up"></i>
-                                            {{i18n "wallet.app.buttons.send"}}
-                                        </a>
-                                    </td>
-                                </tr>
-                            {{/each}}
-                        </tbody>
-                    </table>
-                {{/with}}
-
                 {{#if owners}}
                     <!-- Wallet infos -->
 
@@ -132,35 +112,12 @@
 
             <div class="accounts-transactions">
 
-                {{#if pendingConfirmations}}
-                    <h2>{{i18n 'wallet.transactions.pendingConfirmations'}}</h2>
-
-                    {{> elements_transactions_table collection="PendingConfirmations" ids=pendingConfirmations account=_id}}
-                {{/if}}
-
                 {{#if transactions}}
                     <h2>{{i18n 'wallet.transactions.latest'}}</h2>
 
                     {{> elements_transactions_table ids=transactions account=_id}}
                 {{/if}}
 
-                {{#with customContract}}
-                    <h2>{{i18n 'wallet.events.latest'}}</h2>
-                    <br>
-
-                    <div>
-                        <input type="checkbox" id="watch-events-checkbox" class="toggle-watch-events" checked="{{TemplateVar.get 'watchEvents'}}">
-                        <label for="watch-events-checkbox">{{i18n "wallet.contracts.buttons.watchContractEvents"}}</label>
-                    </div>
-
-                    {{#if (TemplateVar.get "watchEvents")}}
-                        <div class="watch-events-spinner">
-                            {{> spinner}}
-                        </div>
-                    {{/if}}
-
-                    {{> elements_event_table ids=contractEvents}}
-                {{/with}}
             </div>
         </div>
     {{/with}}
