@@ -69,10 +69,14 @@ Template["views_send"].onRendered(function() {
   if (keys.length > 0) {
     
     Tracker.autorun(() => {
+      let from = FlowRouter.getParam('from');
+      if (!from)
+        ObservableAccounts.accounts[keys[0]].name;
+
       TemplateVar.setTo(
         'select[name="dapp-select-account"].send-from',
         'value',
-        ObservableAccounts.accounts[keys[0]].name
+        from
       );
       template.$('select.send-from').trigger('change')
     });
