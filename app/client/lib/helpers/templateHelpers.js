@@ -132,9 +132,9 @@ Returns a list of accounts and wallets sorted by balance
 @method (latestBlock)
 **/
 Template.registerHelper('selectAccounts', function() {
-  if(Object.keys(ObservableAccounts.accounts).length === 0)
-    FlowRouter.go("dashboard");
-  return Object.values(ObservableAccounts.accounts).filter((item) => {
+  if (Object.keys(ObservableAccounts.accounts).length === 0)
+    FlowRouter.go('dashboard');
+  return Object.values(ObservableAccounts.accounts).filter(item => {
     return !item.creating;
   });
 });
@@ -246,3 +246,12 @@ Check if on main network
 Template.registerHelper('isMainNetwork', function() {
   return Session.get('network') === 'main';
 });
+
+/**
+or logic function
+
+@method or
+**/
+Template.registerHelper('or',(a,b)=>{
+  return a || b;
+})

@@ -112,7 +112,27 @@ Helpers.getAccountByName = function(name) {
   })
 }
 
+/**
+Returns a error handler
 
-Template.registerHelper('or',(a,b)=>{
-  return a || b;
-})
+@method handleError
+**/
+Helpers.handleError = (e) => {
+  console.log(e);
+  if (
+    e.message === 'wrong password' ||
+    e.message === "gcm: tag doesn't match"
+  ) {
+    GlobalNotification.warning({
+      content: 'i18n:wallet.accounts.wrongPassword',
+      duration: 2
+    });
+    return;
+  } else {
+    GlobalNotification.warning({
+      content: e.message,
+      duration: 5
+    });
+    return;
+  }
+};

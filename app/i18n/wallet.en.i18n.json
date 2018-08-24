@@ -111,7 +111,7 @@
         "showInterface": "Show Interface"
       },
       "modal": {
-        "deleteText": "Do you really want to delete this wallet contract? If you don't separately track it and its private key, you may not be able to find it on the blockchain and will lose access to any funds deposited<br><br> Type \"delete\" confirm the deletion.",
+        "deleteText": "Do you really want to delete this Account? Please backup your private key at first, or you may not be able to find it on the blockchain and will lose access to any funds deposited. \n Type your password confirm the deletion.",
         "backupWallet": {
           "title": "Backup your wallet contract address!",
           "description": "Make sure to write down the wallet contract address:"

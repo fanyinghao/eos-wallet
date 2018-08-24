@@ -26,7 +26,6 @@ Template.views_account.onRendered(function() {
 })
 
 Template['views_account'].onRendered(function() {
-  console.timeEnd('renderAccountPage');
 });
 
 Template['views_account'].onDestroyed(function() {
@@ -194,26 +193,25 @@ Template['views_account'].events({
   /**
     Clicking the delete button will show delete modal
 
-    @event click button.delete
+    @event click button.remove-button
     */
-  'click button.delete': function(e, template) {
-    var data = this;
+  'click button.remove-button': function(e, template) {
 
-    EthElements.Modal.question({
-      text: new Spacebars.SafeString(
-        TAPi18n.__('wallet.accounts.modal.deleteText') +
-          '<br><input type="text" class="deletionConfirmation" autofocus="true">'
-      ),
-      ok: function() {
-        if ($('input.deletionConfirmation').val() === 'delete') {
-          Wallets.remove(data._id);
-          CustomContracts.remove(data._id);
-
+    let account_name = TemplateVar.get('account_name');
+    // Open a modal showing the QR Code
+    EthElements.Modal.show({
+      template: 'authorized',
+      data: {
+        title: new Spacebars.SafeString(
+          TAPi18n.__('wallet.accounts.modal.deleteText')
+        ),
+        account_name: account_name,
+        callback: (privateKey) => {
+          keystore.Remove(account_name);
           FlowRouter.go('dashboard');
           return true;
         }
-      },
-      cancel: true
+      }
     });
   },
   /**
@@ -235,14 +233,25 @@ Template['views_account'].events({
 
     @event click a.export private Key
     */
-  'click .exportKey-button': function(e) {
+  'click button.exportKey-button': function(e) {
     e.preventDefault();
-
+    let account_name = TemplateVar.get('account_name');
     // Open a modal showing the QR Code
     EthElements.Modal.show({
-      template: 'views_modals_qrCode',
+      template: 'authorized',
       data: {
-        address: this.address
+        account_name: account_name,
+        callback: (privateKey) => {
+          EthElements.Modal.hide();
+          EthElements.Modal.question({
+            text: privateKey,
+            ok: () => {}
+          },
+          {
+            closeable: false,
+            class: "modal-medium"
+          })
+        }
       }
     });
   },
@@ -276,46 +285,5 @@ Template['views_account'].events({
     {
       class: 'modal-small'
     });
-  },
-
-  /**
-    Click to reveal the jsonInterface
-
-    @event click .interface-button
-    */
-  'click .interface-button': function(e) {
-    e.preventDefault();
-    var jsonInterface = this.owners
-      ? _.clone(walletInterface)
-      : _.clone(this.jsonInterface);
-
-    //clean ABI from circular references
-    var cleanJsonInterface = _.map(jsonInterface, function(e, i) {
-      return _.omit(e, 'contractInstance');
-    });
-
-    // Open a modal showing the QR Code
-    EthElements.Modal.show({
-      template: 'views_modals_interface',
-      data: {
-        jsonInterface: cleanJsonInterface
-      }
-    });
-  },
-  /**
-    Click watch contract events
-
-    @event change button.toggle-watch-events
-    */
-  'change .toggle-watch-events': function(e, template) {
-    e.preventDefault();
-
-    if (template.customEventSubscription) {
-      template.customEventSubscription.unsubscribe();
-      template.customEventSubscription = null;
-      TemplateVar.set('watchEvents', false);
-    } else {
-      TemplateVar.set('watchEvents', true);
-    }
   }
 });

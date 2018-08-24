@@ -14,6 +14,11 @@ export function Get(accountName, password) {
   return storage.get(accountName, password);
 }
 
+export function Remove(accountName) {
+  const storage = new SecureStorage({ id: STORGE_ID });
+  return storage.remove(accountName);
+}
+
 export function SignProvider(accountName, password) {
   const storage = new SecureStorage({ id: STORGE_ID });
   let sensitive = storage.get(accountName, password).sensitive;

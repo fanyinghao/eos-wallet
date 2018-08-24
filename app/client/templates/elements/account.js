@@ -94,6 +94,5 @@ Template.elements_account.events({
     @event click button.show-data
     */
   'click .wallet-box': function(e) {
-    console.time('renderAccountPage');
   }
 });
