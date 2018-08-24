@@ -30,6 +30,21 @@ Template.elements_account.created = function() {
       account = extend({}, account, _account)
       account.loading = false;
       account.creating = false;
+      account.permissions.map(item => {
+        if (item.perm_name === "active") {
+          let isMultiSig = item.required_auth.threshold > 1;
+          if(isMultiSig) {
+            account.multiSig_perm = Array.prototype.map.call(
+              item.required_auth.accounts,
+              item => {
+                item.permission.name = item.permission.actor;
+                return item.permission;
+              }
+            );
+          }
+        }
+      })
+      ObservableAccounts.accounts[name] = account;
       TemplateVar.set(self, 'account', account)
     }, err => {
       account = extend({}, account, {creating: true, loading: false})

@@ -31,20 +31,8 @@
             <div class="col col-4 mobile-full from">
                 <h3>{{i18n 'wallet.send.from'}}</h3>
 
-                {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
+                {{> eos_selectAccount accounts=(selectAccounts) class='send-from' }}
 
-                <div class="indented-box">
-                    <br> 
-                    {{#if isMultiSig}} 
-                        <span>{{i18n 'wallet.send.showNotice'}} </span>
-                        <br> 
-                        
-                        {{> dapp_selectAccount accounts=(selectAccounts) class='send-proposer'}}
-                        
-                    {{else}} 
-                        <span>&nbsp;</span> 
-                    {{/if}}
-                </div>
             </div>
 
             <div class="col col-4 mobile-full">
@@ -115,7 +103,7 @@
             <div class="col col-4 mobile-full from">
                 <h3>{{i18n 'wallet.send.from'}}</h3>
 
-                {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
+                {{> selectAccount accounts=(selectAccounts true) class='send-from'}}
 
             </div>
 
@@ -151,7 +139,7 @@
             <div class="col col-4 mobile-full from">
                 <h3>{{i18n 'wallet.send.from'}}</h3>
 
-                {{> dapp_selectAccount accounts=(selectAccounts) class='send-from'}}
+                {{> selectAccount accounts=(selectAccounts true) class='send-from'}}
 
             </div>
             <div class="dapp-clear-fix"></div>

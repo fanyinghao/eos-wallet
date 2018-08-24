@@ -136,3 +136,23 @@ Helpers.handleError = (e) => {
     return;
   }
 };
+
+/**
+Returns a bool if an account is MultiSig
+
+@method (isMultiSig)
+**/
+Helpers.isMultiSig = function(account) {
+  let isMultiSig = false
+  let _account = account
+
+  if(typeof(account) === "string")
+    _account = ObservableAccounts.accounts[account];
+
+  _account.permissions.map(item => {
+    if (item.perm_name === "active") {
+      isMultiSig = item.required_auth.threshold > 1;
+    }
+  })
+  return isMultiSig;
+};

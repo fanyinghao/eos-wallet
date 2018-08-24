@@ -1,0 +1,13 @@
+<template name="selectAccount">
+
+    <div class="dapp-select-account {{class}}">
+        <select name="{{#if name}}{{name}}{{else}}dapp-select-account{{/if}}" class="{{class}}">
+            {{#each accounts}}
+            <option value="{{account_name}}" {{selected}}>
+                {{#if isMultiSig this }} 🔑 {{else}} 👤 {{/if}} {{account_name}}
+            </option>
+            {{/each}}
+        </select>
+    </div>
+
+</template>

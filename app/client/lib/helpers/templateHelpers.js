@@ -131,12 +131,12 @@ Returns a list of accounts and wallets sorted by balance
 
 @method (latestBlock)
 **/
-Template.registerHelper('selectAccounts', function() {
+Template.registerHelper('selectAccounts', function(ignoreMultiSig) {
   if (Object.keys(ObservableAccounts.accounts).length === 0)
     FlowRouter.go('dashboard');
   return Object.values(ObservableAccounts.accounts).filter(item => {
-    return !item.creating;
-  });
+    return !item.creating && !(ignoreMultiSig && Helpers.isMultiSig(item));
+  }).sort((a, b) => {return a.account_name > b.account_name});
 });
 
 /**
@@ -254,4 +254,13 @@ or logic function
 **/
 Template.registerHelper('or',(a,b)=>{
   return a || b;
+})
+
+/**
+isMultiSig
+
+@method isMultiSig
+**/
+Template.registerHelper('isMultiSig',(account)=>{
+  return Helpers.isMultiSig(account);
 })

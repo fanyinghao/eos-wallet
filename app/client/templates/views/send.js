@@ -74,11 +74,11 @@ Template["views_send"].onRendered(function() {
         ObservableAccounts.accounts[keys[0]].name;
 
       TemplateVar.setTo(
-        'select[name="dapp-select-account"].send-from',
+        'select[name="dapp-select-account"]',
         'value',
         from
       );
-      template.$('select.send-from').trigger('change')
+      template.$('select[name="dapp-select-account"]').trigger('change')
     });
   }
 
@@ -95,7 +95,7 @@ Template["views_send"].helpers({
     */
   selectedAccount: function() {
     return ObservableAccounts.accounts[
-      TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+      TemplateVar.getFrom(".dapp-select-account", "value")
     ];
   },
   isMultiSig: function() {
@@ -105,7 +105,7 @@ Template["views_send"].helpers({
   selectedBalance: function() {
     selectedAccount =
       ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+        TemplateVar.getFrom(".dapp-select-account", "value")
       ];
 
     let empty = { value: "0.0000", symbol: "EOS" };
@@ -130,7 +130,7 @@ Template["views_send"].helpers({
       sendAll = TemplateVar.get("sendAll"),
       selectedAccount =
         ObservableAccounts.accounts[
-          TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+          TemplateVar.getFrom(".dapp-select-account", "value")
         ];
 
     if (sendAll && selectedAccount) amount = selectedAccount.eosBalance.value;
@@ -154,16 +154,6 @@ Template["views_send"].helpers({
           console.log(err);
         }
       );
-  },
-  proposers: function() {
-    let permissions = TemplateVar.get("permissions");
-    if (permissions && permissions.length > 0) {
-      permissions[0].selected = true;
-    }
-    return permissions;
-  },
-    isSelected: function(selected) {
-    return selected ? "selected" : "";
   }
 });
 
@@ -177,7 +167,7 @@ Template["views_send"].events({
     TemplateVar.set("sendAll", $(e.currentTarget)[0].checked);
     selectedAccount =
       ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+        TemplateVar.getFrom(".dapp-select-account", "value")
       ];
 
     if (selectedAccount)
@@ -288,36 +278,6 @@ Template["views_send"].events({
   ) {
     TemplateVar.set("publicKey", e.currentTarget.value);
   },
-  'change select[name="dapp-select-account"].send-from': function(e, template) {
-    let selectedAccount = ObservableAccounts.accounts[e.target.value];
-    let isMultiSig = false;
-    let permissionCount = 0;
-
-    let permissions = [];
-    TemplateVar.set(template, "permissions", permissions);
-
-    selectedAccount &&
-      selectedAccount.permissions &&
-      selectedAccount.permissions.map(item => {
-        if (item.perm_name === "active") {
-          isMultiSig = item.required_auth.threshold > 1;
-          permissionCount = item.required_auth.accounts.length;
-          TemplateVar.set("isMultiSig", isMultiSig);
-          TemplateVar.set("permissionCount", permissionCount);
-
-          if (isMultiSig) {
-            permissions = Array.prototype.map.call(
-              item.required_auth.accounts,
-              item => {
-                item.permission.name = item.permission.actor;
-                return item.permission;
-              }
-            );
-            TemplateVar.set(template, "permissions", permissions);
-          }
-        }
-      });
-  },
   /**
     Submit the form and send the transaction!
 
@@ -327,7 +287,7 @@ Template["views_send"].events({
     let send_type = TemplateVar.get("send_type");
     let selectedAccount =
       ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account.send-from", "value")
+        TemplateVar.getFrom(".dapp-select-account", "value")
       ];
     let password = TemplateVar.get("password");
 
@@ -450,13 +410,11 @@ Template["views_send"].events({
         TemplateVar.set(template, "sending", true);
 
         try {
-          let isMultiSig = TemplateVar.get(template, "isMultiSig");
-          let permissions = [];
-          let permissionCount = 0;
+          let isMultiSig = Helpers.isMultiSig(selectedAccount);
 
           if (!isMultiSig) {
             let provider = keystore.SignProvider(
-              selectedAccount.name,
+              selectedAccount.account_name,
               password
             );
             const _eos = Eos({
@@ -468,18 +426,18 @@ Template["views_send"].events({
 
             _eos
               .transfer(
-                selectedAccount.name,
+                selectedAccount.account_name,
                 _to,
                 _amount,
                 _memo || "transfer", {
-                  authorization: `${selectedAccount.name}@active`,
+                  authorization: `${selectedAccount.account_name}@active`,
                   broadcast: true,
                   sign: true
                 }
               )
               .then(onSuccess, onError);
           } else {
-            let selectedProposer = TemplateVar.getFrom(".dapp-select-account.send-proposer", "value");
+            let selectedProposer = TemplateVar.getFrom("[name=dapp-select-proposer]", "value");
             let propose_provider = keystore.SignProvider(
               selectedProposer,
               password
@@ -491,10 +449,7 @@ Template["views_send"].events({
               verbose: false
             });
 
-            permissions = Object.values(
-              TemplateVar.get(template, "permissions")
-            );
-            permissionCount = TemplateVar.get(template, "permissionCount");
+            let permissions = selectedAccount.multiSig_perm;
 
             if (!selectedProposer)
               throw new Error("i18n:wallet.accounts.noProposer");
@@ -505,7 +460,7 @@ Template["views_send"].events({
             propose_eos.contract("eosio.msig").then(msig => {
               eos
                 .transfer(
-                  selectedAccount.name,
+                  selectedAccount.account_name,
                   _to,
                   _amount,
                   _memo || "transfer",
@@ -522,12 +477,13 @@ Template["views_send"].events({
                     .propose(
                       selectedProposer,
                       proposal_name,
-                      Array.prototype.map.call(permissions, item => {
-                        return {
-                          actor: item.actor,
-                          permission: item.permission
-                        };
-                      }),
+                      // Array.prototype.map.call(permissions, item => {
+                      //   return {
+                      //     actor: item.actor,
+                      //     permission: item.permission
+                      //   };
+                      // }),
+                      permissions,
                       transfer.transaction.transaction,
                       { authorization: `${selectedProposer}@active` }
                     )
@@ -559,7 +515,7 @@ Template["views_send"].events({
         TemplateVar.set(template, "sending", true);
 
         try {
-          let provider = keystore.SignProvider(selectedAccount.name, password);
+          let provider = keystore.SignProvider(selectedAccount.account_name, password);
           const _eos = Eos({
             httpEndpoint: httpEndpoint,
             chainId: chainId,
@@ -571,37 +527,37 @@ Template["views_send"].events({
             .transaction(tr => {
               tr.newaccount(
                 {
-                  creator: selectedAccount.name,
+                  creator: selectedAccount.account_name,
                   name: _name,
                   owner: _owner,
                   active: _active
                 },
                 {
-                  authorization: `${selectedAccount.name}@active`
+                  authorization: `${selectedAccount.account_name}@active`
                 }
               );
 
               tr.buyram(
                 {
-                  payer: selectedAccount.name,
+                  payer: selectedAccount.account_name,
                   receiver: _name,
                   quant: "0.6295 EOS"
                 },
                 {
-                  authorization: `${selectedAccount.name}@active`
+                  authorization: `${selectedAccount.account_name}@active`
                 }
               );
 
               tr.delegatebw(
                 {
-                  from: selectedAccount.name,
+                  from: selectedAccount.account_name,
                   receiver: _name,
                   stake_net_quantity: "0.0050 EOS",
                   stake_cpu_quantity: "0.0400 EOS",
                   transfer: 0
                 },
                 {
-                  authorization: `${selectedAccount.name}@active`
+                  authorization: `${selectedAccount.account_name}@active`
                 }
               );
             })
@@ -617,7 +573,7 @@ Template["views_send"].events({
 
         try {
           let signProvider = keystore.SignProvider(
-            selectedAccount.name,
+            selectedAccount.account_name,
             password
           );
           const _eos_app = Eos({
@@ -633,19 +589,19 @@ Template["views_send"].events({
                 _proposer,
                 _name,
                 {
-                  actor: selectedAccount.name,
+                  actor: selectedAccount.account_name,
                   permission: "active"
                 },
                 {
                   broadcast: true,
-                  authorization: `${selectedAccount.name}@active`
+                  authorization: `${selectedAccount.account_name}@active`
                 }
               )
               .then(tx => {
                 msig
-                  .exec(_proposer, _name, selectedAccount.name, {
+                  .exec(_proposer, _name, selectedAccount.account_name, {
                     broadcast: true,
-                    authorization: `${selectedAccount.name}@active`
+                    authorization: `${selectedAccount.account_name}@active`
                   })
                   .then(
                     exec_tx => {
@@ -701,7 +657,7 @@ Template["views_send"].events({
           {
             template: "views_modals_sendTransactionInfo",
             data: {
-              from: selectedAccount.name,
+              from: selectedAccount.account_name,
               to: to,
               amount: amount,
               memo: memo
