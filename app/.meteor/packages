@@ -52,7 +52,7 @@ tap:i18n-bundler
 numeral:numeral
 numeral:languages
 hashanp:geopattern
-dynamic-import@0.4.0
+dynamic-import@0.4.2
 ethereum:elements@1.1.0
 3stack:bignumber
-underscore
+underscore@1.0.10
