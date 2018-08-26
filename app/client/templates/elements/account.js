@@ -26,35 +26,47 @@ Template.elements_account.created = function() {
   TemplateVar.set(self, 'account', account)
 
   Tracker.autorun(() => {
-    eos.getAccount(name).then(_account => {
+
+    // let account = ObservableAccounts.accounts[name]
+
+    // TemplateVar.set(self, 'account', account)
+
+    ObservableAccounts.refresh(account).then(_account=>{
       account = extend({}, account, _account)
-      account.loading = false;
-      account.creating = false;
-      account.permissions.map(item => {
-        if (item.perm_name === "active") {
-          let isMultiSig = item.required_auth.threshold > 1;
-          if(isMultiSig) {
-            account.multiSig_perm = Array.prototype.map.call(
-              item.required_auth.accounts,
-              item => {
-                item.permission.name = item.permission.actor;
-                return item.permission;
-              }
-            );
-          }
-        }
-      })
-      ObservableAccounts.accounts[name] = account;
       TemplateVar.set(self, 'account', account)
     }, err => {
-      account = extend({}, account, {creating: true, loading: false})
-      TemplateVar.set(self, 'account', account)
+      console.error(err)
     })
-    eos.getCurrencyBalance('eosio.token', name).then(res => {
-        TemplateVar.set(self, 'balance', res);
-      }, err => {
-      //console.log(err)
-    })
+
+    // eos.getAccount(name).then(_account => {
+    //   account = extend({}, account, _account)
+    //   account.loading = false;
+    //   account.creating = false;
+    //   account.permissions.map(item => {
+    //     if (item.perm_name === "active") {
+    //       let isMultiSig = item.required_auth.threshold > 1;
+    //       if(isMultiSig) {
+    //         account.multiSig_perm = Array.prototype.map.call(
+    //           item.required_auth.accounts,
+    //           item => {
+    //             item.permission.name = item.permission.actor;
+    //             return item.permission;
+    //           }
+    //         );
+    //       }
+    //     }
+    //   })
+    //   ObservableAccounts.accounts[name] = account;
+    //   TemplateVar.set(self, 'account', account)
+    // }, err => {
+    //   account = extend({}, account, {creating: true, loading: false})
+    //   TemplateVar.set(self, 'account', account)
+    // })
+    // eos.getCurrencyBalance('eosio.token', name).then(res => {
+    //     TemplateVar.set(self, 'balance', res);
+    //   }, err => {
+    //   //console.log(err)
+    // })
   })
 };
 
@@ -63,6 +75,15 @@ Template.elements_account.rendered = function() {
   var pattern = GeoPattern.generate(this.data.name);
   this.$('.account-pattern').css('background-image', pattern.toDataUrl());
 };
+
+// Template.elements_account.onRendered(function(){
+//   let self = this
+//   let name = this.data.name
+//   Tracker.autorun(() => {
+//     let account = ObservableAccounts.accounts[name]
+//     TemplateVar.set(self, 'account', account)
+//   })
+// })
 
 Template.elements_account.helpers({
   /**
@@ -80,10 +101,10 @@ Template.elements_account.helpers({
     @method (formattedTokenBalance)
     */
   formattedTokenBalance: function(e) {
-    var balance = TemplateVar.get('balance'); 
-    if(!balance || balance.length === 0) 
-      balance = ["0.0000 EOS"]
-    return balance[0];
+    var account = TemplateVar.get('account'); 
+    if(!account || !account.eosBalance) 
+      return ["0.0000 EOS"]
+    return `${account.eosBalance.value} ${account.eosBalance.symbol}`;
   },
   /**
     Account was just added. Return true and remove the "new" field.

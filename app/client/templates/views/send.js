@@ -65,13 +65,13 @@ Template["views_send"].onRendered(function() {
     });
   }
 
-  let keys = Object.keys(ObservableAccounts.accounts);
+  let keys = Object.keys(ObservableAccounts.accounts).sort();
   if (keys.length > 0) {
     
     Tracker.autorun(() => {
       let from = FlowRouter.getParam('from');
       if (!from)
-        ObservableAccounts.accounts[keys[0]].name;
+        from = ObservableAccounts.accounts[keys[0]].name;
 
       TemplateVar.setTo(
         'select[name="dapp-select-account"]',
@@ -94,20 +94,18 @@ Template["views_send"].helpers({
     @method (selectedAccount)
     */
   selectedAccount: function() {
-    return ObservableAccounts.accounts[
-      TemplateVar.getFrom(".dapp-select-account", "value")
-    ];
+    // return ObservableAccounts.accounts[
+    //   TemplateVar.getFrom(".dapp-select-account", "value")
+    // ];
+    
+    return TemplateVar.get("selectedAccount");
   },
   isMultiSig: function() {
     let isMultiSig = TemplateVar.get("isMultiSig");
     return isMultiSig;
   },
   selectedBalance: function() {
-    selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account", "value")
-      ];
-
+    let selectedAccount = TemplateVar.get("selectedAccount");
     let empty = { value: "0.0000", symbol: "EOS" };
     if (!selectedAccount) return empty;
 
@@ -277,6 +275,16 @@ Template["views_send"].events({
     template
   ) {
     TemplateVar.set("publicKey", e.currentTarget.value);
+  },
+  /**
+    
+
+    @event change select[name="dapp-select-account"]
+    */
+  'change select[name="dapp-select-account"]': function(e) {
+    let selectedAccount = ObservableAccounts.accounts[e.target.value];
+    TemplateVar.set("selectedAccount", selectedAccount);
+    
   },
   /**
     Submit the form and send the transaction!

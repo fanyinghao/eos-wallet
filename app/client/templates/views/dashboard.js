@@ -11,6 +11,10 @@ The dashboard template
 @constructor
 */
 
+// Template.views_dashboard.onCreated(function() {
+//   ObservableAccounts.init();
+// })
+
 Template['views_dashboard'].helpers({
   /**
     Get all current accounts

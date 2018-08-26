@@ -29,4 +29,4 @@ eos = Eos({
 })
 
 ObservableAccounts = observableAccounts;
-ObservableAccounts.init();
+// ObservableAccounts.init();
