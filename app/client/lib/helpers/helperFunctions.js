@@ -149,6 +149,9 @@ Helpers.isMultiSig = function(account) {
   if(typeof(account) === "string")
     _account = ObservableAccounts.accounts[account];
 
+  if(!_account || !_account.permissions)
+    return false;
+
   _account.permissions.map(item => {
     if (item.perm_name === "active") {
       isMultiSig = item.required_auth.threshold > 1;

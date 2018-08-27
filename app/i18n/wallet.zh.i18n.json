@@ -72,6 +72,11 @@
                 "description": "如果您想让其他人执行这个合约，请把这个信息和合约地址一起发送给他。"
             }
         },
+        "account": {
+            "multiSig": {
+                "notice": "此账号需提案多重签名，提案者"
+            }
+        },
         "accounts": {
             "title": "<strong>账户总览</strong>",
             "walletsTitle": "钱包合约",

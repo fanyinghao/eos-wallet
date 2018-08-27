@@ -76,6 +76,11 @@
         "description": "If you want to have someone else execute this contract, send this information along with the contract's address."
       }
     },
+    "account": {
+        "multiSig": {
+            "notice": "Requires Propose MulitSig, Proposer"
+        }
+    },
     "accounts": {
       "title": "<strong>Accounts</strong> Overview",
       "walletsTitle": "Wallet contracts",

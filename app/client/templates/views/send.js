@@ -78,7 +78,9 @@ Template["views_send"].onRendered(function() {
         'value',
         from
       );
-      template.$('select[name="dapp-select-account"]').trigger('change')
+
+      if(template.find('select[name="dapp-select-account"]'))
+        template.$('select[name="dapp-select-account"]').trigger('change')
     });
   }
 
@@ -282,7 +284,7 @@ Template["views_send"].events({
     @event change select[name="dapp-select-account"]
     */
   'change select[name="dapp-select-account"]': function(e) {
-    let selectedAccount = ObservableAccounts.accounts[e.target.value];
+    let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
     TemplateVar.set("selectedAccount", selectedAccount);
     
   },
@@ -431,7 +433,8 @@ Template["views_send"].events({
               signProvider: provider,
               verbose: false
             });
-
+console.log(chainId)
+console.log(selectedAccount.account_name)
             _eos
               .transfer(
                 selectedAccount.account_name,
@@ -439,7 +442,7 @@ Template["views_send"].events({
                 _amount,
                 _memo || "transfer", {
                   authorization: `${selectedAccount.account_name}@active`,
-                  broadcast: true,
+                  broadcast: false,
                   sign: true
                 }
               )
