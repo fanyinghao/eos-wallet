@@ -217,15 +217,15 @@ Template["views_account_authorize"].events({
             err => {
               TemplateVar.set(template, "sending", false);
 
-              let error = JSON.parse(err)
-              if(error && error.error) {
+              if (err.message) {
                 GlobalNotification.error({
-                  content: JSON.parse(err).error.message,
+                  content: err.message,
                   duration: 20
                 });
               } else {
+                let error = JSON.parse(err);
                 GlobalNotification.error({
-                  content: err.message,
+                  content: Helpers.translateExternalErrorMessage(error.error),
                   duration: 20
                 });
               }
@@ -243,6 +243,17 @@ Template["views_account_authorize"].events({
             duration: 2
           });
           return;
+        } else if (err.message) {
+          GlobalNotification.error({
+            content: err.message,
+            duration: 20
+          });
+        } else {
+          let error = JSON.parse(err);
+          GlobalNotification.error({
+            content: Helpers.translateExternalErrorMessage(error.error),
+            duration: 20
+          });
         }
       }
     }
