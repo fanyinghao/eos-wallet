@@ -84,8 +84,8 @@ Template.stake.events({
               {
                 from: from,
                 receiver: to,
-                stake_net_quantity: toAmount(stake_cpu),
-                stake_cpu_quantity: toAmount(stake_net),
+                stake_net_quantity: toAmount(stake_net),
+                stake_cpu_quantity: toAmount(stake_cpu),
                 transfer: 0
               },
               {
@@ -110,8 +110,8 @@ Template.stake.events({
               {
                 from: from,
                 receiver: to,
-                unstake_net_quantity: toAmount(unstake_cpu),
-                unstake_cpu_quantity: toAmount(unstake_net),
+                unstake_net_quantity: toAmount(unstake_net),
+                unstake_cpu_quantity: toAmount(unstake_cpu),
                 transfer: 0
               },
               {
