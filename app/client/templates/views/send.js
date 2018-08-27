@@ -186,6 +186,8 @@ Template["views_send"].events({
     if (amount.indexOf(".") == 0) amount = "0" + amount;
     if (amount.indexOf(".") >= 0)
       amount = amount.substring(0, amount.indexOf(".") + 5);
+    if (amount[amount.length - 1] === '.' && amount.indexOf('.') !== amount.length -1)
+      amount = amount.substring(0, amount.length -1); 
     e.currentTarget.value = amount;
     TemplateVar.set("amount", amount.replace(",", "") || "0");
   },
