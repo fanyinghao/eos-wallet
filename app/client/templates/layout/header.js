@@ -11,10 +11,6 @@ The header template
 @constructor
 */
 
-Template['layout_header'].onCreated(function() {
-  var template = this;
-});
-
 Template['layout_header'].helpers({
   /**
     Returns the correct url for the send to route
@@ -109,5 +105,19 @@ Template['layout_header'].helpers({
       Helpers.rerun['1s'].tick();
       return TAPi18n.__('wallet.app.texts.timeSinceBlock');
     }
+  },
+  chain_nodes: function() {
+    return Object.keys(chains);
+  },
+  selected: function(value) {
+    let ret = value === chain_node? 'selected': '';
+    return ret;
+  }
+});
+
+Template['layout_header'].events({
+  'change select[name=chain_node]': function(e, template) {
+    localStorage.setItem('chain_node', e.target.value);
+    location.reload();
   }
 });

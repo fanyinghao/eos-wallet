@@ -22,17 +22,22 @@ Template['views_dashboard'].helpers({
     @method (accounts)
     */
   accounts: function() {
-    let accounts = []
+    let accounts = [];
     for (var i = 0; i < localStorage.length; i++) {
       let key = localStorage.key(i);
-      if(key.indexOf('EOS_ACCOUNT') >= 0) {
-        let name = key.substring(12);
-        let account = {
-          name: name,
-          publicKey: localStorage[key].publicKey,
-          new: this.new === name
+
+      if (key.indexOf('EOS_ACCOUNT') >= 0) {
+        let cid = key.substring(12).split('_')[0];
+
+        if (cid === chainId) {
+          let name = key.substring(12).split('_')[1];
+          let account = {
+            name: name,
+            publicKey: localStorage[key].publicKey,
+            new: this.new === name
+          };
+          accounts.push(account);
         }
-        accounts.push(account);
       }
     }
     return accounts;
@@ -45,8 +50,7 @@ Template['views_dashboard'].helpers({
   hasAccounts: function() {
     for (var i = 0; i < localStorage.length; i++) {
       let key = localStorage.key(i);
-      if(key.indexOf('EOS_ACCOUNT_') >= 0)
-        return true;
+      if (key.indexOf(`EOS_ACCOUNT_${chainId}`) >= 0) return true;
     }
     return false;
   },

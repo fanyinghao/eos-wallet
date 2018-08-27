@@ -59,8 +59,9 @@ function init() {
   for (var i = 0; i < localStorage.length; i++) {
     let key = localStorage.key(i);
     if (key.indexOf('EOS_ACCOUNT') >= 0) {
-      let name = key.substring(12).split('_')[0];
-      let publicKey = key.substring(12).split('_')[1];
+      let cid = key.split('_')[0];
+      let name = key.split('_')[1];
+      let publicKey = key.split('_')[2];
       eos.getAccount(name).then(
         account => {
           account.name = name;
