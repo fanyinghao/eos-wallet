@@ -319,6 +319,20 @@
           "4": "probably within a few seconds",
           "5": "probably within a few seconds"
         }
+      },
+      "stake": {
+          "stake": "Stake CPU/NET",
+          "cpu": "CPU to Stake (in EOS)",
+          "net": "NET to Stake (in EOS)",
+          "stakeButton": "STAKE",
+          "stakeFrom": "Account to receive the stake (can be same as stake owner)",
+          "authtitle": "Please enter __name__ 's password to process"
+      },
+      "unstake": {
+          "unstake": "Unstake CPU/NET",
+          "cpu": "CPU to Unstake (in EOS)",
+          "net": "NET to Unstake (in EOS)",
+          "unstakeButton": "UNSTAKE"
       }
     },
     "tokens": {

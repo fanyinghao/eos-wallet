@@ -195,6 +195,28 @@ Template['views_account'].events({
 
     @event click button.remove-button
     */
+   'click button.stake-button': function(e, template) {
+
+    let account_name = TemplateVar.get('account_name');
+    // Open a modal showing the QR Code
+    EthElements.Modal.show({
+      template: 'stake',
+      data: {
+        from: account_name,
+        callback: () => {
+          return true;
+        }
+      }
+    },
+    {
+      class: "modal-medium"
+    });
+  },
+  /**
+    Clicking the delete button will show delete modal
+
+    @event click button.remove-button
+    */
   'click button.remove-button': function(e, template) {
 
     let account_name = TemplateVar.get('account_name');
@@ -214,20 +236,6 @@ Template['views_account'].events({
       }
     });
   },
-  /**
-    Click to copy the code to the clipboard
-
-    @event click a.create.account
-    */
-  'click .copy-to-clipboard-button': accountClipboardEventHandler,
-
-  /**
-    Tries to copy account token.
-
-    @event copy .copyable-address span
-    */
-  'copy .copyable-address': accountClipboardEventHandler,
-
   /**
     Click to export private Key
 

@@ -308,6 +308,20 @@
                     "4": "约几秒钟内約幾秒鐘內",
                     "5": "约几秒钟内約幾秒鐘內"
                 }
+            },
+            "stake": {
+                "stake": "进行抵押",
+                "cpu": "抵押CPU（单位EOS）",
+                "net": "抵押NET（单位EOS）",
+                "stakeButton": "抵押",
+                "stakeFrom": "接受抵押的账户（可为拥有者自身）",
+                "authtitle": "请输入 __name__ 的密码以完成操作"
+            },
+            "unstake": {
+                "unstake": "进行赎回",
+                "cpu": "赎回CPU（单位EOS）",
+                "net": "赎回NET（单位EOS）",
+                "unstakeButton": "赎回"
             }
         },
         "tokens": {

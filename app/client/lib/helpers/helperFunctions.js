@@ -159,3 +159,20 @@ Helpers.isMultiSig = function(account) {
   })
   return isMultiSig;
 };
+
+
+/**
+Translate an external error message into the user's language if possible. Otherwise return
+the old error message.
+
+@method translateExternalErrorMessage
+*/
+Helpers.translateExternalErrorMessage = function(message) {
+  // 'setTxStatusRejected' occurs in the stack trace of the error message triggered when
+  // the user has rejects a transaction in MetaMask. Show a localised error message
+  // instead of the stack trace.
+  let ret = `[${message.code}] - [${message.name}] - ${message.what}`;
+  if (message.details && message.details.length > 0)
+    ret += ` - ${message.details[0].message}`;
+  return ret;
+};

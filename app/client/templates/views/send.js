@@ -45,7 +45,7 @@ Template["views_send"].onCreated(function() {
   }
 });
 
-Template["views_send"].onRendered(function() {
+Template.views_send.onRendered(function() {
   var template = this;
 
   if (FlowRouter.getRouteName() === "newaccount") {
@@ -189,7 +189,7 @@ Template["views_send"].events({
     e.currentTarget.value = amount;
     TemplateVar.set("amount", amount.replace(",", "") || "0");
   },
-  /**
+  /** 
     Set the memo while typing
 
     @event keyup keyup textarea[name="memo"], change textarea[name="memo"], input textarea[name="memo"]
@@ -433,8 +433,6 @@ Template["views_send"].events({
               signProvider: provider,
               verbose: false
             });
-console.log(chainId)
-console.log(selectedAccount.account_name)
             _eos
               .transfer(
                 selectedAccount.account_name,
@@ -442,7 +440,7 @@ console.log(selectedAccount.account_name)
                 _amount,
                 _memo || "transfer", {
                   authorization: `${selectedAccount.account_name}@active`,
-                  broadcast: false,
+                  broadcast: true,
                   sign: true
                 }
               )
