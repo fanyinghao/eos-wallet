@@ -1,8 +1,8 @@
-Template.stake.onRendered(function() {
+Template.tradeRam.onRendered(function() {
   template.$('input[name="to"]').focus();
 });
 
-Template.stake.events({
+Template.tradeRam.events({
   'keyup .amount input': function(e) {
     let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, '');
     if (amount.indexOf('.') == 0) amount = '0' + amount;
@@ -16,16 +16,21 @@ Template.stake.events({
     e.currentTarget.value = amount;
     TemplateVar.set(e.target.name, amount.replace(',', '') || '0');
   },
+  'keyup .bytes input': function(e) {
+    let amount = e.currentTarget.value
+      .replace(/[a-zA-Z]+/g, '')
+      .replace('.', '');
+    e.currentTarget.value = amount;
+    TemplateVar.set(e.target.name, amount.replace(',', '') || 0);
+  },
   'keyup input[name=to].to': function(e) {
     TemplateVar.set('to', e.target.value);
   },
   'click button': function(e, template) {
     let from = this.from;
     let to = TemplateVar.get('to');
-    let stake_cpu = TemplateVar.get('stake_cpu');
-    let stake_net = TemplateVar.get('stake_net');
-    let unstake_cpu = TemplateVar.get('unstake_cpu');
-    let unstake_net = TemplateVar.get('unstake_net');
+    let buy_ram = TemplateVar.get('buy_ram');
+    let sell_bytes = TemplateVar.get('sell_bytes');
 
     function get_eos(privateKey) {
       const _eos = Eos({
@@ -40,7 +45,8 @@ Template.stake.events({
     var onSuccess = tr => {
       console.log(tr);
       EthElements.Modal.hide();
-      TemplateVar.set(template, 'sending', true);
+
+      TemplateVar.set(template, 'sending', false);
 
       GlobalNotification.success({
         content: 'i18n:wallet.send.transactionSent',
@@ -55,7 +61,7 @@ Template.stake.events({
 
     var onError = err => {
       EthElements.Modal.hide();
-      TemplateVar.set(template, 'sending', true);
+      TemplateVar.set(template, 'sending', false);
 
       if (err.message) {
         GlobalNotification.error({
@@ -80,20 +86,18 @@ Template.stake.events({
       return amount;
     }
 
-    function stake(privateKey) {
+    function buy_ram_tx(privateKey) {
       // show loading
       let _eos = get_eos(privateKey);
 
       try {
         _eos
           .transaction(tr => {
-            tr.delegatebw(
+            tr.buyram(
               {
-                from: from,
+                payer: from,
                 receiver: to,
-                stake_net_quantity: toAmount(stake_net),
-                stake_cpu_quantity: toAmount(stake_cpu),
-                transfer: 0
+                quant: toAmount(buy_ram)
               },
               {
                 authorization: `${from}@active`
@@ -106,20 +110,17 @@ Template.stake.events({
       }
     }
 
-    function unstake(privateKey) {
+    function sell_ram_tx(privateKey) {
       // show loading
       let _eos = get_eos(privateKey);
 
       try {
         _eos
           .transaction(tr => {
-            tr.undelegatebw(
+            tr.sellram(
               {
-                from: from,
-                receiver: to,
-                unstake_net_quantity: toAmount(unstake_net),
-                unstake_cpu_quantity: toAmount(unstake_cpu),
-                transfer: 0
+                account: from,
+                bytes: parseInt(sell_bytes) * 1024
               },
               {
                 authorization: `${from}@active`
@@ -131,21 +132,23 @@ Template.stake.events({
         handleError(e);
       }
     }
+
     if (!TemplateVar.get('sending')) {
       TemplateVar.set('sending', true);
+
       EthElements.Modal.show({
         template: 'authorized',
         data: {
           title: new Spacebars.SafeString(
-            TAPi18n.__('wallet.send.stake.authtitle', { name: from })
+            TAPi18n.__('wallet.send.tradeRam.authtitle', { name: from })
           ),
           account_name: from,
           callback: privateKey => {
             if (!TemplateVar.get('sending')) {
-              if (e.target.name === 'stake') {
-                stake(privateKey);
-              } else if (e.target.name === 'unstake') {
-                unstake(privateKey);
+              if (e.target.name === 'buy_ram') {
+                buy_ram_tx(privateKey);
+              } else if (e.target.name === 'sell_ram') {
+                sell_ram_tx(privateKey);
               }
             }
           }

@@ -195,6 +195,28 @@ Template['views_account'].events({
 
     @event click button.remove-button
     */
+   'click button.buy-button': function(e, template) {
+
+    let account_name = TemplateVar.get('account_name');
+    // Open a modal showing the QR Code
+    EthElements.Modal.show({
+      template: 'tradeRam',
+      data: {
+        from: account_name,
+        callback: () => {
+          return true;
+        }
+      }
+    },
+    {
+      class: "modal-small"
+    });
+  },
+  /**
+    Clicking the delete button will show delete modal
+
+    @event click button.remove-button
+    */
    'click button.stake-button': function(e, template) {
 
     let account_name = TemplateVar.get('account_name');

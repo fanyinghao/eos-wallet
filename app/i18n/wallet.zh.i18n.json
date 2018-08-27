@@ -322,6 +322,16 @@
                 "cpu": "赎回CPU（单位EOS）",
                 "net": "赎回NET（单位EOS）",
                 "unstakeButton": "赎回"
+            },
+            "tradeRam": {
+                "buy": "买入RAM",
+                "sell": "卖出RAM",
+                "buyRam": "买入RAM数量（单位EOS）",
+                "sellRam": "卖出RAM数量（单位KB）",
+                "buyButton": "买入",
+                "sellButton": "卖出",
+                "receiver": "买入RAM的接收方账号（可为拥有者自身）",
+                "authtitle":"请输入 __name__ 的密码以完成操作"
             }
         },
         "tokens": {

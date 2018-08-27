@@ -333,6 +333,16 @@
           "cpu": "CPU to Unstake (in EOS)",
           "net": "NET to Unstake (in EOS)",
           "unstakeButton": "UNSTAKE"
+      },
+      "tradeRam": {
+          "buy": "Buy RAM",
+          "sell": "Sell RAM",
+          "buyRam": "RAM Purchase (in EOS)",
+          "sellRam": "RAM to Sell (in KB)",
+          "buyButton": "BUY",
+          "sellButton": "SELL",
+          "receiver": "Receiver account name (can be same as payer account)",
+          "authtitle": "Please enter __name__ 's password to process"
       }
     },
     "tokens": {
