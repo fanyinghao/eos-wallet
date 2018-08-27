@@ -38,7 +38,8 @@ reload_chain = function(node) {
 };
 
 if (!chain_node) {
-    localStorage.setItem('chain_node', 'kylin.eosasia');
+    localStorage.setItem('chain_node', 'eosasia');
+    chain_node = 'eosasia';
 }
 reload_chain(chains[chain_node]);
 
