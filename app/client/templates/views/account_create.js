@@ -1,5 +1,5 @@
-const ecc = require("eosjs-ecc");
-const keystore = require("../../lib/eos/keystore");
+const ecc = require('eosjs-ecc');
+const keystore = require('../../lib/eos/keystore');
 /**
 Template Controllers
 
@@ -13,38 +13,38 @@ The account create template
 @constructor
 */
 
-Template["views_account_create"].onCreated(function() {
+Template['views_account_create'].onCreated(function() {
   TemplateVar.set(
-    "selectedSection",
-    Number(FlowRouter.getQueryParam("ownersNum")) > 0 ? "multisig" : "simple"
+    'selectedSection',
+    Number(FlowRouter.getQueryParam('ownersNum')) > 0 ? 'multisig' : 'simple'
   );
 
   // number of owners of the account
-  var walletId = FlowRouter.getQueryParam("walletId");
-  var maxOwners = FlowRouter.getQueryParam("ownersNum");
+  var walletId = FlowRouter.getQueryParam('walletId');
+  var maxOwners = FlowRouter.getQueryParam('ownersNum');
   if (maxOwners && Helpers.isWatchOnly(walletId)) maxOwners++;
-  TemplateVar.set("multisigSignees", maxOwners || 3);
+  TemplateVar.set('multisigSignees', maxOwners || 3);
 
   // number of required signatures
   TemplateVar.set(
-    "multisigSignatures",
-    Number(FlowRouter.getQueryParam("requiredSignatures")) || 2
+    'multisigSignatures',
+    Number(FlowRouter.getQueryParam('requiredSignatures')) || 2
   );
 });
 
-Template["views_account_create"].onRendered(function() {
+Template['views_account_create'].onRendered(function() {
   // focus the input
   this.$('input[name="accountName"]').focus();
 });
 
-Template["views_account_create"].helpers({
+Template['views_account_create'].helpers({
   /**
     Return the selectedOwner
 
     @method (selectedOwner)
     */
   selectedOwner: function() {
-    return TemplateVar.getFrom(".dapp-select-account", "value");
+    return TemplateVar.getFrom('.dapp-select-account', 'value');
   },
   /**
     Return TRUE, if the current section is selected
@@ -53,10 +53,10 @@ Template["views_account_create"].helpers({
     */
   showSection: function(section) {
     // reset import wallet
-    TemplateVar.set("importWalletOwners", false);
-    TemplateVar.set("importWalletInfo", "");
+    TemplateVar.set('importWalletOwners', false);
+    TemplateVar.set('importWalletInfo', '');
 
-    return TemplateVar.get("selectedSection") === section;
+    return TemplateVar.get('selectedSection') === section;
   },
   /**
     Return the number of signees fields
@@ -67,24 +67,24 @@ Template["views_account_create"].helpers({
   signees: function() {
     var owners = [];
 
-    if (FlowRouter.getQueryParam("owners")) {
-      owners = FlowRouter.getQueryParam("owners")
-        .split(",")
-        .slice(0, TemplateVar.get("multisigSignees"));
+    if (FlowRouter.getQueryParam('owners')) {
+      owners = FlowRouter.getQueryParam('owners')
+        .split(',')
+        .slice(0, TemplateVar.get('multisigSignees'));
       owners = _.without(
         owners,
-        TemplateVar.getFrom(".dapp-select-account", "value")
+        TemplateVar.getFrom('.dapp-select-account', 'value')
       );
     }
 
     owners = owners.concat(
-      _.range(TemplateVar.get("multisigSignees") - 1 - owners.length)
+      _.range(TemplateVar.get('multisigSignees') - 1 - owners.length)
     );
 
     if (
-      TemplateVar.get("multisigSignatures") > TemplateVar.get("multisigSignees")
+      TemplateVar.get('multisigSignatures') > TemplateVar.get('multisigSignees')
     ) {
-      TemplateVar.set("multisigSignatures", TemplateVar.get("multisigSignees"));
+      TemplateVar.set('multisigSignatures', TemplateVar.get('multisigSignees'));
     }
 
     return owners;
@@ -95,7 +95,7 @@ Template["views_account_create"].helpers({
     @method (i18nOwnerAddress)
     */
   i18nOwnerAddress: function() {
-    return TAPi18n.__("wallet.newWallet.accountType.multisig.ownerAddress");
+    return TAPi18n.__('wallet.newWallet.accountType.multisig.ownerAddress');
   },
   /**
     Translates to 'private key'
@@ -103,7 +103,7 @@ Template["views_account_create"].helpers({
     @method (i18nPrivateKey)
     */
   i18nPrivateKey: function() {
-    return TAPi18n.__("wallet.newWallet.accountType.import.privateKey");
+    return TAPi18n.__('wallet.newWallet.accountType.import.privateKey');
   },
   /**
     Returns the import info text.
@@ -111,11 +111,11 @@ Template["views_account_create"].helpers({
     @method (importInfo)
     */
   importInfo: function() {
-    var text = TemplateVar.get("importWalletInfo"),
-      owners = TemplateVar.get("importWalletOwners");
+    var text = TemplateVar.get('importWalletInfo'),
+      owners = TemplateVar.get('importWalletOwners');
 
     if (!text) {
-      return "";
+      return '';
     } else {
       if (owners) return '<i class="icon-check"></i> ' + text;
       else return '<i class="icon-close"></i> ' + text;
@@ -127,7 +127,7 @@ Template["views_account_create"].helpers({
     @method (importValidClass)
     */
   importValidClass: function() {
-    return TemplateVar.get("importWalletOwners") ? "valid" : "invalid";
+    return TemplateVar.get('importWalletOwners') ? 'valid' : 'invalid';
   },
   /**
     Get the number of required multisignees (account owners)
@@ -135,8 +135,8 @@ Template["views_account_create"].helpers({
     @method (multisigSignees)
     */
   multisigSignees: function() {
-    var id = FlowRouter.getQueryParam("walletId");
-    var maxOwners = FlowRouter.getQueryParam("ownersNum");
+    var id = FlowRouter.getQueryParam('walletId');
+    var maxOwners = FlowRouter.getQueryParam('ownersNum');
     if (maxOwners && Helpers.isWatchOnly(id)) maxOwners++;
     maxOwners = Math.max(maxOwners || 7, 7);
 
@@ -152,7 +152,7 @@ Template["views_account_create"].helpers({
     @method (multisigSignatures)
     */
   multisigSignatures: function() {
-    var signees = TemplateVar.get("multisigSignees");
+    var signees = TemplateVar.get('multisigSignees');
     var returnArray = [];
 
     for (i = 2; i <= signees; i++) {
@@ -167,7 +167,7 @@ Template["views_account_create"].helpers({
     @method (simpleCheck)
     */
   simpleCheck: function() {
-    return TemplateVar.get("selectedSection") === "simple" ? "checked" : "";
+    return TemplateVar.get('selectedSection') === 'simple' ? 'checked' : '';
   },
   /**
     Is multisig checked
@@ -175,7 +175,7 @@ Template["views_account_create"].helpers({
     @method (multisigCheck)
     */
   multisigCheck: function() {
-    return TemplateVar.get("selectedSection") === "multisig" ? "checked" : "";
+    return TemplateVar.get('selectedSection') === 'multisig' ? 'checked' : '';
   },
   /**
     Default Name
@@ -183,45 +183,22 @@ Template["views_account_create"].helpers({
     @method (name)
     */
   name: function() {
-    return FlowRouter.getQueryParam("name");
+    return FlowRouter.getQueryParam('name');
   },
 
   errMsg: function() {
-    return TemplateVar.get("errMsg");
+    return TemplateVar.get('errMsg');
   }
 });
 
-Template["views_account_create"].events({
-  /**
-    Check the owner of the imported wallet.
-    
-    @event change input.import, input input.import
-    */
-  "change input.import, input input.import": function(e, template) {
-    checkWalletOwners(e.currentTarget.value).then(
-      function(wallet) {
-        TemplateVar.set(template, "importWalletOwners", wallet.owners);
-        TemplateVar.set(template, "importWalletInfo", wallet.info);
-        return null;
-      },
-      function() {}
-    );
-  },
-  /**
-    Check the owner that its not a contract wallet
-    
-    @event change input.owners, input input.owners
-    */
-  "change input.owners, input input.owners": function(e, template) {
-    var address = TemplateVar.getFrom(e.currentTarget, "value");
-  },
+Template['views_account_create'].events({
   /**
     Select the current section, based on the radio inputs value.
 
     @event change input[type="radio"]
     */
   'change input[type="radio"]': function(e) {
-    TemplateVar.set("selectedSection", e.currentTarget.value);
+    TemplateVar.set('selectedSection', e.currentTarget.value);
   },
   /**
     Change the number of signatures
@@ -229,7 +206,7 @@ Template["views_account_create"].events({
     @event click span[name="multisigSignatures"] .simple-modal button
     */
   'click span[name="multisigSignatures"] .simple-modal button': function(e) {
-    TemplateVar.set("multisigSignatures", $(e.currentTarget).data("value"));
+    TemplateVar.set('multisigSignatures', $(e.currentTarget).data('value'));
   },
   /**
     Change the number of signees
@@ -237,19 +214,19 @@ Template["views_account_create"].events({
     @event click span[name="multisigSignees"] .simple-modal button
     */
   'click span[name="multisigSignees"] .simple-modal button': function(e) {
-    TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
+    TemplateVar.set('multisigSignees', $(e.currentTarget).data('value'));
   },
   /**
     input password, based on the password inputs value.
 
     @event change input[type="password"]
     */
-  "change input[name=rePassword]": function(e, template) {
+  'change input[name=rePassword]': function(e, template) {
     let password = template.find('input[name="password"]').value;
     let rePassword = e.currentTarget.value;
     if (password !== rePassword)
       return GlobalNotification.warning({
-        content: "i18n:wallet.accounts.matchPassword",
+        content: 'i18n:wallet.accounts.matchPassword',
         duration: 2
       });
   },
@@ -259,83 +236,113 @@ Template["views_account_create"].events({
     @event submit
     */
   submit: function(e, template) {
-    var type = TemplateVar.get("selectedSection");
+    var type = TemplateVar.get('selectedSection');
+    try {
+      // SIMPLE
+      if (type === 'simple') {
+        let accountName = template.find('input[name="accountName"]').value;
+        let password = template.find('input[name="password"]').value;
+        let rePassword = template.find('input[name="rePassword"]').value;
 
-    // SIMPLE
-    if (type === "simple") {
-      
-      let accountName = template.find('input[name="accountName"]').value;
-      let password = template.find('input[name="password"]').value;
-      let rePassword = template.find('input[name="rePassword"]').value;
-
-      if (password.length === 0 || password !== rePassword)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.accounts.matchPassword",
-          duration: 2
-        });
-
-      if (accountName.trim().length !== 12)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.newWallet.accountName",
-          duration: 2
-        });
-
-      let exists = keystore.Get(accountName);
-      if (exists)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.newWallet.error.alreadyExists",
-          duration: 2
-        });
-
-      eos.getAccount(accountName).then(
-        account => {
-          TemplateVar.set(template, "errMsg", "error.existsAccount");
-        },
-        err => {
-          ecc.randomKey().then(privateKey => {
-            let publicKey = ecc.privateToPublic(privateKey);
-            // storage private key
-            keystore.SetKey(accountName, password, privateKey, publicKey);
-
-            EthElements.Modal.show(
-              {
-                template: "generateKey",
-                data: {
-                  accountName: accountName,
-                  keys: {
-                    publicKey: publicKey,
-                    privateKey
-                  }
-                }
-              },
-              {
-                class: "modal-small"
-              }
-            );
+        if (password.length === 0 || password !== rePassword)
+          return GlobalNotification.warning({
+            content: 'i18n:wallet.accounts.matchPassword',
+            duration: 2
           });
-        }
-      );
-    }
 
-    // IMPORT
-    if (type === "import") {
-      let password = template.find('input[name="password"]').value;
-      let privateKey = template.find('input[name="privateKey"]').value;
-      let publicKey = ecc.privateToPublic(privateKey);
+        if (accountName.trim().length !== 12)
+          return GlobalNotification.warning({
+            content: 'i18n:wallet.newWallet.accountName',
+            duration: 2
+          });
 
-      eos.getKeyAccounts(publicKey).then(accounts => {
-        accounts.account_names.forEach(name => {
-          // storage private key
-          keystore.SetKey(name, password, privateKey, publicKey);
-        });
+        let exists = keystore.Get(accountName);
+        if (exists)
+          return GlobalNotification.warning({
+            content: 'i18n:wallet.newWallet.error.alreadyExists',
+            duration: 2
+          });
 
-        EthElements.Modal.show({
-          template: "importKey",
-          data: {
-            accounts: accounts
+        eos.getAccount(accountName).then(
+          account => {
+            return GlobalNotification.warning({
+              content: 'i18n:wallet.newWallet.error.alreadyExists',
+              duration: 2
+            });
+          },
+          err => {
+            ecc.randomKey().then(privateKey => {
+              let publicKey = ecc.privateToPublic(privateKey);
+              // storage private key
+              keystore.SetKey(accountName, password, privateKey, publicKey);
+
+              EthElements.Modal.show(
+                {
+                  template: 'generateKey',
+                  data: {
+                    accountName: accountName,
+                    keys: {
+                      publicKey: publicKey,
+                      privateKey
+                    }
+                  }
+                },
+                {
+                  class: 'modal-small'
+                }
+              );
+            });
           }
+        );
+      }
+
+      // IMPORT
+      if (type === 'import') {
+        let password = template.find('input[name="password"]').value;
+        let rePassword = template.find('input[name="rePassword"]').value;
+        let privateKey = template.find('input[name="privateKey"]').value;
+        let publicKey = ecc.privateToPublic(privateKey);
+
+        if (password.length === 0 || password !== rePassword)
+          return GlobalNotification.warning({
+            content: 'i18n:wallet.accounts.matchPassword',
+            duration: 2
+          });
+
+        eos.getKeyAccounts(publicKey).then(accounts => {
+          if(accounts.account_names.length === 0) {
+            return GlobalNotification.error({
+              content: 'wrong key',
+              duration: 20
+            });
+          }
+
+          accounts.account_names.forEach(name => {
+            // storage private key
+            keystore.SetKey(name, password, privateKey, publicKey);
+          });
+
+          EthElements.Modal.show({
+            template: 'importKey',
+            data: {
+              accounts: accounts
+            }
+          });
         });
-      });
+      }
+    } catch (err) {
+      if (err.message) {
+        GlobalNotification.error({
+          content: err.message,
+          duration: 20
+        });
+      } else {
+        let error = JSON.parse(err);
+        GlobalNotification.error({
+          content: Helpers.translateExternalErrorMessage(error.error),
+          duration: 20
+        });
+      }
     }
   }
 });
