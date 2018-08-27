@@ -1,5 +1,5 @@
 Template.tradeRam.onRendered(function() {
-  template.$('input[name="to"]').focus();
+  this.$('input[name="to"]').focus();
 });
 
 Template.tradeRam.events({
