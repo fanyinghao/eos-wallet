@@ -68,7 +68,7 @@ Template["views_send"].onRendered(function() {
   let keys = Object.keys(ObservableAccounts.accounts).sort();
   if (keys.length > 0) {
     
-    Tracker.autorun(() => {
+    Tracker.autorun((c) => {
       let from = FlowRouter.getParam('from');
       if (!from)
         from = ObservableAccounts.accounts[keys[0]].name;
@@ -79,7 +79,7 @@ Template["views_send"].onRendered(function() {
         from
       );
 
-      if(template.find('select[name="dapp-select-account"]'))
+      // if(c.firstRun)
         template.$('select[name="dapp-select-account"]').trigger('change')
     });
   }
