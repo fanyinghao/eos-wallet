@@ -1,5 +1,6 @@
 Eos = require('eosjs');
 const { observableAccounts } = require('./observableAccounts');
+ObservableAccounts = observableAccounts;
 
 chains = {
   zbeos: {
@@ -30,7 +31,10 @@ transactionMonitor = '';
 chainId = '';
 var chain_node = localStorage.getItem('chain_node');
 
-reload_chain = function(node) {
+reload_chain = function(_node) {
+  localStorage.setItem('chain_node', _node);
+  let node = chains[_node];
+
   httpEndpoint = node.httpEndpoint;
   transactionMonitor = node.transactionMonitor;
   chainId = node.chainId;
@@ -40,13 +44,12 @@ reload_chain = function(node) {
     chainId: chainId,
     verbose: false
   });
+
+  ObservableAccounts.accounts = [];
 };
 
 if (!chain_node) {
   localStorage.setItem('chain_node', 'zbeos');
   chain_node = 'zbeos';
 }
-reload_chain(chains[chain_node]);
-
-ObservableAccounts = observableAccounts;
-// ObservableAccounts.init();
+reload_chain(chain_node);

@@ -97,8 +97,7 @@ Template['views_dashboard'].events({
   },
 
   'change select[name=chain_node]': function(e, template) {
-    reload_chain(chains[e.target.value])
-    localStorage.setItem('chain_node', e.target.value);
+    reload_chain(e.target.value)
     reactive_node.set(e.target.value);
     console.log('clicked');
   }
