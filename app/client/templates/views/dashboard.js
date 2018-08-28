@@ -81,7 +81,7 @@ Template['views_dashboard'].helpers({
     return Object.keys(chains);
   },
   selected: function(value) {
-    let ret = value === chain_node? 'selected': '';
+    let ret = value === localStorage.getItem('chain_node')? 'selected': '';
     return ret;
   }
 });
@@ -97,9 +97,9 @@ Template['views_dashboard'].events({
   },
 
   'change select[name=chain_node]': function(e, template) {
+    reload_chain(chains[e.target.value])
     localStorage.setItem('chain_node', e.target.value);
     reactive_node.set(e.target.value);
-    reload_chain(chains[e.target.value])
     console.log('clicked');
   }
 });

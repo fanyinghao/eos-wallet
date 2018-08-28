@@ -28,7 +28,7 @@ eos = null;
 httpEndpoint = '';
 transactionMonitor = '';
 chainId = '';
-chain_node = localStorage.getItem('chain_node');
+var chain_node = localStorage.getItem('chain_node');
 
 reload_chain = function(node) {
   httpEndpoint = node.httpEndpoint;
@@ -43,8 +43,8 @@ reload_chain = function(node) {
 };
 
 if (!chain_node) {
-  localStorage.setItem('chain_node', 'eosasia.kylin');
-  chain_node = 'eosasia';
+  localStorage.setItem('chain_node', 'zbeos');
+  chain_node = 'zbeos';
 }
 reload_chain(chains[chain_node]);
 
