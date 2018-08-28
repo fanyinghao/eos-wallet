@@ -34,7 +34,6 @@
                     <div class="dapp-address-input">
                         <input type="text" name="privateKey" placeholder="{{i18nPrivateKey}}" class="import">
                     </div>
-                    <p class="{{importValidClass}}">{{{importInfo}}}</p>
                 </div>
             {{/if}}
         </div>
@@ -44,18 +43,11 @@
         <input type="password" name="password" placeholder="{{i18n 'wallet.newWallet.password.newPassword'}}" autofocus="true" autocomplete="password"  />
         <input type="password" name="rePassword" placeholder="{{i18n 'wallet.newWallet.password.rePassword'}}" autofocus="true" autocomplete="rePassword" />
 
-        {{#if errMsg}}
-            <br>
-            <small class="red">
-                <i class="icon-shield"></i> {{ i18n errMsg }}
-            </small>
-        {{/if}}
-
         <hr>
 
-        <!-- button type="submit" will send the form -->
-        <button type="submit" class="dapp-block-button">{{i18n 'buttons.create'}}</button>
-
+        <button type="submit" class="dapp-block-button">
+            {{#if TemplateVar.get "sending"}} {{i18n 'buttons.sending'}} {{else}} {{i18n 'buttons.create'}} {{/if}}
+        </button>
     </form>
 
 </template>
