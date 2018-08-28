@@ -1,56 +1,45 @@
 <template name="views_dashboard">
-    {{#if isMist }}
-      {{>mist_alert}}
-    {{/if}}
-
+    
     <div class="dapp-container">
 
         <h1>{{{i18n "wallet.accounts.title"}}}</h1>
 
         {{#if pendingConfirmations}}
-            <h2>{{i18n 'wallet.transactions.pendingConfirmations'}}</h2>
+        <h2>{{i18n 'wallet.transactions.pendingConfirmations'}}</h2>
 
-            {{> elements_transactions_table collection="PendingConfirmations" ids=pendingConfirmations }}
+        {{> elements_transactions_table collection="PendingConfirmations" ids=pendingConfirmations }} {{/if}} {{#if hasAccounts}}
 
-        {{/if}}
+        <h2>{{i18n "wallet.accounts.accountsTitle"}}</h2>
 
-        {{#if hasAccounts}}
+        <div class="dapp-clear-fix"></div>
 
-            <h2>{{i18n "wallet.accounts.accountsTitle"}}</h2>
+        <div class="wallet-box-list">
+            {{#each accounts}} {{> elements_account }} {{/each}}
+        </div>
 
-            <div class="dapp-clear-fix"></div>
-
-            <div class="wallet-box-list">
-                {{#each accounts}}
-                    {{> elements_account }}
-                {{/each}}
-            </div>
-
-            <!-- {{#unless isBrowserMode}} -->
-                {{> elements_new_account_button }}
-            <!-- {{/unless}} -->
+        {{> elements_new_account_button }}
 
 
         {{else}}
-            <div class="col col-5 mobile-full ">
-                <br>
-                <!-- {{#unless isBrowserMode}} -->
-                  {{> elements_new_account_button }}
-                <!-- {{/unless}} -->
-            </div>
-            <div class="col col-5 mobile-full ">
-                <h3>{{i18n "wallet.app.texts.noAccounts.title"}}</h3>
-                <p>{{i18n "wallet.app.texts.noAccounts.text"}}</p>
-            </div>
+        <div class="col col-5 mobile-full ">
+            <br>
+            {{> elements_new_account_button }}
+        </div>
+        <div class="col col-5 mobile-full ">
+            <h3>{{i18n "wallet.app.texts.noAccounts.title"}}</h3>
+            <p>{{i18n "wallet.app.texts.noAccounts.text"}}</p>
+        </div>
         {{/if}}
 
         <div class="dapp-clear-fix"></div>
-<!-- 
-        {{#if allTransactions}}
-            <h2>{{i18n 'wallet.transactions.latest'}}</h2>
-            {{> elements_transactions_table limit=5}}
-        {{else}}
-            <h2 class="no-txs">{{i18n 'wallet.transactions.none'}}</h2>
-        {{/if}} -->
+        <div class="select-chain-container">
+            <select name="chain_node" value={{chain_node}}>
+                {{#each chain_nodes}}
+                <option value="{{this}}" {{selected this}}>
+                    {{this}}
+                </option>
+                {{/each}}
+            </select>
+        </div>
     </div>
 </template>

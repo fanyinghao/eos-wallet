@@ -10,10 +10,7 @@ The dashboard template
 @class [template] views_dashboard
 @constructor
 */
-
-// Template.views_dashboard.onCreated(function() {
-//   ObservableAccounts.init();
-// })
+var reactive_node = new ReactiveVar(localStorage.getItem('chain_node'));
 
 Template['views_dashboard'].helpers({
   /**
@@ -23,13 +20,15 @@ Template['views_dashboard'].helpers({
     */
   accounts: function() {
     let accounts = [];
+    let _node = reactive_node.get();
+
     for (var i = 0; i < localStorage.length; i++) {
       let key = localStorage.key(i);
 
       if (key.indexOf('EOS_ACCOUNT') >= 0) {
         let cid = key.substring(12).split('_')[0];
 
-        if (cid === chainId) {
+        if (cid === chains[_node].chainId) {
           let name = key.substring(12).split('_')[1];
           let account = {
             name: name,
@@ -40,6 +39,8 @@ Template['views_dashboard'].helpers({
         }
       }
     }
+    reactive_node.set(_node)
+    console.log("recompute accounts");
     return accounts;
   },
   /**
@@ -48,10 +49,15 @@ Template['views_dashboard'].helpers({
     @method (hasAccounts)
     */
   hasAccounts: function() {
+    let _node = reactive_node.get();
+
     for (var i = 0; i < localStorage.length; i++) {
       let key = localStorage.key(i);
-      if (key.indexOf(`EOS_ACCOUNT_${chainId}`) >= 0) return true;
+      if (key.indexOf(`EOS_ACCOUNT_${chains[_node].chainId}`) >= 0) return true;
     }
+    reactive_node.set(_node)
+    console.log("recompute hasAccounts");
+
     return false;
   },
   /**
@@ -70,6 +76,13 @@ Template['views_dashboard'].helpers({
     */
   pendingConfirmations: function() {
     return [];
+  },
+  chain_nodes: function() {
+    return Object.keys(chains);
+  },
+  selected: function(value) {
+    let ret = value === chain_node? 'selected': '';
+    return ret;
   }
 });
 
@@ -81,5 +94,11 @@ Template['views_dashboard'].events({
     */
   'click .create.account': function(e) {
     e.preventDefault();
+  },
+
+  'change select[name=chain_node]': function(e, template) {
+    localStorage.setItem('chain_node', e.target.value);
+    reactive_node.set(e.target.value);
+    console.log('clicked');
   }
 });
