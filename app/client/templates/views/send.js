@@ -45,6 +45,21 @@ Template["views_send"].onCreated(function() {
   }
 });
 
+function reload_from(template) {
+  let keys = Object.keys(ObservableAccounts.accounts).sort();
+  if (keys.length > 0) {
+    let from = FlowRouter.getParam('from');
+    if (!from)
+      from = ObservableAccounts.accounts[keys[0]].account_name;
+    TemplateVar.setTo(
+      'select[name="dapp-select-account"]',
+      'value',
+      from
+    );
+    template.$('select[name="dapp-select-account"]').trigger('change')
+  }
+}
+
 Template.views_send.onRendered(function() {
   var template = this;
 
@@ -65,24 +80,9 @@ Template.views_send.onRendered(function() {
     });
   }
 
-  let keys = Object.keys(ObservableAccounts.accounts).sort();
-  if (keys.length > 0) {
-    
-    Tracker.autorun((c) => {
-      let from = FlowRouter.getParam('from');
-      if (!from)
-        from = ObservableAccounts.accounts[keys[0]].name;
-
-      TemplateVar.setTo(
-        'select[name="dapp-select-account"]',
-        'value',
-        from
-      );
-
-      // if(c.firstRun)
-        template.$('select[name="dapp-select-account"]').trigger('change')
-    });
-  }
+  Tracker.autorun((c) => {
+    reload_from(template)
+  });
 
 });
 
@@ -96,10 +96,6 @@ Template["views_send"].helpers({
     @method (selectedAccount)
     */
   selectedAccount: function() {
-    // return ObservableAccounts.accounts[
-    //   TemplateVar.getFrom(".dapp-select-account", "value")
-    // ];
-    
     return TemplateVar.get("selectedAccount");
   },
   isMultiSig: function() {
@@ -244,8 +240,9 @@ Template["views_send"].events({
 
     @event change input[name="choose-type"]
     */
-  'change input[name="choose-type"]': function(e) {
+  'change input[name="choose-type"]': function(e, template) {
     TemplateVar.set("send_type", e.currentTarget.value);
+    reload_from(template);
   },
   /**
     Set the to while typing
@@ -288,7 +285,7 @@ Template["views_send"].events({
   'change select[name="dapp-select-account"]': function(e) {
     let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
     TemplateVar.set("selectedAccount", selectedAccount);
-    
+
   },
   /**
     Submit the form and send the transaction!

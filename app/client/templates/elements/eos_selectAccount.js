@@ -10,12 +10,15 @@ The select account template
 */
 
 Template['eos_selectAccount'].onCreated(function() {
-  if (this.data) {
-    if (this.data.value) {
-      TemplateVar.set('value', this.data.value);
-    } else if (this.data.accounts && this.data.accounts[0]) {
-      TemplateVar.set("value", this.data.accounts[0].account_name);
-    }
+  var template = this;
+  if (template.data) {
+    template.autorun(function(c) {
+      if (template.data.value) {
+        TemplateVar.set('value', template.data.value);
+      } else if (template.data.accounts && template.data.accounts[0]) {
+        TemplateVar.set('value', template.data.accounts[0].account_name);
+      }
+    });
   }
 });
 
@@ -29,8 +32,7 @@ Template['eos_selectAccount'].helpers({
       ? { selected: true }
       : {};
   },
-  className: function(){
-    debugger
+  className: function() {
     return this.class;
   }
 });
