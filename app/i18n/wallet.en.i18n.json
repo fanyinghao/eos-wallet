@@ -79,6 +79,15 @@
     "account": {
         "multiSig": {
             "notice": "Requires Propose MulitSig, Proposer"
+        },
+        "info": {
+            "UnstakedBalance": "Unstaked Balance",
+            "RefundBalance": "Refund Balance",
+            "CPUStake": "CPU Stake",
+            "NETStake": "NET Stake",
+            "RAMUsage": "RAM Usage",
+            "CPUUsage": "CPU Usage",
+            "NETUsage": "NET Usage"
         }
     },
     "accounts": {

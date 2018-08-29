@@ -72,22 +72,22 @@
                         <div class="data-item">
                             <div class="data-value medium">
                                 {{> eos_amount amount=formattedBalance }}
-                            </div><label>Unstaked Balance</label>
+                            </div><label>{{i18n "wallet.account.info.UnstakedBalance"}}</label>
                         </div>
                         <div class="data-item">
                             <div class="data-value medium">
                                 {{> eos_amount amount=refundBalance }}
-                            </div><label>Refund Balance</label>
+                            </div><label>{{i18n "wallet.account.info.RefundBalance"}}</label>
                         </div>
                         <div class="data-item">
                             <div class="data-value medium">
                                 {{> eos_amount amount=(total_resources.cpu_weight) }}
-                            </div><label>CPU Stake</label>
+                            </div><label>{{i18n "wallet.account.info.CPUStake"}}</label>
                         </div>
                         <div class="data-item">
                             <div class="data-value medium">
                                 {{> eos_amount amount=(total_resources.net_weight) }}
-                            </div><label>NET Stake</label>
+                            </div><label>{{i18n "wallet.account.info.NETStake"}}</label>
                         </div>
                     </div>
                     <div class="data-flex">
@@ -97,7 +97,7 @@
                                     <div role="progressbar" class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress ram_usage ram_quota 3 }};"></div>
                                 </div>{{ ramToString ram_usage }}<span class="light"> / {{ ramToString ram_quota }}</span>
                             </div>
-                            <label>RAM Usage</label>
+                            <label>{{i18n "wallet.account.info.RAMUsage"}}</label>
                         </div>
                         <div class="data-item">
                             <div class="data-value medium">
@@ -107,7 +107,7 @@
                                 <span data-full-string="cpu_limit.used">{{cpu_limit.used}}</span> µs
                                 <span class="light"> / <span data-full-string="cpu_limit.max">{{cpu_limit.max}}</span> µs</span>
                             </div>
-                            <label>CPU Usage</label>
+                            <label>{{i18n "wallet.account.info.CPUUsage"}}</label>
                         </div>
                         <div class="data-item">
                             <div class="data-value medium">
@@ -117,7 +117,7 @@
                                 <span data-full-string="net_limit.used">{{ net_limit.used }}</span> KB
                                 <span class="light"> / <span data-full-string="net_limit.max">{{ net_limit.max }}</span> KB</span>
                             </div>
-                            <label>NET Usage</label>
+                            <label>{{i18n "wallet.account.info.NETUsage"}}</label>
                         </div>
                     </div>
                 </div>
