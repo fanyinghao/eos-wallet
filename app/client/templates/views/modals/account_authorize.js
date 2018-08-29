@@ -1,5 +1,5 @@
-const keystore = require("../../../lib/eos/keystore");
-const ecc = require("eosjs-ecc");
+const keystore = require('../../../lib/eos/keystore');
+const ecc = require('eosjs-ecc');
 /**
 Template Controllers
 
@@ -13,25 +13,25 @@ The account authorize template
 @constructor
 */
 
-Template["views_account_authorize"].onCreated(function() {
+Template['views_account_authorize'].onCreated(function() {
   // number of owners of the account
   var maxOwners = this.data.owners.length;
   if (maxOwners) maxOwners++;
-  TemplateVar.set("multisigSignees", maxOwners || 3);
+  TemplateVar.set('multisigSignees', maxOwners || 3);
 
   // number of required signatures
   TemplateVar.set(
-    "multisigSignatures",
-    Number(FlowRouter.getQueryParam("requiredSignatures")) || 2
+    'multisigSignatures',
+    Number(FlowRouter.getQueryParam('requiredSignatures')) || 2
   );
 });
 
-Template["views_account_authorize"].onRendered(function() {
+Template['views_account_authorize'].onRendered(function() {
   // focus the input`
   this.$('input[name="accountName"]').focus();
 });
 
-Template["views_account_authorize"].helpers({
+Template['views_account_authorize'].helpers({
   /**
     Return the selectedAccount
 
@@ -48,18 +48,18 @@ Template["views_account_authorize"].helpers({
     */
   signees: function() {
     let owners = this.owners;
-    let insert = TemplateVar.get("multisigSignees") - owners.length;
+    let insert = TemplateVar.get('multisigSignees') - owners.length;
     if (insert < 0) {
-      insert = TemplateVar.get("multisigSignees");
-      owners = new Array(insert).fill("");
+      insert = TemplateVar.get('multisigSignees');
+      owners = new Array(insert).fill('');
     } else {
-      owners = owners.concat(new Array(insert).fill(""));
+      owners = owners.concat(new Array(insert).fill(''));
     }
 
     if (
-      TemplateVar.get("multisigSignatures") > TemplateVar.get("multisigSignees")
+      TemplateVar.get('multisigSignatures') > TemplateVar.get('multisigSignees')
     ) {
-      TemplateVar.set("multisigSignatures", TemplateVar.get("multisigSignees"));
+      TemplateVar.set('multisigSignatures', TemplateVar.get('multisigSignees'));
     }
 
     return owners;
@@ -70,7 +70,7 @@ Template["views_account_authorize"].helpers({
     @method (importValidClass)
     */
   importValidClass: function() {
-    return TemplateVar.get("importWalletOwners") ? "valid" : "invalid";
+    return TemplateVar.get('importWalletOwners') ? 'valid' : 'invalid';
   },
   /**
     Get the number of required multisignees (account owners)
@@ -94,7 +94,7 @@ Template["views_account_authorize"].helpers({
     @method (multisigSignatures)
     */
   multisigSignatures: function() {
-    var signees = TemplateVar.get("multisigSignees");
+    var signees = TemplateVar.get('multisigSignees');
     var returnArray = [];
 
     for (i = 1; i <= signees; i++) {
@@ -105,14 +105,14 @@ Template["views_account_authorize"].helpers({
   }
 });
 
-Template["views_account_authorize"].events({
+Template['views_account_authorize'].events({
   /**
     Change the number of signatures
 
     @event click span[name="multisigSignatures"] .simple-modal button
     */
   'click span[name="multisigSignatures"] .simple-modal button': function(e) {
-    TemplateVar.set("multisigSignatures", $(e.currentTarget).data("value"));
+    TemplateVar.set('multisigSignatures', $(e.currentTarget).data('value'));
   },
   /**
     Change the number of signees
@@ -120,18 +120,7 @@ Template["views_account_authorize"].events({
     @event click span[name="multisigSignees"] .simple-modal button
     */
   'click span[name="multisigSignees"] .simple-modal button': function(e) {
-    TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
-  },
-  /**
-  Set the password
-
-  @event keyup keyup input[name="password"], change input[name="password"], input input[name="password"]
-  */
-  'keyup input[name="password"], change input[name="password"], input input[name="password"]': function(
-    e,
-    template
-  ) {
-    TemplateVar.set("password", e.currentTarget.value);
+    TemplateVar.set('multisigSignees', $(e.currentTarget).data('value'));
   },
   /**
     Create the account
@@ -139,50 +128,25 @@ Template["views_account_authorize"].events({
     @event submit
     */
   submit: function(e, template) {
-    let formValues = InlineForm(".inline-form");
-    let password = TemplateVar.get("password");
-    let threshold = TemplateVar.get("multisigSignatures");
+    let formValues = InlineForm('.inline-form');
+    let threshold = TemplateVar.get('multisigSignatures');
     let self = this;
 
-    if (this.account && !TemplateVar.get("sending")) {
-      if (!password || password.length === 0)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.accounts.wrongPassword",
-          duration: 2
-        });
-
-      var owners = _.uniq(
-        _.compact(
-          _.map(template.findAll("input.owners"), function(item) {
-            return item.value;
-          })
-        )
-      );
-
-      if (owners.length != formValues.multisigSignees)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.newWallet.error.emptySignees",
-          duration: 2
-        });
-
+    function updateauth(privateKey) {
       try {
-        TemplateVar.set(template, "sending", true);
+        TemplateVar.set(template, 'sending', true);
 
-        let provider = keystore.SignProvider(
-          this.account.account_name,
-          password
-        );
         const _eos = Eos({
           httpEndpoint: httpEndpoint,
           chainId: chainId,
-          signProvider: provider,
+          keyProvider: [privateKey],
           verbose: false
         });
 
         let required_auth = {
           accounts: Array.prototype.map.call(owners, function(obj) {
             return {
-              permission: { actor: obj, permission: "active" },
+              permission: { actor: obj, permission: 'active' },
               weight: 1
             };
           }),
@@ -193,29 +157,29 @@ Template["views_account_authorize"].events({
           .transaction(tr => {
             tr.updateauth(
               {
-                account: this.account.account_name,
-                permission: "active",
-                parent: "owner",
+                account: self.account.account_name,
+                permission: 'active',
+                parent: 'owner',
                 auth: required_auth
               },
-              { authorization: `${this.account.account_name}@owner` }
+              { authorization: `${self.account.account_name}@owner` }
             );
           })
           .then(
             tr => {
               console.log(tr);
-              TemplateVar.set(template, "sending", false);
+              TemplateVar.set(template, 'sending', false);
               EthElements.Modal.hide();
 
               GlobalNotification.success({
-                content: "i18n:wallet.authMultiSig.success",
+                content: 'i18n:wallet.authMultiSig.success',
                 duration: 2
               });
 
               FlowRouter.go('/dashboard/');
             },
             err => {
-              TemplateVar.set(template, "sending", false);
+              TemplateVar.set(template, 'sending', false);
 
               if (err.message) {
                 GlobalNotification.error({
@@ -233,17 +197,8 @@ Template["views_account_authorize"].events({
           );
       } catch (e) {
         console.log(e);
-        TemplateVar.set(template, "sending", false);
-        if (
-          e.message === "wrong password" ||
-          e.message === "gcm: tag doesn't match"
-        ) {
-          GlobalNotification.warning({
-            content: "i18n:wallet.accounts.wrongPassword",
-            duration: 2
-          });
-          return;
-        } else if (err.message) {
+        TemplateVar.set(template, 'sending', false);
+        if (err.message) {
           GlobalNotification.error({
             content: err.message,
             duration: 20
@@ -256,6 +211,36 @@ Template["views_account_authorize"].events({
           });
         }
       }
+    }
+
+    if (this.account && !TemplateVar.get('sending')) {
+      var owners = _.uniq(
+        _.compact(
+          _.map(template.findAll('input.owners'), function(item) {
+            return item.value;
+          })
+        )
+      );
+
+      if (owners.length != formValues.multisigSignees)
+        return GlobalNotification.warning({
+          content: 'i18n:wallet.newWallet.error.emptySignees',
+          duration: 2
+        });
+
+      EthElements.Modal.show({
+        template: 'authorized',
+        data: {
+          account_name: self.account.account_name,
+          callback: (privateKey) => {
+
+            updateauth(privateKey)
+            //refresh account
+
+            return true;
+          }
+        }
+      });
     }
   }
 });

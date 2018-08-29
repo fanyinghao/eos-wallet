@@ -121,7 +121,7 @@
                 "showInterface": "显示界面"
             },
             "modal": {
-                "deleteText": "您真的想要删除此钱包账户么？账户汇仍然保持在区块链上，但请您删除这个地址前备份好私钥，否则您将无法找到，并且将无法取出存入的资金。输入账户密码以确认删除。",
+                "deleteText": "您真的想要删除此钱包账户么？账户仍然保持在区块链上，但请您删除这个地址前备份好私钥，否则您将无法找到，并且将无法取出存入的资金。输入账户密码以确认删除。",
                 "backupWallet": {
                     "title": "备份您的钱包合约地址！",
                     "description": "请确保写下钱包合约地址："
@@ -210,7 +210,7 @@
             "title": "授权多签",
             "selectOwner": "选择拥有者",
             "accountName": "账户名称",
-            "multisigSigneesTitle": "多签地址"
+            "multisigSigneesTitle": "修改多签账户"
         },
         "newWallet": {
             "title": "<strong>新增账户</strong>",
@@ -231,7 +231,7 @@
                 "multisig": {
                     "title": "多重签名的钱包合约",
                     "description": "一个受多个账户控制的合约。",
-                    "text1": "这是一个多签账户受",
+                    "text1": "此多签账户受",
                     "text2": "个所有者控制。每次合约交易都需要",
                     "text5": "个所有账户确认。",
                     "accountOwnersTitle": "账户所有者们",

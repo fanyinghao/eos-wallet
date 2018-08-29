@@ -216,7 +216,7 @@
     "authMultiSig": {
       "title": "Authorize MultiSigture",
       "selectOwner": "Select owner",
-      "multisigSigneesTitle": "Multisig Signees",
+      "multisigSigneesTitle": "Modify Multisig Signees",
       "accountName": "Account name",
       "success": "Authorize MultSig success"
     },
@@ -239,7 +239,7 @@
         "multisig": {
           "title": "Multisignature wallet contract",
           "description": "A contract controlled by multiple accounts",
-          "text1": "This is a multisig account controlled by",
+          "text1": "The multisig account controlled by",
           "text2": "owners. Any transaction requires the confirmation of",
           "text5": "owners.",
           "accountOwnersTitle": "Account owners",
