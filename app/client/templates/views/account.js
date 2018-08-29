@@ -242,7 +242,6 @@ Template['views_account'].events({
   'click button.remove-button': function(e, template) {
 
     let account_name = TemplateVar.get('account_name');
-    // Open a modal showing the QR Code
     EthElements.Modal.show({
       template: 'authorized',
       data: {

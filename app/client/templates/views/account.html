@@ -16,7 +16,6 @@
                 {{#each permissions}}
                 <h1></h1>
                 <h2 class="copyable-address">{{walletIcon}}
-                    <!-- <input type="text" value="{{toChecksumAddress address}}" readonly class=""> -->
                     <b>{{perm_name}}</b><span>(threshold {{required_auth.threshold}})</span>
                     <br /> {{#each required_auth.keys}}
                     <span>{{key}}</span>
