@@ -108,7 +108,7 @@ Template['views_account'].helpers({
     */
   ownedAccount: function() {
     return (
-      EthAccounts.find({ address: this.address.toLowerCase() }).count() > 0
+      true
     );
   },
   /**

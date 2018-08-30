@@ -46,7 +46,7 @@ Helpers.getLocalStorageSize = function() {
   var size = 0;
   if (localStorage) {
     _.each(Object.keys(localStorage), function(key) {
-      size += localStorage[key].length * 2 / 1024 / 1024;
+      size += (localStorage[key].length * 2) / 1024 / 1024;
     });
   }
 
@@ -104,20 +104,23 @@ Returns a string, given an account anme
 **/
 Helpers.getAccountByName = function(name) {
   return new Promise((resolve, reject) => {
-    eos.getAccount(name).then(account => {
-      resolve(account)
-    }, err => {
-      reject(err)
-    })
-  })
-}
+    eos.getAccount(name).then(
+      account => {
+        resolve(account);
+      },
+      err => {
+        reject(err);
+      }
+    );
+  });
+};
 
 /**
 Returns a error handler
 
 @method handleError
 **/
-Helpers.handleError = (e) => {
+Helpers.handleError = e => {
   console.log(e);
   if (
     e.message === 'wrong password' ||
@@ -143,23 +146,21 @@ Returns a bool if an account is MultiSig
 @method (isMultiSig)
 **/
 Helpers.isMultiSig = function(account) {
-  let isMultiSig = false
-  let _account = account
+  let isMultiSig = false;
+  let _account = account;
 
-  if(typeof(account) === "string")
+  if (typeof account === 'string')
     _account = ObservableAccounts.accounts[account];
 
-  if(!_account || !_account.permissions)
-    return false;
+  if (!_account || !_account.permissions) return false;
 
   _account.permissions.map(item => {
-    if (item.perm_name === "active") {
+    if (item.perm_name === 'active') {
       isMultiSig = item.required_auth.threshold > 1;
     }
-  })
+  });
   return isMultiSig;
 };
-
 
 /**
 Translate an external error message into the user's language if possible. Otherwise return
@@ -175,4 +176,111 @@ Helpers.translateExternalErrorMessage = function(message) {
   if (message.details && message.details.length > 0)
     ret += ` - ${message.details[0].message}`;
   return ret;
+};
+
+/**
+Reactive wrapper for the moment package.
+
+@method moment
+@param {String} time    a date object passed to moment function.
+@return {Object} the moment js package
+**/
+Helpers.moment = function(time) {
+  // react to language changes as well
+  TAPi18n.getLanguage();
+
+  if (_.isFinite(time) && moment.unix(time).isValid()) return moment.unix(time);
+  else return moment(time);
+};
+
+/**
+Formats a timestamp to any format given.
+
+    Helpers.formatTime(myTime, "YYYY-MM-DD")
+
+@method formatTime
+@param {String} time         The timestamp, can be string or unix format
+@param {String} format       the format string, can also be "iso", to format to ISO string, or "fromnow"
+@return {String} The formated time
+**/
+Helpers.formatTime = function(time, format) {
+  //parameters
+
+  // make sure not existing values are not Spacebars.kw
+  if (format instanceof Spacebars.kw) format = null;
+
+  if (time) {
+    if (_.isString(format) && !_.isEmpty(format)) {
+      if (format.toLowerCase() === 'iso')
+        time = Helpers.moment(time).toISOString();
+      else if (format.toLowerCase() === 'fromnow') {
+        // make reactive updating
+        Helpers.rerun['10s'].tick();
+        time = Helpers.moment(time).fromNow();
+      } else time = Helpers.moment(time).format(format);
+    }
+
+    return time;
+  } else return '';
+};
+
+/**
+Gets the docuement matching the given addess from the EthAccounts or Wallets collection.
+
+@method getAccountByAddress
+@param {String} address
+@param {Boolean} reactive
+*/
+Helpers.getAccountByAddress = function(address, reactive) {
+  var options = reactive === false ? { reactive: false } : {};
+  // if(_.isString(address))
+  //     address = address.toLowerCase();
+  return address;
+};
+
+/**
+Formats a given transactions balance
+
+    Helpers.formatTransactionBalance(tx)
+
+@method formatTransactionBalance
+@param {String} value  the value to format
+@param {Object} exchangeRates  the exchange rates to use
+@param {String} unit  the unit to format to
+@return {String} The formated value
+**/
+Helpers.formatTransactionBalance = function(value, exchangeRates, unit) {
+  // make sure not existing values are not Spacebars.kw
+  if (unit instanceof Spacebars.kw) unit = null;
+
+  var unit = unit || EthTools.getUnit(),
+    format = '0,0.00';
+
+  if (
+    (unit === 'usd' || unit === 'eur' || unit === 'btc') &&
+    exchangeRates &&
+    exchangeRates[unit]
+  ) {
+    if (unit === 'btc') format += '[000000]';
+    else format += '[0]';
+
+    var price = new BigNumber(String(value), 10).times(
+      exchangeRates[unit].price
+    );
+    return EthTools.formatNumber(price, format) + ' ' + unit.toUpperCase();
+  } else {
+    return EthTools.formatBalance(value, format + '[0000000000000000] UNIT');
+  }
+};
+
+Helpers.getActions = (name, pos, offset, callback) => {
+  eos.getActions(name, pos, offset).then(res => {
+    callback(
+      res.actions.sort((a, b) => {
+        if (a.account_action_seq > b.account_action_seq) return -1;
+        if (a.account_action_seq < b.account_action_seq) return 1;
+        return 0;
+      })
+    );
+  });
 };

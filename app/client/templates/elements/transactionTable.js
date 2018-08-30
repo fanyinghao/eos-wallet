@@ -32,7 +32,20 @@ Template['elements_transactions_table'].onCreated(function() {
     cursor: {}
   };
 
-  TemplateVar.set('limit', this.data.limit || defaultLimit);
+  let self = this
+
+
+  Tracker.autorun(function() {
+    Helpers.getActions('eosasia11111', -1, -defaultLimit, actions => {
+      TemplateVar.set(self, 'actions', actions);
+      if(actions.length > 0) {
+        TemplateVar.set(self, 'lastSeq', actions[0].account_action_seq);
+        TemplateVar.set(self, 'position', actions[actions.length - 1].account_action_seq);
+      }
+      else
+        TemplateVar.set(self, 'position', -1);
+    })
+  })
 });
 
 Template['elements_transactions_table'].helpers({
@@ -43,6 +56,10 @@ Template['elements_transactions_table'].helpers({
     @return {Object} The items cursor
     */
   items: function() {
+    let actions = TemplateVar.get('actions')
+    return actions|| [];
+
+
     var template = Template.instance(),
       items = [],
       searchQuery = TemplateVar.get('search'),
@@ -98,26 +115,31 @@ Template['elements_transactions_table'].helpers({
     @return {Boolean}
     */
   hasMore: function() {
-    var template = Template.instance();
+    let lastSeq = TemplateVar.get('lastSeq');
+    let actions = TemplateVar.get('actions');
+    let position = TemplateVar.get('position');
 
-    template._properties.cursor.limit = null;
-    return (
-      !TemplateVar.get('search') &&
-      template._properties.cursor.count() > TemplateVar.get('limit')
-    );
+    if(position === -1)
+      return false;
+
+    return position !== 0 || actions.length !== lastSeq + 1;
   }
 });
 
 Template['elements_transactions_table'].events({
   'click button.show-more': function(e, template) {
-    var limit = TemplateVar.get('limit');
-    TemplateVar.set('limit', limit + (template.data.limit || defaultLimit));
-  },
-  'keyup input.filter-transactions': _.debounce(function(e, template) {
-    if (e.keyCode === 27) e.currentTarget.value = '';
+    let position = TemplateVar.get('position')
+    let actions = TemplateVar.get('actions');
 
-    TemplateVar.set(template, 'search', e.currentTarget.value);
-  }, 200)
+    if(position === -1)
+      return;
+
+    Helpers.getActions('eosasia11111', position - defaultLimit - 1, defaultLimit, _actions => {
+      actions = actions.concat(_actions);
+      TemplateVar.set(template, 'actions', actions);
+      TemplateVar.set(template, 'position', actions[actions.length - 1].account_action_seq);
+    })
+  }
 });
 
 /**
@@ -136,15 +158,10 @@ Template['elements_transactions_row'].helpers({
     @param {String} account     The _id of the current account
     */
   incomingTx: function(account) {
-    var account =
-      EthAccounts.findOne({ _id: account }) ||
-      Wallets.findOne({ _id: account });
-    return !!(
-      (account && this.from !== account.address) ||
-      (!account &&
-        (EthAccounts.findOne({ address: this.to }) ||
-          Wallets.findOne({ address: this.to })))
-    );
+    // var account =
+    //   EthAccounts.findOne({ _id: account }) ||
+    //   Wallets.findOne({ _id: account });
+    return true;
   },
   /**
     Returns the correct text for this transaction
@@ -215,20 +232,21 @@ Template['elements_transactions_row'].helpers({
     @method (unConfirmed)
     */
   unConfirmed: function() {
-    if (!this.blockNumber || !EthBlocks.latest.number)
-      return {
-        confirmations: 0,
-        percent: 0
-      };
+    return false
+    // if (!this.blockNumber || !EthBlocks.latest.number)
+      // return {
+      //   confirmations: 0,
+      //   percent: 0
+      // };
 
-    var currentBlockNumber = EthBlocks.latest.number + 1,
-      confirmations = currentBlockNumber - this.blockNumber;
-    return blocksForConfirmation >= confirmations && confirmations >= 0
-      ? {
-          confirmations: confirmations,
-          percent: confirmations / blocksForConfirmation * 100
-        }
-      : false;
+    // var currentBlockNumber = EthBlocks.latest.number + 1,
+    //   confirmations = currentBlockNumber - this.blockNumber;
+    // return blocksForConfirmation >= confirmations && confirmations >= 0
+    //   ? {
+    //       confirmations: confirmations,
+    //       percent: confirmations / blocksForConfirmation * 100
+    //     }
+    //   : false;
   },
   /**
     Return the number of owner confirmations
