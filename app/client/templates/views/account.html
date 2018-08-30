@@ -31,41 +31,8 @@
                 {{/each}}
 
             </header>
-            {{#if owners}}
-            <!-- Wallet infos -->
 
-            <div class="row clear wallet-info">
-                {{#if showRequiredSignatures}}
-                <div class="col col-4 mobile-full">
-                    <h3>{{i18n "wallet.accounts.requiredSignatures"}}</h3> {{requiredSignatures}}
-                </div>
-                {{/if}}
-                <div class="col col-4 mobile-full">
-                    <h3>{{i18n "wallet.accounts.owners"}}</h3>
-                    {{#each owners}}
-                    <span data-tooltip="{{accountNameOrAddress this}}" class="simptip-position-bottom simptip-movable">
-                        {{> dapp_identicon identity=this class="dapp-tiny" link=ownerLink}}
-                    </span>
-                    {{/each}}
-                </div>
-            </div>
-
-            <!-- Account infos -->
-            <div class="account-info">
-                <h3>{{i18n "wallet.app.texts.note"}}</h3>
-                <p>{{i18n "wallet.accounts.walletNote"}}</p>
-            </div>
-            {{/if}} {{#if $eq type "account"}}
-            <!-- Account infos -->
-            <div class="account-info">
-                <h3>{{i18n "wallet.app.texts.note"}}</h3>
-                <p>{{{i18n "wallet.accounts.accountNote"}}}</p>
-                <p><strong>{{i18n "wallet.accounts.outOfSyncNote"}}</strong></p>
-            </div>
-            {{/if}}
-
-
-        <div class="accounts-items">
+            <div class="accounts-items">
                 <div class="data-table">
                     <div class="data-flex">
                         <div class="data-item">
@@ -114,14 +81,14 @@
                                     <div role="progressbar" class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress net_limit.used net_limit.max 3 }};"></div>
                                 </div>
                                 <span data-full-string="net_limit.used">{{ net_limit.used }}</span> KB
-                                <span class="light"> / <span data-full-string="net_limit.max">{{ net_limit.max }}</span> KB</span>
+                                <span class="light"> / <span data-full-string="net_limit.max">{{ net_limit.max }}</span>
+                                    KB</span>
                             </div>
                             <label>{{i18n "wallet.account.info.NETUsage"}}</label>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <aside class="dapp-actionbar">
@@ -161,13 +128,12 @@
             </nav>
         </aside>
 
-
         <div class="accounts-transactions">
 
             {{#if transactions}}
-            <h2>{{i18n 'wallet.transactions.latest'}}</h2>
-
-            {{> elements_transactions_table ids=transactions account=_id}} {{/if}}
+                <h2>{{i18n 'wallet.transactions.latest'}}</h2>
+                {{> elements_transactions_table ids=transactions account=_id}} 
+            {{/if}}
 
         </div>
     </div>
