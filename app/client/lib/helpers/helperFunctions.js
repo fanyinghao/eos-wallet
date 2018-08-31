@@ -189,6 +189,7 @@ Helpers.moment = function(time) {
   // react to language changes as well
   TAPi18n.getLanguage();
 
+  time = time + "+0000";
   if (_.isFinite(time) && moment.unix(time).isValid()) return moment.unix(time);
   else return moment(time);
 };
