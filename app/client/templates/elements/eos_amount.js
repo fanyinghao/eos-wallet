@@ -19,6 +19,8 @@ Template.eos_amount.helpers({
     @method (integerPart)
     */
    integerPart: function() {
+    if(!this.amount) 
+      return 0;
     let val = this.amount.replace('EOS', '').replace('eos', '').trim()
     let values = val.split('.');
     return values[0];
@@ -29,6 +31,8 @@ Template.eos_amount.helpers({
     @method (decimalPart)
     */
    decimalPart: function() {
+    if(!this.amount) 
+      return 0;
     let val = this.amount.replace('EOS', '').replace('eos', '').trim()
     let values = val.split('.');
     return values[1];
