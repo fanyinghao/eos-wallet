@@ -113,7 +113,7 @@ Template['elements_transactions_table'].helpers({
 
     if(position === -1 || position === 0)
       return false;
-    return actions.length !== lastSeq + 1;
+    return actions && actions.length !== lastSeq + 1;
   }
 });
 
@@ -172,9 +172,7 @@ Template['elements_transactions_row'].events({
       EthElements.Modal.show(
         {
           template: 'views_modals_transactionInfo',
-          data: {
-            _id: this._id
-          }
+          data: this
         },
         {
           class: 'transaction-info'

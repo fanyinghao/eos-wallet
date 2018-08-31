@@ -83,7 +83,6 @@
         {{else}}
             <td class="transaction-data" colspan="3">
                 <pre>
-                <!-- {{parseJSON action_trace.act.data}} -->
                 {{> jsonView json=(parseJSON action_trace.act.data) options=jsonOptions }}
                 </pre>
             </td>
