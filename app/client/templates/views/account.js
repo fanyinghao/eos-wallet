@@ -14,8 +14,6 @@ Template.views_account.onRendered(function() {
     TemplateVar.set(self, 'account_name', name)
     eos.getAccount(name).then(account => {
       account.creating = false;
-      let item = keystore.Get(name)
-      account.publicKey = item.publicKey;
       TemplateVar.set(self, 'account', account)
 
       eos.getCurrencyBalance('eosio.token', name).then(res => {
@@ -32,15 +30,6 @@ Template.views_account.onRendered(function() {
 Template['views_account'].onRendered(function() {
 });
 
-Template['views_account'].onDestroyed(function() {
-  // stop watching custom events, on destroy
-  if (this.customEventSubscription) {
-    this.customEventSubscription.unsubscribe();
-    this.customEventSubscription = null;
-    TemplateVar.set('watchEvents', false);
-  }
-});
-
 Template['views_account'].helpers({
   /**
     Get the current selected account
@@ -50,32 +39,9 @@ Template['views_account'].helpers({
   account: function() {
     return TemplateVar.get('account');
   },
-  /**
-    Get the current jsonInterface, or use the wallet jsonInterface
-
-    @method (jsonInterface)
-    */
-  jsonInterface: function() {
-    return this.owners ? _.clone(walletInterface) : _.clone(this.jsonInterface);
-  },
-  /**
-    Show requiredSignatures section
-
-    @method (showRequiredSignatures)
-    */
-  showRequiredSignatures: function() {
-    return this.requiredSignatures && this.requiredSignatures > 1;
-  },
-  /**
-    Link the owner either to send or to the account itself.
-
-    @method (ownerLink)
-    */
-  ownerLink: function() {
-    var owner = String(this);
-    if (Helpers.getAccountByAddress(owner))
-      return FlowRouter.path('account', { address: owner });
-    else return FlowRouter.path('sendTo', { address: owner });
+  accountName: function() {
+    let account = TemplateVar.get('account');
+    return account.account_name;
   },
   /**
     Get the tokens balance
@@ -104,38 +70,6 @@ Template['views_account'].helpers({
   progress: function(e, v, a) {
     
     return (e/v *100).toFixed(a) + '%'
-  },
-  /**
-    Checks if this is Owned
-
-    @method (ownedAccount)
-    */
-  ownedAccount: function() {
-    return (
-      true
-    );
-  },
-  /**
-    Gets the contract events if available
-
-    @method (customContract)
-    */
-  customContract: function() {
-    return CustomContracts.findOne({ address: this.address.toLowerCase() });
-  },
-  /**
-     Displays ENS names with triangles
-
-     @method (nameDisplay)
-     */
-  displayName: function() {
-    return this.ens
-      ? this.name
-          .split('.')
-          .slice(0, -1)
-          .reverse()
-          .join(' ▸ ')
-      : this.name;
   }
 });
 
