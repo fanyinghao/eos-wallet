@@ -7,21 +7,25 @@ Template Controllers
 
 Template.views_account.onRendered(function() {
   let self = this
-  let name = FlowRouter.getParam('name')
-  TemplateVar.set(self, 'account_name', name)
-  eos.getAccount(name).then(account => {
-    account.creating = false;
-    let item = keystore.Get(name)
-    account.publicKey = item.publicKey;
-    TemplateVar.set(self, 'account', account)
 
-    eos.getCurrencyBalance('eosio.token', name).then(res => {
-        TemplateVar.set(self, 'balance', res);
-      }, err => {
-      console.log(err)
+  Tracker.autorun(function() {
+
+    let name = FlowRouter.getParam('name')
+    TemplateVar.set(self, 'account_name', name)
+    eos.getAccount(name).then(account => {
+      account.creating = false;
+      let item = keystore.Get(name)
+      account.publicKey = item.publicKey;
+      TemplateVar.set(self, 'account', account)
+
+      eos.getCurrencyBalance('eosio.token', name).then(res => {
+          TemplateVar.set(self, 'balance', res);
+        }, err => {
+        console.log(err)
+      })
+    }, err => {
+      FlowRouter.go('/notfound');
     })
-  }, err => {
-    FlowRouter.go('/notfound');
   })
 })
 
