@@ -20,5 +20,8 @@ Template['views_modals_transactionInfo'].helpers({
     */
   transaction: function() {
     return this;
+  },
+  transactionMonitor: function() {
+    return transactionMonitor;
   }
 });
