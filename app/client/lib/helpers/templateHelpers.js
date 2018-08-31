@@ -264,3 +264,22 @@ isMultiSig
 Template.registerHelper('isMultiSig',(account)=>{
   return Helpers.isMultiSig(account);
 })
+
+/**
+parseTrascationId
+
+@method parseTrascationId
+**/
+Template.registerHelper('parseTrascationId',(tx_id)=>{
+  return tx_id.substr(0, 6);
+})
+
+/**
+parseJSON
+
+@method parseJSON
+**/
+Template.registerHelper('parseJSON',(obj)=>{
+  return JSON.stringify(obj).replace(/\n[\s| | ]*\r/g,'\n').replace(/[\r\n]/g,"").trim();
+})
+

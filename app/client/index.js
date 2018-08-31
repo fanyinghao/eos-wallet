@@ -19,7 +19,7 @@ Meteor.startup(function() {
   Tracker.autorun(function() {
     if (_.isString(TAPi18n.getLanguage())) {
       var lang = TAPi18n.getLanguage().substr(0, 2);
-      moment.locale(lang);
+      moment.locale(lang === 'zh' ? 'zh-cn': lang);
       try {
         numeral.language(lang);
       } catch (err) {

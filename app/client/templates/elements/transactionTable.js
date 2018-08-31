@@ -36,7 +36,7 @@ Template['elements_transactions_table'].onCreated(function() {
 
 
   Tracker.autorun(function() {
-    Helpers.getActions('eosasia11111', -1, -defaultLimit, actions => {
+    Helpers.getActions(self.data.account_name, -1, -defaultLimit, actions => {
       TemplateVar.set(self, 'actions', actions);
       if(actions.length > 0) {
         TemplateVar.set(self, 'lastSeq', actions[0].account_action_seq);
@@ -134,7 +134,7 @@ Template['elements_transactions_table'].events({
     if(position === -1)
       return;
 
-    Helpers.getActions('eosasia11111', position - defaultLimit - 1, defaultLimit, _actions => {
+    Helpers.getActions(this.account_name, position - defaultLimit - 1, defaultLimit, _actions => {
       actions = actions.concat(_actions);
       TemplateVar.set(template, 'actions', actions);
       TemplateVar.set(template, 'position', actions[actions.length - 1].account_action_seq);
@@ -150,18 +150,11 @@ The transaction row template
 */
 
 Template['elements_transactions_row'].helpers({
-  /**
-    Checks if, from the perspective of the selected account
-    the transaction was incoming or outgoing.
 
-    @method (incomingTx)
-    @param {String} account     The _id of the current account
-    */
-  incomingTx: function(account) {
-    // var account =
-    //   EthAccounts.findOne({ _id: account }) ||
-    //   Wallets.findOne({ _id: account });
-    return true;
+  jsonOptions: function() {
+    return {
+      collapsed: true
+    }
   },
   /**
     Returns the correct text for this transaction
@@ -216,9 +209,8 @@ Template['elements_transactions_row'].helpers({
     */
   fromNowTime: function() {
     Helpers.rerun['10s'].tick();
-
-    var diff = moment().diff(moment.unix(this.timestamp), 'hours');
-    return diff < 23 ? ' ' + moment.unix(this.timestamp).fromNow() : '';
+    var diff = moment().diff(moment.unix(this.block_time), 'hours');
+    return diff < 23 ? ' ' + moment.unix(this.block_time).fromNow() : '';
   },
   /**
     Returns the confirmations

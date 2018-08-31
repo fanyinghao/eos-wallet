@@ -276,7 +276,16 @@ Helpers.formatTransactionBalance = function(value, exchangeRates, unit) {
 Helpers.getActions = (name, pos, offset, callback) => {
   eos.getActions(name, pos, offset).then(res => {
     callback(
-      res.actions.sort((a, b) => {
+      res.actions.filter(item => {
+        if(item.action_trace.act.name !== "transfer")
+          return true;
+        else if(item.action_trace.act.data.to === name)
+          return true;
+        return item.action_trace.act.data.from === item.action_trace.receipt.receiver;
+      }).map(item => {
+        item.isIncoming = name === item.action_trace.act.data.to;
+        return item;
+      }).sort((a, b) => {
         if (a.account_action_seq > b.account_action_seq) return -1;
         if (a.account_action_seq < b.account_action_seq) return 1;
         return 0;
