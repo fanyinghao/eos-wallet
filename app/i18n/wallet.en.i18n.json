@@ -87,7 +87,10 @@
             "NETStake": "NET Stake",
             "RAMUsage": "RAM Usage",
             "CPUUsage": "CPU Usage",
-            "NETUsage": "NET Usage"
+            "NETUsage": "NET Usage",
+            "viewPermission": "View __count__ permissions",
+            "threshold": "threshold",
+            "weight": "weight"
         }
     },
     "accounts": {

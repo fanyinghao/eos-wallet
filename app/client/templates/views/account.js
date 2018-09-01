@@ -7,6 +7,10 @@ Template Controllers
 
 Template.views_account.onRendered(function() {
   let self = this
+  
+  Tracker.autorun(function() {
+    TemplateVar.set(self, 'showPermissions', false)
+  })
 
   Tracker.autorun(function() {
     if(FlowRouter.getRouteName() !== 'account')
@@ -75,59 +79,6 @@ Template['views_account'].helpers({
   }
 });
 
-var accountClipboardEventHandler = function(e) {
-  if (Session.get('tmpAllowCopy') === true) {
-    Session.set('tmpAllowCopy', false);
-    return true;
-  } else {
-    e.preventDefault();
-  }
-
-  function copyAddress() {
-    var copyTextarea = document.querySelector('.copyable-address span');
-    var selection = window.getSelection();
-    var range = document.createRange();
-    range.selectNodeContents(copyTextarea);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    try {
-      document.execCommand('copy');
-
-      GlobalNotification.info({
-        content: 'i18n:wallet.accounts.addressCopiedToClipboard',
-        duration: 3
-      });
-    } catch (err) {
-      GlobalNotification.error({
-        content: 'i18n:wallet.accounts.addressNotCopiedToClipboard',
-        closeable: false,
-        duration: 3
-      });
-    }
-    selection.removeAllRanges();
-  }
-
-  if (Helpers.isOnMainNetwork()) {
-    Session.set('tmpAllowCopy', true);
-    copyAddress();
-  } else {
-    EthElements.Modal.question({
-      text: new Spacebars.SafeString(
-        TAPi18n.__('wallet.accounts.modal.copyAddressWarning')
-      ),
-      ok: function() {
-        Session.set('tmpAllowCopy', true);
-        copyAddress();
-      },
-      cancel: true,
-      modalQuestionOkButtonText: TAPi18n.__('wallet.accounts.modal.buttonOk'),
-      modalQuestionCancelButtonText: TAPi18n.__(
-        'wallet.accounts.modal.buttonCancel'
-      )
-    });
-  }
-};
 
 Template['views_account'].events({
   /**
@@ -254,5 +205,9 @@ Template['views_account'].events({
     {
       class: 'modal-small'
     });
+  },
+  'click .account-permissions-link a': (e, template) => {
+    let showPermissions = TemplateVar.get(template, 'showPermissions')
+    TemplateVar.set(template, 'showPermissions', !showPermissions)
   }
 });

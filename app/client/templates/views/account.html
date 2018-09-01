@@ -13,22 +13,28 @@
                     {{/if}}
                 </h1>
 
-                {{#each permissions}}
-                <h1></h1>
-                <h2 class="copyable-address">{{walletIcon}}
-                    <b>{{perm_name}}</b><span>(threshold {{required_auth.threshold}})</span>
-                    <br /> {{#each required_auth.keys}}
-                    <span>{{key}}</span>
-                    {{/each}}
-                    <ul>
-                        {{#each required_auth.accounts}}
-                        <li><a href="{{pathFor route='account' name=(permission.actor)}}">{{permission.actor}}</a> (weight
-                            {{weight}})
-                        </li>
+                <div class="account-permissions-link"><a href="#">{{i18n "wallet.account.info.viewPermission" count=(permissions.length) }} →</a></div>
+
+                {{#if TemplateVar.get "showPermissions"}}
+                <div>
+                    {{#each permissions}}
+                    <h1></h1>
+                    <h2 class="account-permissions">{{walletIcon}}
+                        <b>{{perm_name}}</b><span>({{i18n "wallet.account.info.threshold"}} {{required_auth.threshold}})</span>
+                        <br /> {{#each required_auth.keys}}
+                        <span>{{key}}</span>
                         {{/each}}
-                    </ul>
-                </h2>
-                {{/each}}
+                        <ul>
+                            {{#each required_auth.accounts}}
+                            <li><a href="{{pathFor route='account' name=(permission.actor)}}">{{permission.actor}}</a> ({{i18n "wallet.account.info.weight"}}
+                                {{weight}})
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </h2>
+                    {{/each}}
+                </div>
+                {{/if}}
 
             </header>
 

@@ -83,7 +83,10 @@
                 "NETStake": "已抵押NET",
                 "RAMUsage": "已使用RAM",
                 "CPUUsage": "已使用CPU",
-                "NETUsage": "已使用NET"
+                "NETUsage": "已使用NET",
+                "viewPermission": "查看 __count__ 个权限",
+                "threshold": "阀值",
+                "weight": "权重"
             }
         },
         "accounts": {
