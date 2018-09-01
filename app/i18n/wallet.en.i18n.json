@@ -150,6 +150,9 @@
       "returnValues": "Return values",
       "eventName": "Event name"
     },
+    "proposals": {
+        "latest": "Pending Proposals"
+    },
     "transactions": {
       "transactionInfoTitle": "Transaction",
       "latest": "Latest transactions",

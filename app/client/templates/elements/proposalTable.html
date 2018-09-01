@@ -1,0 +1,62 @@
+<template name="elements_proposal_table">
+    <div class="accounts-transactions">
+        <h2>{{i18n 'wallet.proposals.latest'}}</h2>
+
+        <table class="dapp-zebra transactions">
+            <tbody>
+                {{#each items}} {{> elements_proposals_row}} {{else}}
+                <tr class="full-width">
+                    <td colspan="5">
+                        {{! > spinner}} {{i18n "wallet.transactions.noneFound"}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</template>
+
+<template name="elements_proposals_row">
+    <tr data-action-seq="{{account_action_seq}}">
+
+        <td class="trx-type">
+            <p>
+                <span>
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                </span>
+            </p>
+        </td>
+        <td class="trx-type">
+            <h3>{{i18n "wallet.proposals.approve"}}</h3>
+            <p>
+                <span>
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                </span>
+            </p>
+        </td>
+        <td class="trx-type">
+            <h3>{{i18n "wallet.proposals.pending"}}</h3>
+            <p>
+                <span>
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                    TX#{{parseTrascationId action_trace.trx_id}}
+                </span>
+            </p>
+        </td>
+    </tr>
+</template>

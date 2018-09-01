@@ -143,6 +143,9 @@
             "returnValues": "返回值",
             "eventName": "事件名称"
         },
+        "proposals": {
+            "latest": "待签提案"
+        },
         "transactions": {
             "transactionInfoTitle": "交易",
             "latest": "最新交易",

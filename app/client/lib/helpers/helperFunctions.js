@@ -189,7 +189,7 @@ Helpers.moment = function(time) {
   // react to language changes as well
   TAPi18n.getLanguage();
 
-  time = time + "+0000";
+  time = time + '+0000';
   if (_.isFinite(time) && moment.unix(time).isValid()) return moment.unix(time);
   else return moment(time);
 };
@@ -277,20 +277,49 @@ Helpers.formatTransactionBalance = function(value, exchangeRates, unit) {
 Helpers.getActions = (name, pos, offset, callback) => {
   eos.getActions(name, pos, offset).then(res => {
     callback(
-      res.actions.filter(item => {
-        if(item.action_trace.act.name !== "transfer")
-          return true;
-        else if(item.action_trace.act.data.to === name)
-          return true;
-        return item.action_trace.act.data.from === item.action_trace.receipt.receiver;
-      }).map(item => {
-        item.isIncoming = name === item.action_trace.act.data.to;
-        return item;
-      }).sort((a, b) => {
-        if (a.account_action_seq > b.account_action_seq) return -1;
-        if (a.account_action_seq < b.account_action_seq) return 1;
-        return 0;
-      })
+      res.actions
+        .filter(item => {
+          if (item.action_trace.act.name !== 'transfer') return true;
+          else if (item.action_trace.act.data.to === name) return true;
+          return (
+            item.action_trace.act.data.from ===
+            item.action_trace.receipt.receiver
+          );
+        })
+        .map(item => {
+          item.isIncoming = name === item.action_trace.act.data.to;
+          return item;
+        })
+        .sort((a, b) => {
+          if (a.account_action_seq > b.account_action_seq) return -1;
+          if (a.account_action_seq < b.account_action_seq) return 1;
+          return 0;
+        })
     );
   });
+};
+
+Helpers.getActiveKeys = account => {
+  let _account = account;
+  let ret = [];
+  if (!_account || !_account.permissions) return [];
+
+  _account.permissions.forEach(item => {
+    if (item.perm_name === 'active') {
+      ret = ret.concat(
+        item.required_auth.accounts.map(account => {
+          return account.permission.actor;
+        })
+      );
+    }
+  });
+  return ret;
+};
+
+Helpers.getProposals = account => {
+  let keys = Helpers.getActiveKeys(account);
+
+  let func = keys.map(key => eos.getTableRows({json: true, code:'eosio.msig', scope:key, table:'approvals', limit:0}))
+
+  return Promise.all(func)
 };
