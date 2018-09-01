@@ -17,7 +17,7 @@ The default limit, of none is given.
 @property defaultLimit
 @type Number
 */
-var defaultLimit = 10;
+var defaultLimit = 30;
 
 Template['elements_transactions_table'].onCreated(function() {
   this._properties = {
