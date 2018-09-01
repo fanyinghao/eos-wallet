@@ -200,6 +200,21 @@ Template['views_account_create'].events({
                 accounts: accounts
               }
             });
+          }, err=>{
+            TemplateVar.set(template, 'sending', false);
+
+            if (err.message) {
+              GlobalNotification.error({
+                content: err.message,
+                duration: 20
+              });
+            } else {
+              let error = JSON.parse(err);
+              GlobalNotification.error({
+                content: Helpers.translateExternalErrorMessage(error.error),
+                duration: 20
+              });
+            }
           });
         }
       }
