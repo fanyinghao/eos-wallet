@@ -11,6 +11,8 @@ Template.views_account.onRendered(function() {
   Tracker.autorun(function() {
 
     let name = FlowRouter.getParam('name')
+    if(!name)
+      return;
     TemplateVar.set(self, 'account_name', name)
     eos.getAccount(name).then(account => {
       account.creating = false;
