@@ -313,10 +313,13 @@ Template["views_send"].events({
           duration: 2
         });
 
-      var onSuccess = tr => {
+      var onSuccess = (tr, from) => {
         console.log(tr);
         TemplateVar.set(template, "sending", false);
-        FlowRouter.go("dashboard");
+
+        if(!from)
+          from = selectedAccount.account_name;
+        FlowRouter.go("account", {name: from});
         GlobalNotification.success({
           content: "i18n:wallet.send.transactionSent",
           duration: 20,
@@ -326,7 +329,7 @@ Template["views_send"].events({
             );
             return true;
           },
-          okText: `#${tr.transaction_id.substr(0, 10)}..`
+          okText: `TX#${tr.transaction_id.substr(0, 6)}..`
         });
       };
 
@@ -502,7 +505,7 @@ Template["views_send"].events({
                             proposeName: proposal_name
                           }),
                           ok: function() {
-                            onSuccess(tx);
+                            onSuccess(tx, selectedProposer);
                           }
                         },
                         {

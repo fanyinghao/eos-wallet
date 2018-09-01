@@ -49,7 +49,7 @@ Template.stake.events({
           window.open(`${transactionMonitor}/${tr.transaction_id}`);
           return true;
         },
-        okText: `#${tr.transaction_id.substr(0, 10)}..`
+        okText: `TX#${tr.transaction_id.substr(0, 6)}..`
       });
     };
 
