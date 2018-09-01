@@ -18,17 +18,17 @@ The default limit, of none is given.
 @type Number
 */
 var defaultLimit = 30;
+var reactive_account_name = new ReactiveVar();
 
 Template['elements_transactions_table'].onCreated(function() {
-  this._properties = {
-    cursor: {}
-  };
-
   let self = this
-
+  
+  reactive_account_name.set(self.data.account_name)
 
   Tracker.autorun(function() {
-    Helpers.getActions(self.data.account_name, -1, -defaultLimit, actions => {
+    let account_name = reactive_account_name.get();
+
+    Helpers.getActions(account_name, -1, -defaultLimit, actions => {
       TemplateVar.set(self, 'actions', actions);
       if(actions.length > 0) {
         TemplateVar.set(self, 'lastSeq', actions[0].account_action_seq);
@@ -49,56 +49,12 @@ Template['elements_transactions_table'].helpers({
     */
   items: function() {
     let actions = TemplateVar.get('actions')
-    return actions|| [];
-
-
-    var template = Template.instance(),
-      items = [],
-      searchQuery = TemplateVar.get('search'),
-      limit = TemplateVar.get('limit'),
-      collection = window[this.collection] || Transactions,
-      selector = this.ids ? { _id: { $in: this.ids } } : {};
-
-    // if search
-    if (searchQuery) {
-      var pattern = new RegExp(
-        '^.*' + searchQuery.replace(/ +/g, '.*') + '.*$',
-        'i'
-      );
-      template._properties.cursor = collection.find(selector, {
-        sort: { timestamp: -1, blockNumber: -1 }
-      });
-      items = template._properties.cursor.fetch();
-      items = _.filter(items, function(item) {
-        // search from address
-        if (pattern.test(item.from)) return item;
-
-        // search to address
-        if (pattern.test(item.to)) return item;
-
-        // search value
-        if (
-          pattern.test(
-            EthTools.formatBalance(item.value, '0,0.00[000000] unit')
-          )
-        )
-          return item;
-
-        // search date
-        if (pattern.test(moment.unix(item.timestamp).format('LLLL')))
-          return item;
-
-        return false;
-      });
-      items = items.slice(0, defaultLimit * 4);
-      return items;
-    } else {
-      template._properties.cursor = collection.find(selector, {
-        sort: { timestamp: -1, blockNumber: -1 },
-        limit: limit
-      });
-      return template._properties.cursor.fetch();
+    let account_name = reactive_account_name.get()
+    if(this.account_name != account_name) {
+      reactive_account_name.set(this.account_name)
     }
+
+    return actions|| [];
   },
   /**
     Check if there are more transactions to load. When searching don't show the show more button.
@@ -125,7 +81,7 @@ Template['elements_transactions_table'].events({
     if(position === -1)
       return;
 
-    Helpers.getActions(this.account_name, position - defaultLimit - 1, defaultLimit, _actions => {
+    Helpers.getActions(template.data.account_name, position - defaultLimit - 1, defaultLimit, _actions => {
       actions = actions.concat(_actions);
       TemplateVar.set(template, 'actions', actions);
       TemplateVar.set(template, 'position', actions[actions.length - 1].account_action_seq);

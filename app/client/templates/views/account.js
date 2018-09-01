@@ -7,7 +7,7 @@ Template Controllers
 
 Template.views_account.onRendered(function() {
   let self = this
-  
+
   Tracker.autorun(function() {
     TemplateVar.set(self, 'showPermissions', false)
   })
@@ -44,10 +44,6 @@ Template['views_account'].helpers({
     */
   account: function() {
     return TemplateVar.get('account');
-  },
-  accountName: function() {
-    let account = TemplateVar.get('account');
-    return account.account_name;
   },
   /**
     Get the tokens balance
