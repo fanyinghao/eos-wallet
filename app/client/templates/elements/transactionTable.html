@@ -60,9 +60,17 @@
         {{else if $eq action_trace.act.name "delegatebw"}}
             {{> elements_transactions_row_delegatebw item=this}}
 
+        {{else if $eq action_trace.act.name "undelegatebw"}}
+            {{> elements_transactions_row_undelegatebw item=this}}
+
         {{else if $eq action_trace.act.name "buyram"}}
             {{> elements_transactions_row_buyram item=this}}
 
+        {{else if $eq action_trace.act.name "buyrambytes"}}
+            {{> elements_transactions_row_buyrambytes item=this}}
+
+        {{else if $eq action_trace.act.name "sellram"}}
+            {{> elements_transactions_row_sellram item=this}}
 
         {{else if $eq action_trace.act.name "newaccount"}}
             {{> elements_transactions_row_newaccount item=this}}
@@ -187,6 +195,17 @@
     {{/with}}
 </template>
 
+<template name="elements_transactions_row_undelegatebw">
+        {{#with item}}
+        <td class="account-name" colspan="3">
+            <strong>{{> elements_account_link name=(action_trace.act.data.from)}}</strong> undelegated from
+            <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}: </span>
+            <strong>{{action_trace.act.data.unstake_net_quantity}}</strong> for NET and
+            <strong>{{action_trace.act.data.unstake_cpu_quantity}}</strong> for CPU
+        </td>
+        {{/with}}
+</template>
+    
 <template name="elements_transactions_row_buyram">
     {{#with item}}
     <td class="account-name" colspan="3">
@@ -197,6 +216,25 @@
     {{/with}}
 </template>
 
+<template name="elements_transactions_row_buyrambytes">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.payer)}}</strong> bought
+        <strong>{{action_trace.act.data.bytes}} bytes</strong> of RAM for
+        <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}</span>
+    </td>
+    {{/with}}
+</template>
+    
+<template name="elements_transactions_row_sellram">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.account)}}</strong> sold
+        <strong>{{action_trace.act.data.bytes}}</strong> bytes
+    </td>
+    {{/with}}
+</template>
+    
 <template name="elements_transactions_row_newaccount">
     {{#with item}}
     <td class="account-name" colspan="3">
