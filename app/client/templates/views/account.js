@@ -45,6 +45,9 @@ Template['views_account'].helpers({
   account: function() {
     return TemplateVar.get('account');
   },
+  isOwner: function() {
+    return keystore.Get(this.account_name)
+  },
   /**
     Get the tokens balance
 
