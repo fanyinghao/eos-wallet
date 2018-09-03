@@ -40,45 +40,32 @@
         </td>
         
         {{#if $eq action_trace.act.name "transfer"}}
-            <td class="account-name">
-                <p>
-                    {{#if $eq action_trace.receipt.receiver action_trace.act.data.from}}
-                    <strong>
-                    {{> elements_account_link name=(action_trace.act.data.from)}}
-                    </strong>
-                    {{else}}
-                    {{> elements_account_link name=(action_trace.act.data.from)}}
-                    {{/if}}
+            {{> elements_transactions_row_transfer item=this}}
 
-                    <span class="arrow">→</span> 
+        {{else if $eq action_trace.act.name "updateauth"}}
+            {{> elements_transactions_row_updateauth item=this}}
 
-                    {{#if action_trace.act.data.to}}
-                        {{#if $eq action_trace.receipt.receiver action_trace.act.data.to}}
-                        <strong>
-                        {{> elements_account_link name=(action_trace.act.data.to)}}
-                        </strong>
-                        {{else}}
-                        {{> elements_account_link name=(action_trace.act.data.to)}}
-                        {{/if}}
-                    {{/if}}
-                </p>
-            </td>
+        {{else if $eq action_trace.act.name "propose"}}
+            {{> elements_transactions_row_propose item=this}}
 
-            {{#if isIncoming}}
-                <td class="transaction-amount plus">
-                    <strong>{{action_trace.act.data.quantity}}</strong>
-                </td>
-            {{else}}
-                <td class="transaction-amount minus">
-                    -<strong>{{action_trace.act.data.quantity}}</strong>
-                </td>
-            {{/if}}
-            
-            <td class="memo">
-                {{#if action_trace.act.data.memo}}
-                    <pre><strong>MEMO:</strong>{{action_trace.act.data.memo}}</pre>
-                {{/if}}
-            </td>
+        {{else if $eq action_trace.act.name "approve"}}
+            {{> elements_transactions_row_approve item=this}}
+
+        {{else if $eq action_trace.act.name "unapprove"}}
+            {{> elements_transactions_row_unapprove item=this}}
+
+        {{else if $eq action_trace.act.name "exec"}}
+            {{> elements_transactions_row_exec item=this}}
+
+        {{else if $eq action_trace.act.name "delegatebw"}}
+            {{> elements_transactions_row_delegatebw item=this}}
+
+        {{else if $eq action_trace.act.name "buyram"}}
+            {{> elements_transactions_row_buyram item=this}}
+
+
+        {{else if $eq action_trace.act.name "newaccount"}}
+            {{> elements_transactions_row_newaccount item=this}}
 
         {{else}}
             <td class="transaction-data" colspan="3">
@@ -90,3 +77,131 @@
     </tr>
 </template>
 
+<template name="elements_transactions_row_transfer">
+    {{#with item}}
+    <td class="account-name">
+        <p>
+            {{#if $eq action_trace.receipt.receiver action_trace.act.data.from}}
+            <strong>
+            {{> elements_account_link name=(action_trace.act.data.from)}}
+            </strong>
+            {{else}}
+            {{> elements_account_link name=(action_trace.act.data.from)}}
+            {{/if}}
+
+            <span class="arrow">→</span> 
+
+            {{#if action_trace.act.data.to}}
+                {{#if $eq action_trace.receipt.receiver action_trace.act.data.to}}
+                <strong>
+                {{> elements_account_link name=(action_trace.act.data.to)}}
+                </strong>
+                {{else}}
+                {{> elements_account_link name=(action_trace.act.data.to)}}
+                {{/if}}
+            {{/if}}
+        </p>
+    </td>
+
+    {{#if isIncoming}}
+        <td class="transaction-amount plus">
+            <strong>{{action_trace.act.data.quantity}}</strong>
+        </td>
+    {{else}}
+        <td class="transaction-amount minus">
+            -<strong>{{action_trace.act.data.quantity}}</strong>
+        </td>
+    {{/if}}
+    
+    <td class="memo">
+        {{#if action_trace.act.data.memo}}
+            <pre><strong>MEMO:</strong>{{action_trace.act.data.memo}}</pre>
+        {{/if}}
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_updateauth">
+    {{#with item}}
+    <td class="account-name">
+        <h3>{{walletIcon}} {{action_trace.act.data.permission}}</h3>
+    </td>
+    <td class="" colspan="2">
+        {{#each action_trace.act.data.auth.accounts}}
+            <strong>{{> elements_account_link name=(permission.actor)}}</strong>
+        {{/each}}
+        {{#each action_trace.act.data.auth.keys}}
+            <label>{{key}}</label>
+        {{/each}}
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_propose">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.proposer)}}</strong> proposed
+        <span><i class="icon-support"></i> {{action_trace.act.data.proposal_name}}</span>
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_approve">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.level.actor)}}</strong> approved
+        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}'s </span>
+        <span><i class="icon-support"></i>{{action_trace.act.data.proposal_name}}</span>
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_unapprove">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.level.actor)}}</strong> unapproved
+        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}'s </span>
+        <span><i class="icon-support"></i>{{action_trace.act.data.proposal_name}}</span>
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_exec">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.executer)}}</strong> exec
+        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}'s </span>
+        <span><i class="icon-support"></i>{{action_trace.act.data.proposal_name}}</span>
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_delegatebw">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.from)}}</strong> delegated for
+        <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}: </span>
+        <strong>{{action_trace.act.data.stake_net_quantity}}</strong> for NET and
+        <strong>{{action_trace.act.data.stake_cpu_quantity}}</strong> for CPU
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_buyram">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.payer)}}</strong> bought
+        <strong>{{action_trace.act.data.quant}}</strong> of RAM for
+        <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}</span>
+    </td>
+    {{/with}}
+</template>
+
+<template name="elements_transactions_row_newaccount">
+    {{#with item}}
+    <td class="account-name" colspan="3">
+        <strong>{{> elements_account_link name=(action_trace.act.data.creator)}}</strong> created account
+        <span>{{> elements_account_link name=(action_trace.act.data.name)}}</span>
+    </td>
+    {{/with}}
+</template>
