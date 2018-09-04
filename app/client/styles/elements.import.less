@@ -95,8 +95,8 @@ span.address {
   }
 
   &.creating {
-    pointer-events: none;
-    cursor: default;
+    //pointer-events: none;
+    //cursor: default;
   }
 
   &:last-child {
@@ -110,7 +110,13 @@ span.address {
   }
 
   &.wallets {
-    .background-image(linear-gradient(to right,  lighten(@colorBackgroundHeader, 12%) 0%, rgba(255,255,255, 0.1) 100%));
+    .background-image(
+      linear-gradient(
+        to right,
+        lighten(@colorBackgroundHeader, 12%) 0%,
+        rgba(255, 255, 255, 0.1) 100%
+      )
+    );
     overflow: hidden;
   }
   &.tokens {
@@ -303,7 +309,11 @@ span.address {
     overflow: hidden;
     height: @gridHeight * 2;
     padding: @defaultPaddingVertical / 2 @defaultPaddingHorizontal / 2;
-    .transition(height @animationSpeed/2, opacity @animationSpeed/2, padding @animationSpeed/2);
+    .transition(
+      height @animationSpeed / 2,
+      opacity @animationSpeed / 2,
+      padding @animationSpeed / 2
+    );
     cursor: pointer;
 
     &:hover {
@@ -395,7 +405,13 @@ table {
         .opacity(0.1);
 
         .dapp-bar {
-          .background-image(linear-gradient(to bottom, @colorBlue 0%, fadeout(@colorBlue, 100%) 100%));
+          .background-image(
+            linear-gradient(
+              to bottom,
+              @colorBlue 0%,
+              fadeout(@colorBlue, 100%) 100%
+            )
+          );
         }
 
         > span {
@@ -488,7 +504,7 @@ table {
           width: 120px;
           margin-right: @defaultMargin;
           text-align: center;
-          .transition(background-color @animationSpeed/2);
+          .transition(background-color @animationSpeed / 2);
 
           .hover-label {
             display: none;

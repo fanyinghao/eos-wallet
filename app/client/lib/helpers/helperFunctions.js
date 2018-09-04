@@ -319,7 +319,39 @@ Helpers.getActiveKeys = account => {
 Helpers.getProposals = account => {
   let keys = Helpers.getActiveKeys(account);
 
-  let func = keys.map(key => eos.getTableRows({json: true, code:'eosio.msig', scope:key, table:'approvals', limit:0}))
+  let func = keys.map(key =>
+    eos.getTableRows({
+      json: true,
+      code: 'eosio.msig',
+      scope: key,
+      table: 'approvals',
+      limit: 0
+    })
+  );
 
-  return Promise.all(func)
+  return Promise.all(func);
+};
+
+Helpers.copyAddress = element => {
+  var selection = window.getSelection();
+  var range = document.createRange();
+  range.selectNodeContents(element);
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  try {
+    document.execCommand('copy');
+
+    GlobalNotification.info({
+      content: 'i18n:wallet.accounts.addressCopiedToClipboard',
+      duration: 3
+    });
+  } catch (err) {
+    GlobalNotification.error({
+      content: 'i18n:wallet.accounts.addressNotCopiedToClipboard',
+      closeable: false,
+      duration: 3
+    });
+  }
+  selection.removeAllRanges();
 };

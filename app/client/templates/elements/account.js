@@ -80,3 +80,11 @@ Template.elements_account.helpers({
     return this.account_name;
   }
 });
+
+Template['elements_account'].events({
+  'click .creating': function(e) {
+    console.log('click');
+    e.preventDefault();
+    Helpers.copyAddress(e.currentTarget.querySelector('.account-id'));
+  }
+});
