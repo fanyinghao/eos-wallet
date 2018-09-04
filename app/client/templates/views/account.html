@@ -4,13 +4,9 @@
     <div class="dapp-container accounts-page">
         <div class="accounts-page-summary">
             {{> dapp_identicon identity=account_name}}
-            <header class="{{ensClass}}">
+            <header>
                 <h1>
-                    {{#if ens}}
                     <span>{{account_name}}</span>
-                    {{else}}
-                    <em class="edit-name">{{account_name}}</em>
-                    {{/if}}
                 </h1>
 
                 <div class="account-permissions-link"><a href="#">{{i18n "wallet.account.info.viewPermission" count=(permissions.length) }} →</a></div>
