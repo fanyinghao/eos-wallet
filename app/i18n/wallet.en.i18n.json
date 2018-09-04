@@ -77,21 +77,21 @@
       }
     },
     "account": {
-        "multiSig": {
-            "notice": "Requires Propose MulitSig, Proposer"
-        },
-        "info": {
-            "UnstakedBalance": "Unstaked Balance",
-            "RefundBalance": "Refund Balance",
-            "CPUStake": "CPU Stake",
-            "NETStake": "NET Stake",
-            "RAMUsage": "RAM Usage",
-            "CPUUsage": "CPU Usage",
-            "NETUsage": "NET Usage",
-            "viewPermission": "View __count__ permissions",
-            "threshold": "threshold",
-            "weight": "weight"
-        }
+      "multiSig": {
+        "notice": "Requires Propose MulitSig, Proposer"
+      },
+      "info": {
+        "UnstakedBalance": "Unstaked Balance",
+        "RefundBalance": "Refund Balance",
+        "CPUStake": "CPU Stake",
+        "NETStake": "NET Stake",
+        "RAMUsage": "RAM Usage",
+        "CPUUsage": "CPU Usage",
+        "NETUsage": "NET Usage",
+        "viewPermission": "View __count__ permissions",
+        "threshold": "threshold",
+        "weight": "weight"
+      }
     },
     "accounts": {
       "title": "<strong>Accounts</strong> Overview",
@@ -151,7 +151,7 @@
       "eventName": "Event name"
     },
     "proposals": {
-        "latest": "Pending Proposals"
+      "latest": "Pending Proposals"
     },
     "transactions": {
       "transactionInfoTitle": "Transaction",
@@ -198,7 +198,34 @@
         },
         "creatingContract": "Creating contract",
         "tokenTransfer": "__token__ - Token transfer",
-        "pendingConfirmations": "__initiator__ wants to send from __from__"
+        "pendingConfirmations": "__initiator__ wants to send from __from__",
+        "transfer": "Transfer",
+        "updateauth": "Update Auth",
+        "propose": "Propose",
+        "approve": "Approve",
+        "unapprove": "Unapprove",
+        "exec": "EXEC",
+        "delegatebw": "Delegate",
+        "undelegatebw": "Undelegate",
+        "buyram": "Buy RAM",
+        "sellram": "Sell RAM",
+        "newaccount": "New Account"
+      },
+      "message": {
+        "proposal": "proposal",
+        "proposed": "proposed",
+        "approved": "approved",
+        "de": "'s",
+        "unapprove": "unapproved",
+        "exec": "executed",
+        "delegatedfor": "delegated for",
+        "forNET": "for NET and",
+        "forCPU": "for CPU",
+        "undelegatedfrom": "undelegated from",
+        "bought": "bought",
+        "ofRAM": "of RAM for",
+        "sold": "sold",
+        "createdaccount": "created account"
       },
       "notifications": {
         "incomingTransaction": {
@@ -336,28 +363,28 @@
         }
       },
       "stake": {
-          "stake": "Stake CPU/NET",
-          "cpu": "CPU to Stake (in EOS)",
-          "net": "NET to Stake (in EOS)",
-          "stakeButton": "STAKE",
-          "stakeFrom": "Account to receive the stake (can be same as stake owner)",
-          "authtitle": "Please enter __name__ 's password to process"
+        "stake": "Stake CPU/NET",
+        "cpu": "CPU to Stake (in EOS)",
+        "net": "NET to Stake (in EOS)",
+        "stakeButton": "STAKE",
+        "stakeFrom": "Account to receive the stake (can be same as stake owner)",
+        "authtitle": "Please enter __name__ 's password to process"
       },
       "unstake": {
-          "unstake": "Unstake CPU/NET",
-          "cpu": "CPU to Unstake (in EOS)",
-          "net": "NET to Unstake (in EOS)",
-          "unstakeButton": "UNSTAKE"
+        "unstake": "Unstake CPU/NET",
+        "cpu": "CPU to Unstake (in EOS)",
+        "net": "NET to Unstake (in EOS)",
+        "unstakeButton": "UNSTAKE"
       },
       "tradeRam": {
-          "buy": "Buy RAM",
-          "sell": "Sell RAM",
-          "buyRam": "RAM Purchase (in EOS)",
-          "sellRam": "RAM to Sell (in KB)",
-          "buyButton": "BUY",
-          "sellButton": "SELL",
-          "receiver": "Receiver account name (can be same as payer account)",
-          "authtitle": "Please enter __name__ 's password to process"
+        "buy": "Buy RAM",
+        "sell": "Sell RAM",
+        "buyRam": "RAM Purchase (in EOS)",
+        "sellRam": "RAM to Sell (in KB)",
+        "buyButton": "BUY",
+        "sellButton": "SELL",
+        "receiver": "Receiver account name (can be same as payer account)",
+        "authtitle": "Please enter __name__ 's password to process"
       }
     },
     "tokens": {
@@ -417,7 +444,7 @@
       }
     },
     "newAccount": {
-      "create":"Create",
+      "create": "Create",
       "accountName": "Account Name",
       "publicKey": "Public Key",
       "privateKey": "Private Key",

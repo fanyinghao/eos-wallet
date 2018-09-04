@@ -31,7 +31,7 @@
             <p>{{formatTime block_time "D"}}</p>
         </td>
         <td class="trx-type">
-            <h3>{{action_trace.act.name}}</h3>
+            <h3>{{i18n typeName}}</h3>
             <p>
                 <span>
                     TX#{{parseTrascationId action_trace.trx_id}}
@@ -148,8 +148,8 @@
 <template name="elements_transactions_row_propose">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.proposer)}}</strong> proposed
-        <span><i class="icon-support"></i> {{action_trace.act.data.proposal_name}}</span>
+        <strong>{{> elements_account_link name=(action_trace.act.data.proposer)}}</strong> {{i18n "wallet.transactions.message.proposed"}}
+        <span>{{i18n "wallet.transactions.message.proposal"}} <i class="icon-support"></i><strong>{{action_trace.act.data.proposal_name}}</strong></span>
     </td>
     {{/with}}
 </template>
@@ -157,9 +157,9 @@
 <template name="elements_transactions_row_approve">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.level.actor)}}</strong> approved
-        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}'s </span>
-        <span><i class="icon-support"></i>{{action_trace.act.data.proposal_name}}</span>
+        <strong>{{> elements_account_link name=(action_trace.act.data.level.actor)}}</strong> {{i18n "wallet.transactions.message.approved"}}
+        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}{{i18n "wallet.transactions.message.de"}} </span>
+        <span>{{i18n "wallet.transactions.message.proposal"}} <i class="icon-support"></i><strong>{{action_trace.act.data.proposal_name}}</strong></span>
     </td>
     {{/with}}
 </template>
@@ -167,9 +167,9 @@
 <template name="elements_transactions_row_unapprove">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.level.actor)}}</strong> unapproved
-        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}'s </span>
-        <span><i class="icon-support"></i>{{action_trace.act.data.proposal_name}}</span>
+        <strong>{{> elements_account_link name=(action_trace.act.data.level.actor)}}</strong> {{i18n "wallet.transactions.message.unapprove"}}
+        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}{{i18n "wallet.transactions.message.de"}} </span>
+        <span>{{i18n "wallet.transactions.message.proposal"}} <i class="icon-support"></i><strong>{{action_trace.act.data.proposal_name}}</strong></span>
     </td>
     {{/with}}
 </template>
@@ -177,9 +177,9 @@
 <template name="elements_transactions_row_exec">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.executer)}}</strong> exec
-        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}'s </span>
-        <span><i class="icon-support"></i>{{action_trace.act.data.proposal_name}}</span>
+        <strong>{{> elements_account_link name=(action_trace.act.data.executer)}}</strong> {{i18n "wallet.transactions.message.exec"}}
+        <span>{{> elements_account_link name=(action_trace.act.data.proposer)}}{{i18n "wallet.transactions.message.de"}} </span>
+        <span>{{i18n "wallet.transactions.message.proposal"}} <i class="icon-support"></i><strong>{{action_trace.act.data.proposal_name}}</strong></span>
     </td>
     {{/with}}
 </template>
@@ -187,10 +187,10 @@
 <template name="elements_transactions_row_delegatebw">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.from)}}</strong> delegated for
+        <strong>{{> elements_account_link name=(action_trace.act.data.from)}}</strong> {{i18n "wallet.transactions.message.delegatedfor"}}
         <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}: </span>
-        <strong>{{action_trace.act.data.stake_net_quantity}}</strong> for NET and
-        <strong>{{action_trace.act.data.stake_cpu_quantity}}</strong> for CPU
+        <strong>{{action_trace.act.data.stake_net_quantity}}</strong> {{i18n "wallet.transactions.message.forNET"}}
+        <strong>{{action_trace.act.data.stake_cpu_quantity}}</strong> {{i18n "wallet.transactions.message.forCPU"}}
     </td>
     {{/with}}
 </template>
@@ -198,10 +198,10 @@
 <template name="elements_transactions_row_undelegatebw">
         {{#with item}}
         <td class="account-name" colspan="3">
-            <strong>{{> elements_account_link name=(action_trace.act.data.from)}}</strong> undelegated from
+            <strong>{{> elements_account_link name=(action_trace.act.data.from)}}</strong> {{i18n "wallet.transactions.message.undelegatedfrom"}}
             <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}: </span>
-            <strong>{{action_trace.act.data.unstake_net_quantity}}</strong> for NET and
-            <strong>{{action_trace.act.data.unstake_cpu_quantity}}</strong> for CPU
+            <strong>{{action_trace.act.data.unstake_net_quantity}}</strong> {{i18n "wallet.transactions.message.forNET"}}
+            <strong>{{action_trace.act.data.unstake_cpu_quantity}}</strong> {{i18n "wallet.transactions.message.forCPU"}}
         </td>
         {{/with}}
 </template>
@@ -209,8 +209,8 @@
 <template name="elements_transactions_row_buyram">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.payer)}}</strong> bought
-        <strong>{{action_trace.act.data.quant}}</strong> of RAM for
+        <strong>{{> elements_account_link name=(action_trace.act.data.payer)}}</strong> {{i18n "wallet.transactions.message.bought"}}
+        <strong>{{action_trace.act.data.quant}}</strong> {{i18n "wallet.transactions.message.ofRAM"}}
         <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}</span>
     </td>
     {{/with}}
@@ -219,8 +219,8 @@
 <template name="elements_transactions_row_buyrambytes">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.payer)}}</strong> bought
-        <strong>{{action_trace.act.data.bytes}} bytes</strong> of RAM for
+        <strong>{{> elements_account_link name=(action_trace.act.data.payer)}}</strong> {{i18n "wallet.transactions.message.bought"}}
+        <strong>{{action_trace.act.data.bytes}} bytes</strong> {{i18n "wallet.transactions.message.ofRAM"}} <!-- of RAM for -->
         <span>{{> elements_account_link name=(action_trace.act.data.receiver)}}</span>
     </td>
     {{/with}}
@@ -229,7 +229,7 @@
 <template name="elements_transactions_row_sellram">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.account)}}</strong> sold
+        <strong>{{> elements_account_link name=(action_trace.act.data.account)}}</strong> {{i18n "wallet.transactions.message.sold"}}
         <strong>{{action_trace.act.data.bytes}}</strong> bytes
     </td>
     {{/with}}
@@ -238,7 +238,7 @@
 <template name="elements_transactions_row_newaccount">
     {{#with item}}
     <td class="account-name" colspan="3">
-        <strong>{{> elements_account_link name=(action_trace.act.data.creator)}}</strong> created account
+        <strong>{{> elements_account_link name=(action_trace.act.data.creator)}}</strong> {{i18n "wallet.transactions.message.createdaccount"}}
         <span>{{> elements_account_link name=(action_trace.act.data.name)}}</span>
     </td>
     {{/with}}
