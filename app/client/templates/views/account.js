@@ -1,4 +1,4 @@
-const keystore = require("../../lib/eos/keystore");
+const keystore = require('../../lib/eos/keystore');
 /**
 Template Controllers
 
@@ -6,35 +6,37 @@ Template Controllers
 */
 
 Template.views_account.onRendered(function() {
-  let self = this
+  let self = this;
+
+  TemplateVar.set(self, 'showPermissions', false);
 
   Tracker.autorun(function() {
-    TemplateVar.set(self, 'showPermissions', false)
-  })
+    if (FlowRouter.getRouteName() !== 'account') return;
 
-  Tracker.autorun(function() {
-    if(FlowRouter.getRouteName() !== 'account')
-      return;
+    let name = FlowRouter.getParam('name');
+    TemplateVar.set(self, 'account_name', name);
+    eos.getAccount(name).then(
+      account => {
+        account.creating = false;
+        TemplateVar.set(self, 'account', account);
 
-    let name = FlowRouter.getParam('name')
-    TemplateVar.set(self, 'account_name', name)
-    eos.getAccount(name).then(account => {
-      account.creating = false;
-      TemplateVar.set(self, 'account', account)
-
-      eos.getCurrencyBalance('eosio.token', name).then(res => {
-          TemplateVar.set(self, 'balance', res);
-        }, err => {
-        console.log(err)
-      })
-    }, err => {
-      FlowRouter.go('/notfound');
-    })
-  })
-})
-
-Template['views_account'].onRendered(function() {
+        eos.getCurrencyBalance('eosio.token', name).then(
+          res => {
+            TemplateVar.set(self, 'balance', res);
+          },
+          err => {
+            console.log(err);
+          }
+        );
+      },
+      err => {
+        FlowRouter.go('/notfound');
+      }
+    );
+  });
 });
+
+Template['views_account'].onRendered(function() {});
 
 Template['views_account'].helpers({
   /**
@@ -46,7 +48,7 @@ Template['views_account'].helpers({
     return TemplateVar.get('account');
   },
   isOwner: function() {
-    return keystore.Get(this.account_name)
+    return keystore.Get(this.account_name);
   },
   /**
     Get the tokens balance
@@ -54,30 +56,25 @@ Template['views_account'].helpers({
     @method (formattedTokenBalance)
     */
   formattedBalance: function(e) {
-    var balance = TemplateVar.get('balance'); 
-    if(!balance || balance.length === 0) 
-      balance = ["0.0000 EOS"]
+    var balance = TemplateVar.get('balance');
+    if (!balance || balance.length === 0) balance = ['0.0000 EOS'];
     return balance[0];
   },
   refundBalance: function(e) {
     let account = TemplateVar.get('account');
-    if(!account.refund_request)
-      return "0.0000 EOS";
-    let total = 
-    Number(account.refund_request.cpu_amount.replace('EOS', '').trim()) +
-    Number(account.refund_request.net_amount.replace('EOS', '').trim())
-    return total.toFixed(4) + ' EOS'
+    if (!account.refund_request) return '0.0000 EOS';
+    let total =
+      Number(account.refund_request.cpu_amount.replace('EOS', '').trim()) +
+      Number(account.refund_request.net_amount.replace('EOS', '').trim());
+    return total.toFixed(4) + ' EOS';
   },
   ramToString: function(e) {
-    
-    return (e / 1024).toFixed(3) + ' KB'
+    return (e / 1024).toFixed(3) + ' KB';
   },
   progress: function(e, v, a) {
-    
-    return (e/v *100).toFixed(a) + '%'
+    return ((e / v) * 100).toFixed(a) + '%';
   }
 });
-
 
 Template['views_account'].events({
   /**
@@ -85,44 +82,46 @@ Template['views_account'].events({
 
     @event click button.remove-button
     */
-   'click button.buy-button': function(e, template) {
-
+  'click button.buy-button': function(e, template) {
     let account_name = TemplateVar.get('account_name');
     // Open a modal showing the QR Code
-    EthElements.Modal.show({
-      template: 'tradeRam',
-      data: {
-        from: account_name,
-        callback: () => {
-          return true;
+    EthElements.Modal.show(
+      {
+        template: 'tradeRam',
+        data: {
+          from: account_name,
+          callback: () => {
+            return true;
+          }
         }
+      },
+      {
+        class: 'modal-small'
       }
-    },
-    {
-      class: "modal-small"
-    });
+    );
   },
   /**
     Clicking the delete button will show delete modal
 
     @event click button.remove-button
     */
-   'click button.stake-button': function(e, template) {
-
+  'click button.stake-button': function(e, template) {
     let account_name = TemplateVar.get('account_name');
     // Open a modal showing the QR Code
-    EthElements.Modal.show({
-      template: 'stake',
-      data: {
-        from: account_name,
-        callback: () => {
-          return true;
+    EthElements.Modal.show(
+      {
+        template: 'stake',
+        data: {
+          from: account_name,
+          callback: () => {
+            return true;
+          }
         }
+      },
+      {
+        class: 'modal-medium'
       }
-    },
-    {
-      class: "modal-medium"
-    });
+    );
   },
   /**
     Clicking the delete button will show delete modal
@@ -130,7 +129,6 @@ Template['views_account'].events({
     @event click button.remove-button
     */
   'click button.remove-button': function(e, template) {
-
     let account_name = TemplateVar.get('account_name');
     EthElements.Modal.show({
       template: 'authorized',
@@ -139,7 +137,7 @@ Template['views_account'].events({
           TAPi18n.__('wallet.accounts.modal.deleteText')
         ),
         account_name: account_name,
-        callback: (privateKey) => {
+        callback: privateKey => {
           keystore.Remove(account_name);
           FlowRouter.go('dashboard');
           return true;
@@ -160,16 +158,18 @@ Template['views_account'].events({
       template: 'authorized',
       data: {
         account_name: account_name,
-        callback: (privateKey) => {
+        callback: privateKey => {
           EthElements.Modal.hide();
-          EthElements.Modal.question({
-            text: privateKey,
-            ok: () => {}
-          },
-          {
-            closeable: false,
-            class: "modal-medium"
-          })
+          EthElements.Modal.question(
+            {
+              text: privateKey,
+              ok: () => {}
+            },
+            {
+              closeable: false,
+              class: 'modal-medium'
+            }
+          );
         }
       }
     });
@@ -180,33 +180,38 @@ Template['views_account'].events({
 
     @event click a.create.account
     */
-   'click .authorize-button': function(e) {
+  'click .authorize-button': function(e) {
     e.preventDefault();
     var owners = [];
     let account = this;
-    account.permissions.forEach((item) => {
-      if(item.perm_name === "active"){
-        owners = Array.prototype.map.call(item.required_auth.accounts, function(obj) {
+    account.permissions.forEach(item => {
+      if (item.perm_name === 'active') {
+        owners = Array.prototype.map.call(item.required_auth.accounts, function(
+          obj
+        ) {
           return obj.permission.actor;
         });
         return;
       }
-    })
+    });
 
     // Open a modal showing the QR Code
-    EthElements.Modal.show({
-      template: 'views_account_authorize',
-      data: {
-        account: this,
-        owners: owners
+    EthElements.Modal.show(
+      {
+        template: 'views_account_authorize',
+        data: {
+          account: this,
+          owners: owners
+        }
+      },
+      {
+        class: 'modal-small'
       }
-    },
-    {
-      class: 'modal-small'
-    });
+    );
   },
   'click .account-permissions-link a': (e, template) => {
-    let showPermissions = TemplateVar.get(template, 'showPermissions')
-    TemplateVar.set(template, 'showPermissions', !showPermissions)
+    e.preventDefault();
+    let showPermissions = TemplateVar.get(template, 'showPermissions');
+    TemplateVar.set(template, 'showPermissions', !showPermissions);
   }
 });
