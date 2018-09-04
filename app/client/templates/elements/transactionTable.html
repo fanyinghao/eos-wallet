@@ -87,7 +87,7 @@
 
 <template name="elements_transactions_row_transfer">
     {{#with item}}
-    <td class="account-name">
+    <td class="account-name" style="min-width:280px">
         <p>
             {{#if $eq action_trace.receipt.receiver action_trace.act.data.from}}
             <strong>
@@ -139,7 +139,7 @@
             <strong>{{> elements_account_link name=(permission.actor)}}</strong>
         {{/each}}
         {{#each action_trace.act.data.auth.keys}}
-            <label>{{key}}</label>
+            <label>{{walletIcon}}{{key}} </label>
         {{/each}}
     </td>
     {{/with}}
