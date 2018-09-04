@@ -110,7 +110,13 @@ body {
   }
   .dapp-header {
     background-color: @colorLinuxBackgroundFocus;
-    .background-image(linear-gradient(to bottom,  @colorLinuxBackgroundFocus 20%, lighten(@colorLinuxBackgroundFocus, 5%) 90%));
+    .background-image(
+      linear-gradient(
+        to bottom,
+        @colorLinuxBackgroundFocus 20%,
+        lighten(@colorLinuxBackgroundFocus, 5%) 90%
+      )
+    );
     color: @colorWhite;
 
     nav a,
@@ -136,7 +142,13 @@ body {
   }
   .dapp-header {
     background-color: @colorOSBackgroundFocus;
-    .background-image(linear-gradient(to top,  @colorOSBackgroundFocus 20%, lighten(@colorOSBackgroundFocus, 10%) 90%));
+    .background-image(
+      linear-gradient(
+        to top,
+        @colorOSBackgroundFocus 20%,
+        lighten(@colorOSBackgroundFocus, 10%) 90%
+      )
+    );
 
     nav > ul {
       margin-left: @gridWidth;
@@ -160,7 +172,9 @@ body {
   padding-left: @gridWidth * 2.5;
   background-color: @colorWinBackgroundFocus;
   -webkit-app-region: drag; // necessary to drag the wallet window
-  .background-image(linear-gradient(to bottom,  @colorWinBackgroundFocus 50%, #ddd9d9 90%));
+  .background-image(
+    linear-gradient(to bottom, @colorWinBackgroundFocus 50%, #ddd9d9 90%)
+  );
   background: #f0f0f0;
 
   &.dapp-small {
@@ -980,13 +994,13 @@ span.address.not-ens-name {
 
 /* Custom icon size for auto-scan button on contracts.html */
 .account-pattern .icon-target {
-    font-size: 0.5em;
+  font-size: 0.5em;
 }
 
 button.token-auto-scan {
-    &:hover {
-        cursor: pointer;
-    }
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 table.transactions {
@@ -1004,7 +1018,6 @@ table.transactions {
     margin-right: 3px;
   }
 }
-
 
 .data-table {
   // margin: 20px 0px;
@@ -1036,7 +1049,7 @@ table.transactions {
 .data-table .data-item:before,
 .data-table .data-item:after {
   display: table;
-  content: "";
+  content: '';
   zoom: 1;
 }
 .data-table .data-item:after {
@@ -1067,7 +1080,7 @@ table.transactions {
   margin-bottom: 2px;
 }
 .data-table .data-value a {
-  color: #474D78;
+  color: #474d78;
 }
 .data-table .data-value.data-break {
   word-break: break-all;
@@ -1091,7 +1104,7 @@ table.transactions {
   font-size: 100%;
 }
 .data-table .data-value .progress {
-  background: #DCE1ED;
+  background: #dce1ed;
   margin-bottom: 6px;
   height: 15px;
 }
@@ -1121,14 +1134,14 @@ table.transactions {
   text-align: center;
 }
 .data-table .data-action > *.data-action-label.green {
-  color: #76B143;
+  color: #76b143;
 }
 .data-table .data-action > *.data-action-label.red {
-  color: #F1496C;
+  color: #f1496c;
 }
 .data-table .data-action > *.data-action-timestamp {
   flex: 0 0 14%;
-  color: #8C98BA;
+  color: #8c98ba;
 }
 .data-table .data-action > *.data-action-tx {
   flex: 0 0 6%;
@@ -1138,14 +1151,14 @@ table.transactions {
 .data-table .data-action > *.data-action-value {
   flex-grow: 10;
   font-size: 14px;
-  color: #8C98BA;
+  color: #8c98ba;
 }
 .data-table .data-action > *.data-action-value strong {
   opacity: 0.9;
 }
 .data-table .data-action > *.data-action-value em {
   font-style: normal;
-  color: #474D78;
+  color: #474d78;
   font-weight: 600;
 }
 @media (max-width: 867px) {
@@ -1169,7 +1182,7 @@ table.transactions {
 .data-table .data-action .memo {
   float: right;
   margin: -3px 0;
-  color: #ADB8D6;
+  color: #adb8d6;
   max-width: 450px;
 }
 @media (max-width: 867px) {
@@ -1184,7 +1197,7 @@ table.transactions {
   margin: 0;
 }
 .data-table .data-action .memo pre strong {
-  color: #474D78;
+  color: #474d78;
 }
 .data-table i {
   margin-right: 4px;
@@ -1237,8 +1250,8 @@ table.transactions {
   overflow: hidden;
   background-color: #f5f5f5;
   border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .progress-bar {
@@ -1251,19 +1264,19 @@ table.transactions {
   text-align: center;
   background-color: @colorLink;
   -webkit-box-shadow: inset 0 -1px 0 rgba(26, 25, 25, 0.15);
-  box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
-  -webkit-transition: width .6s ease;
-  -o-transition: width .6s ease;
-  transition: width .6s ease;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  -webkit-transition: width 0.6s ease;
+  -o-transition: width 0.6s ease;
+  transition: width 0.6s ease;
 }
 
 .stake-container {
   h2 {
-    margin: 0
+    margin: 0;
   }
 
   button {
-    margin: 25px 0
+    margin: 25px 0;
   }
 }
 
@@ -1282,44 +1295,47 @@ table.transactions {
     margin-bottom: 3px;
 
     select {
-      height: 30px; 
+      height: 30px;
     }
   }
 }
 
 tr.memo {
-    float: right;
-    margin: -3px 0;
-    color: #ADB8D6;
-    max-width: 450px;
+  float: right;
+  margin: -3px 0;
+  color: #adb8d6;
+  max-width: 450px;
 }
 
-  td.transaction-data pre {
-    max-height: 68px;
-    margin: 0;
-  }
+td.transaction-data pre {
+  max-height: 68px;
+  margin: 0;
+}
 
 .trx-type h3 {
-  margin: 0
+  margin: 0;
 }
 
 .account-name p {
-  padding-top: 0
+  padding-top: 0;
 }
 
 .transaction-data-detail pre {
   max-height: 100%;
 }
 
-.account-permissions-link{
+.account-permissions-link {
   margin: 10px 0 10px 0;
-
 }
 
 .account-permissions ul {
-  margin: 0 0 10px 0
+  margin: 0 0 10px 0;
 }
 
 .tr-command td {
   padding: 0;
+}
+
+.key-list {
+  word-break: break-all;
 }
