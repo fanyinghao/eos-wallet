@@ -71,13 +71,6 @@ Template.elements_account.helpers({
     */
   new: function() {
     return false;
-  },
-  /**
-    Displays ENS names with triangles
-    @method (nameDisplay)
-    */
-  displayName: function() {
-    return this.account_name;
   }
 });
 
