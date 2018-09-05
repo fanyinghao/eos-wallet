@@ -2,7 +2,7 @@
   "scripts": {
     "start": "meteor run",
     "precommit": "pretty-quick --staged",
-    "build": "meteor-build-client ../build --path \"\""
+    "build": "chmod +x ./scripts/gen.sh & ./scripts/gen.sh & meteor-build-client ../build --path \"\" --settings settings.json"
   },
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.55",
