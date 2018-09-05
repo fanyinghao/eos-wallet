@@ -33,10 +33,10 @@ getBranch()
   .then(getCommit)
   .then(function(_commit) {
     result.commit = _commit;
-    console.log(_commit);
   })
   .then(function() {
     var fileContent = JSON.stringify(result, null, 2);
+    console.log(fileContent);
 
     var pathToFile = __dirname + '/../private/version.json';
     console.log('path normalized: ' + path.normalize(pathToFile));
