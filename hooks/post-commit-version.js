@@ -33,6 +33,7 @@ getBranch()
   .then(getCommit)
   .then(function(_commit) {
     result.commit = _commit;
+    console.log(_commit);
   })
   .then(function() {
     var fileContent = JSON.stringify(result, null, 2);
