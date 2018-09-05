@@ -69,3 +69,15 @@ EOS Wallet 为一个可同时管理多个 eos 账户的工具，具有安全、�
 # 安全性
 
 保存到钱包里的私钥使用[Stanford Javascript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)的[AES-GCM 库](https://github.com/nsjames/AES-OOP)对称加密算法
+
+# 如何测试使用
+
+在首页右下方可以切换网络节点，名称带有.Kylin 的节点为测试网节点，测试网与主网是完全独立。
+
+- 在测试网创建一个账户，访问http://faucet.cryptokylin.io/create_account?new_account_name 其中 new_account_name 为账户名，返回的数据中带有 private 私钥
+- 使用私钥进行导入账户
+- 访问 http://faucet.cryptokylin.io/get_token?your_account_name 可以得到一些 EOS 额度
+
+# 注意
+
+zbeos 和 eosasia 均为主网节点。目前 zbeos 的节点还没开启 history 查询，若需要查询交易记录，可以切换到 eosasia 节点。
