@@ -39,6 +39,7 @@ getBranch()
     console.log(fileContent);
 
     var pathToFile = __dirname + '/../private/version.json';
+
     console.log('path normalized: ' + path.normalize(pathToFile));
     if (fs.existsSync(pathToFile)) {
       fs.writeFile(pathToFile, fileContent, function(err) {
