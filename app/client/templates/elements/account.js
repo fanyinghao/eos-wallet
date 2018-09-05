@@ -1,5 +1,6 @@
 const keystore = require('../../lib/eos/keystore');
 import { extend } from '../../lib/utils';
+
 /**
 Template Controllers
 
@@ -13,19 +14,21 @@ The account template
 @constructor
 */
 
-Template.elements_account.created = function() {
+Template.elements_account.onRendered(function() {
   let self = this;
-  let name = this.data.name;
-  let item = keystore.Get(name);
-  let account = {
-    loading: true,
-    account_name: name
-  };
-  if (item) {
-    account.publicKey = item.publicKey;
-    TemplateVar.set(self, 'account', account);
-  }
+  self.reactiveAccountName = new ReactiveVar(this.data.name);
+
   Tracker.autorun(() => {
+    let name = self.reactiveAccountName.get();
+    let item = keystore.Get(name);
+    let account = {
+      loading: true,
+      account_name: name
+    };
+    if (item) {
+      account.publicKey = item.publicKey;
+      TemplateVar.set(self, 'account', account);
+    }
     ObservableAccounts.refresh(account).then(
       _account => {
         account = extend({}, account, _account);
@@ -36,7 +39,7 @@ Template.elements_account.created = function() {
       }
     );
   });
-};
+});
 
 Template.elements_account.rendered = function() {
   // initiate the geo pattern
@@ -51,7 +54,15 @@ Template.elements_account.helpers({
     @method (account)
     */
   account: function() {
+    const tpl = Template.instance();
     let account = TemplateVar.get('account');
+    if (
+      tpl.reactiveAccountName &&
+      tpl.data.name !== tpl.reactiveAccountName.get()
+    ) {
+      tpl.reactiveAccountName.set(tpl.data.name);
+      return;
+    }
     return account;
   },
   /**
@@ -60,7 +71,15 @@ Template.elements_account.helpers({
     @method (formattedTokenBalance)
     */
   formattedTokenBalance: function(e) {
-    var account = TemplateVar.get('account');
+    const tpl = Template.instance();
+    let account = TemplateVar.get('account');
+    if (
+      tpl.reactiveAccountName &&
+      tpl.data.name !== tpl.reactiveAccountName.get()
+    ) {
+      tpl.reactiveAccountName.set(tpl.data.name);
+      return;
+    }
     if (!account || !account.eosBalance) return ['0.0000 EOS'];
     return `${account.eosBalance.value} ${account.eosBalance.symbol}`;
   },

@@ -11,16 +11,12 @@ The dashboard template
 @constructor
 */
 var reactive_node = new ReactiveVar(localStorage.getItem('chain_node'));
+var reactiveAccounts = new ReactiveVar([]);
 
-Template['views_dashboard'].helpers({
-  /**
-    Get all current accounts
-
-    @method (accounts)
-    */
-  accounts: function() {
-    let accounts = [];
+Template.views_dashboard.created = function() {
+  Tracker.autorun(() => {
     let _node = reactive_node.get();
+    let _accounts = [];
 
     for (var i = 0; i < localStorage.length; i++) {
       let key = localStorage.key(i);
@@ -35,12 +31,23 @@ Template['views_dashboard'].helpers({
             publicKey: localStorage[key].publicKey,
             new: this.new === name
           };
-          accounts.push(account);
+          _accounts.push(account);
         }
       }
     }
-    reactive_node.set(_node)
-    console.log("recompute accounts");
+    reactiveAccounts.set(_accounts);
+    reactive_node.set(_node);
+  });
+};
+
+Template['views_dashboard'].helpers({
+  /**
+    Get all current accounts
+
+    @method (accounts)
+    */
+  accounts: function() {
+    let accounts = reactiveAccounts.get();
     return accounts;
   },
   /**
@@ -55,8 +62,8 @@ Template['views_dashboard'].helpers({
       let key = localStorage.key(i);
       if (key.indexOf(`EOS_ACCOUNT_${chains[_node].chainId}`) >= 0) return true;
     }
-    reactive_node.set(_node)
-    console.log("recompute hasAccounts");
+    reactive_node.set(_node);
+    console.log('recompute hasAccounts');
 
     return false;
   },
@@ -81,7 +88,7 @@ Template['views_dashboard'].helpers({
     return Object.keys(chains);
   },
   selected: function(value) {
-    let ret = value === localStorage.getItem('chain_node')? 'selected': '';
+    let ret = value === localStorage.getItem('chain_node') ? 'selected' : '';
     return ret;
   }
 });
@@ -97,8 +104,10 @@ Template['views_dashboard'].events({
   },
 
   'change select[name=chain_node]': function(e, template) {
-    reload_chain(e.target.value)
+    reload_chain(e.target.value);
     reactive_node.set(e.target.value);
+    reactiveAccounts.set([]);
+
     console.log('clicked');
   }
 });
