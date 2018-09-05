@@ -90,6 +90,9 @@ Template['views_dashboard'].helpers({
   selected: function(value) {
     let ret = value === localStorage.getItem('chain_node') ? 'selected' : '';
     return ret;
+  },
+  version: function() {
+    return Meteor.settings.public.commit.substring(0, 7);
   }
 });
 
