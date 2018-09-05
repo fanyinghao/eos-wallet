@@ -2,14 +2,31 @@
 
 An app for the EOS blockchain platform.
 
+[帮助文档](Wiki.md)
+
 ## Features
-* create account 
-* View past transactions
-* Make transfers to other users
-* Update account permissions
-* buy Ram,cpu,Net
-* private-key import
-* mul-sign
+
+### 账户
+
+- 创建账户
+- 导入账户
+
+### 账户管理
+
+- 查看账户资源
+- 查看账户权限
+- 查看交易记录
+- 买卖 RAM 资源
+- 抵押赎回 CPU/NET 资源
+- 账户多签授权
+- 备份私钥
+- 删除账户
+
+### 发送事务
+
+- 转账
+- 签名提案
+- 完成账户创建
 
 ## Run
 
