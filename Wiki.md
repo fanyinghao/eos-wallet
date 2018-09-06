@@ -2,8 +2,6 @@
 
 EOS Wallet 为一个可同时管理多个 eos 账户的工具，具有安全、操作简单等特点。
 
-[Mac 端下载](https://tcs.teambition.net/storage/1318f8f40f9ee6fd8cd13d9152904b04d854?download=EOS-Wallet-macosx-1-0-0.dmg&Signature=eyJhbGciOiJIUzI1NiJ9.eyJyZXNvdXJjZSI6Ii9zdG9yYWdlLzEzMThmOGY0MGY5ZWU2ZmQ4Y2QxM2Q5MTUyOTA0YjA0ZDg1NCIsImV4cCI6MTUzNjMyMTYwMH0.EEaonfQ9fP7Vf1_ODSTHDr1ClnZ04FUKgxTaYtY6l9A&filekey=1318)
-
 # Linux .zip 安装
 
 要从.zip 文件安装的话，请先安装 `libgconf2-4` ：
