@@ -2,12 +2,10 @@
 
 EOS Wallet 为一个可同时管理多个 eos 账户的工具，具有安全、操作简单等特点。
 
-# Linux .zip 安装
-
-要从.zip 文件安装的话，请先安装 `libgconf2-4` ：
+# Linux .deb 安装
 
 ```bash
-apt-get install libgconf2-4
+$ sudo dpkg -i EOS-Wallet-linux64-1-0-0.deb
 ```
 
 # 账户
