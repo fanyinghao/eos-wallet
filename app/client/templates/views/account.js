@@ -137,7 +137,7 @@ Template["views_account"].events({
           TAPi18n.__("wallet.accounts.modal.deleteText")
         ),
         account_name: account_name,
-        callback: privateKey => {
+        callback: () => {
           keystore.Remove(account_name);
           FlowRouter.go("dashboard");
           return true;
@@ -156,9 +156,10 @@ Template["views_account"].events({
     // Open a modal showing the QR Code
     EthElements.Modal.show({
       template: "authorized",
+      requirePrivateKey: true,
       data: {
         account_name: account_name,
-        callback: privateKey => {
+        callback: (signProvider, privateKey) => {
           EthElements.Modal.hide();
           EthElements.Modal.question(
             {

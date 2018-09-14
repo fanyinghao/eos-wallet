@@ -1,4 +1,4 @@
-const keystore = require('../../../lib/eos/keystore');
+const keystore = require("../../../lib/eos/keystore");
 /**
 Template Controllers
 
@@ -6,9 +6,9 @@ Template Controllers
 */
 
 Template.authorized.helpers({
-    title: function() {
-        return this.title;
-    }
+  title: function() {
+    return this.title;
+  }
 });
 
 Template.authorized.onRendered(() => {
@@ -25,27 +25,33 @@ Template.authorized.events({
     e,
     template
   ) {
-    TemplateVar.set('password', e.currentTarget.value);
+    TemplateVar.set("password", e.currentTarget.value);
   },
   /**
     Submit the form
 
     @event submit form
     */
-  'submit form': function(e, template) {
-    let password = TemplateVar.get('password');
+  "submit form": function(e, template) {
+    let password = TemplateVar.get("password");
 
     if (!password || password.length === 0)
       return GlobalNotification.warning({
-        content: 'i18n:wallet.accounts.wrongPassword',
+        content: "i18n:wallet.accounts.wrongPassword",
         duration: 2
       });
 
     try {
       let sensitive = keystore.Get(this.account_name, password).sensitive;
-      if (!sensitive) throw new Error('wrong password');
+      if (!sensitive) throw new Error("wrong password");
 
-      if (this.callback) this.callback(sensitive.privateKey);
+      let signProvider = keystore.SignProvider(this.account_name, password);
+
+      if (this.callback)
+        this.callback(
+          signProvider,
+          this.requirePrivateKey ? sensitive.privateKey : null
+        );
     } catch (e) {
       Helpers.handleError(e);
     }

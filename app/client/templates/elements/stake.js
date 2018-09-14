@@ -3,35 +3,35 @@ Template.stake.onRendered(function() {
 });
 
 Template.stake.events({
-  'keyup .amount input': function(e) {
-    let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, '');
-    if (amount.indexOf('.') == 0) amount = '0' + amount;
-    if (amount.indexOf('.') >= 0)
-      amount = amount.substring(0, amount.indexOf('.') + 5);
+  "keyup .amount input": function(e) {
+    let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, "");
+    if (amount.indexOf(".") == 0) amount = "0" + amount;
+    if (amount.indexOf(".") >= 0)
+      amount = amount.substring(0, amount.indexOf(".") + 5);
     if (
-      amount[amount.length - 1] === '.' &&
-      amount.indexOf('.') !== amount.length - 1
+      amount[amount.length - 1] === "." &&
+      amount.indexOf(".") !== amount.length - 1
     )
       amount = amount.substring(0, amount.length - 1);
     e.currentTarget.value = amount;
-    TemplateVar.set(e.target.name, amount.replace(',', '') || '0');
+    TemplateVar.set(e.target.name, amount.replace(",", "") || "0");
   },
-  'keyup input[name=to].to': function(e) {
-    TemplateVar.set('to', e.target.value);
+  "keyup input[name=to].to": function(e) {
+    TemplateVar.set("to", e.target.value);
   },
-  'click button': function(e, template) {
+  "click button": function(e, template) {
     let from = this.from;
-    let to = TemplateVar.get('to');
-    let stake_cpu = TemplateVar.get('stake_cpu');
-    let stake_net = TemplateVar.get('stake_net');
-    let unstake_cpu = TemplateVar.get('unstake_cpu');
-    let unstake_net = TemplateVar.get('unstake_net');
+    let to = TemplateVar.get("to");
+    let stake_cpu = TemplateVar.get("stake_cpu");
+    let stake_net = TemplateVar.get("stake_net");
+    let unstake_cpu = TemplateVar.get("unstake_cpu");
+    let unstake_net = TemplateVar.get("unstake_net");
 
-    function get_eos(privateKey) {
+    function get_eos(signProvider) {
       const _eos = Eos({
         httpEndpoint: httpEndpoint,
         chainId: chainId,
-        keyProvider: [privateKey],
+        signProvider: signProvider,
         verbose: false
       });
       return _eos;
@@ -40,10 +40,10 @@ Template.stake.events({
     var onSuccess = tr => {
       console.log(tr);
       EthElements.Modal.hide();
-      TemplateVar.set(template, 'sending', true);
+      TemplateVar.set(template, "sending", true);
 
       GlobalNotification.success({
-        content: 'i18n:wallet.send.transactionSent',
+        content: "i18n:wallet.send.transactionSent",
         duration: 20,
         ok: function() {
           window.open(`${transactionMonitor}/${tr.transaction_id}`);
@@ -55,7 +55,7 @@ Template.stake.events({
 
     var onError = err => {
       EthElements.Modal.hide();
-      TemplateVar.set(template, 'sending', true);
+      TemplateVar.set(template, "sending", true);
 
       if (err.message) {
         GlobalNotification.error({
@@ -80,9 +80,9 @@ Template.stake.events({
       return amount;
     }
 
-    function stake(privateKey) {
+    function stake(signProvider) {
       // show loading
-      let _eos = get_eos(privateKey);
+      let _eos = get_eos(signProvider);
 
       try {
         _eos
@@ -106,9 +106,9 @@ Template.stake.events({
       }
     }
 
-    function unstake(privateKey) {
+    function unstake(signProvider) {
       // show loading
-      let _eos = get_eos(privateKey);
+      let _eos = get_eos(signProvider);
 
       try {
         _eos
@@ -131,21 +131,21 @@ Template.stake.events({
         handleError(e);
       }
     }
-    if (!TemplateVar.get('sending')) {
-      TemplateVar.set('sending', true);
+    if (!TemplateVar.get("sending")) {
+      TemplateVar.set("sending", true);
       EthElements.Modal.show({
-        template: 'authorized',
+        template: "authorized",
         data: {
           title: new Spacebars.SafeString(
-            TAPi18n.__('wallet.send.stake.authtitle', { name: from })
+            TAPi18n.__("wallet.send.stake.authtitle", { name: from })
           ),
           account_name: from,
-          callback: privateKey => {
-            if (!TemplateVar.get('sending')) {
-              if (e.target.name === 'stake') {
-                stake(privateKey);
-              } else if (e.target.name === 'unstake') {
-                unstake(privateKey);
+          callback: signProvider => {
+            if (!TemplateVar.get("sending")) {
+              if (e.target.name === "stake") {
+                stake(signProvider);
+              } else if (e.target.name === "unstake") {
+                unstake(signProvider);
               }
             }
           }

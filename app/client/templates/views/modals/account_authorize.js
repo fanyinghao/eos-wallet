@@ -131,14 +131,14 @@ Template["views_account_authorize"].events({
     let threshold = TemplateVar.get("multisigSignatures");
     let self = this;
 
-    function updateauth(privateKey) {
+    function updateauth(signProvider) {
       try {
         TemplateVar.set(template, "sending", true);
 
         const _eos = Eos({
           httpEndpoint: httpEndpoint,
           chainId: chainId,
-          keyProvider: [privateKey],
+          signProvider: signProvider,
           verbose: false
         });
 
@@ -242,8 +242,8 @@ Template["views_account_authorize"].events({
         template: "authorized",
         data: {
           account_name: self.account.account_name,
-          callback: privateKey => {
-            updateauth(privateKey);
+          callback: signProvider => {
+            updateauth(signProvider);
             //refresh account
 
             return true;

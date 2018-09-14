@@ -3,40 +3,40 @@ Template.tradeRam.onRendered(function() {
 });
 
 Template.tradeRam.events({
-  'keyup .amount input': function(e) {
-    let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, '');
-    if (amount.indexOf('.') == 0) amount = '0' + amount;
-    if (amount.indexOf('.') >= 0)
-      amount = amount.substring(0, amount.indexOf('.') + 5);
+  "keyup .amount input": function(e) {
+    let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, "");
+    if (amount.indexOf(".") == 0) amount = "0" + amount;
+    if (amount.indexOf(".") >= 0)
+      amount = amount.substring(0, amount.indexOf(".") + 5);
     if (
-      amount[amount.length - 1] === '.' &&
-      amount.indexOf('.') !== amount.length - 1
+      amount[amount.length - 1] === "." &&
+      amount.indexOf(".") !== amount.length - 1
     )
       amount = amount.substring(0, amount.length - 1);
     e.currentTarget.value = amount;
-    TemplateVar.set(e.target.name, amount.replace(',', '') || '0');
+    TemplateVar.set(e.target.name, amount.replace(",", "") || "0");
   },
-  'keyup .bytes input': function(e) {
+  "keyup .bytes input": function(e) {
     let amount = e.currentTarget.value
-      .replace(/[a-zA-Z]+/g, '')
-      .replace('.', '');
+      .replace(/[a-zA-Z]+/g, "")
+      .replace(".", "");
     e.currentTarget.value = amount;
-    TemplateVar.set(e.target.name, amount.replace(',', '') || 0);
+    TemplateVar.set(e.target.name, amount.replace(",", "") || 0);
   },
-  'keyup input[name=to].to': function(e) {
-    TemplateVar.set('to', e.target.value);
+  "keyup input[name=to].to": function(e) {
+    TemplateVar.set("to", e.target.value);
   },
-  'click button': function(e, template) {
+  "click button": function(e, template) {
     let from = this.from;
-    let to = TemplateVar.get('to');
-    let buy_ram = TemplateVar.get('buy_ram');
-    let sell_bytes = TemplateVar.get('sell_bytes');
+    let to = TemplateVar.get("to");
+    let buy_ram = TemplateVar.get("buy_ram");
+    let sell_bytes = TemplateVar.get("sell_bytes");
 
-    function get_eos(privateKey) {
+    function get_eos(signProvider) {
       const _eos = Eos({
         httpEndpoint: httpEndpoint,
         chainId: chainId,
-        keyProvider: [privateKey],
+        signProvider: signProvider,
         verbose: false
       });
       return _eos;
@@ -46,10 +46,10 @@ Template.tradeRam.events({
       console.log(tr);
       EthElements.Modal.hide();
 
-      TemplateVar.set(template, 'sending', false);
+      TemplateVar.set(template, "sending", false);
 
       GlobalNotification.success({
-        content: 'i18n:wallet.send.transactionSent',
+        content: "i18n:wallet.send.transactionSent",
         duration: 20,
         ok: function() {
           window.open(`${transactionMonitor}/${tr.transaction_id}`);
@@ -61,7 +61,7 @@ Template.tradeRam.events({
 
     var onError = err => {
       EthElements.Modal.hide();
-      TemplateVar.set(template, 'sending', false);
+      TemplateVar.set(template, "sending", false);
 
       if (err.message) {
         GlobalNotification.error({
@@ -86,9 +86,9 @@ Template.tradeRam.events({
       return amount;
     }
 
-    function buy_ram_tx(privateKey) {
+    function buy_ram_tx(signProvider) {
       // show loading
-      let _eos = get_eos(privateKey);
+      let _eos = get_eos(signProvider);
 
       try {
         _eos
@@ -110,9 +110,9 @@ Template.tradeRam.events({
       }
     }
 
-    function sell_ram_tx(privateKey) {
+    function sell_ram_tx(signProvider) {
       // show loading
-      let _eos = get_eos(privateKey);
+      let _eos = get_eos(signProvider);
 
       try {
         _eos
@@ -133,22 +133,22 @@ Template.tradeRam.events({
       }
     }
 
-    if (!TemplateVar.get('sending')) {
-      TemplateVar.set('sending', true);
+    if (!TemplateVar.get("sending")) {
+      TemplateVar.set("sending", true);
 
       EthElements.Modal.show({
-        template: 'authorized',
+        template: "authorized",
         data: {
           title: new Spacebars.SafeString(
-            TAPi18n.__('wallet.send.tradeRam.authtitle', { name: from })
+            TAPi18n.__("wallet.send.tradeRam.authtitle", { name: from })
           ),
           account_name: from,
-          callback: privateKey => {
-            if (!TemplateVar.get('sending')) {
-              if (e.target.name === 'buy_ram') {
-                buy_ram_tx(privateKey);
-              } else if (e.target.name === 'sell_ram') {
-                sell_ram_tx(privateKey);
+          callback: signProvider => {
+            if (!TemplateVar.get("sending")) {
+              if (e.target.name === "buy_ram") {
+                buy_ram_tx(signProvider);
+              } else if (e.target.name === "sell_ram") {
+                sell_ram_tx(signProvider);
               }
             }
           }
