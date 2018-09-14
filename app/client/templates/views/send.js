@@ -48,15 +48,10 @@ Template["views_send"].onCreated(function() {
 function reload_from(template) {
   let keys = Object.keys(ObservableAccounts.accounts).sort();
   if (keys.length > 0) {
-    let from = FlowRouter.getParam('from');
-    if (!from)
-      from = ObservableAccounts.accounts[keys[0]].account_name;
-    TemplateVar.setTo(
-      'select[name="dapp-select-account"]',
-      'value',
-      from
-    );
-    template.$('select[name="dapp-select-account"]').trigger('change')
+    let from = FlowRouter.getParam("from");
+    if (!from) from = ObservableAccounts.accounts[keys[0]].account_name;
+    TemplateVar.setTo('select[name="dapp-select-account"]', "value", from);
+    template.$('select[name="dapp-select-account"]').trigger("change");
   }
 }
 
@@ -80,10 +75,9 @@ Template.views_send.onRendered(function() {
     });
   }
 
-  Tracker.autorun((c) => {
-    reload_from(template)
+  Tracker.autorun(c => {
+    reload_from(template);
   });
-
 });
 
 Template["views_send"].helpers({
@@ -182,8 +176,11 @@ Template["views_send"].events({
     if (amount.indexOf(".") == 0) amount = "0" + amount;
     if (amount.indexOf(".") >= 0)
       amount = amount.substring(0, amount.indexOf(".") + 5);
-    if (amount[amount.length - 1] === '.' && amount.indexOf('.') !== amount.length -1)
-      amount = amount.substring(0, amount.length -1); 
+    if (
+      amount[amount.length - 1] === "." &&
+      amount.indexOf(".") !== amount.length - 1
+    )
+      amount = amount.substring(0, amount.length - 1);
     e.currentTarget.value = amount;
     TemplateVar.set("amount", amount.replace(",", "") || "0");
   },
@@ -285,7 +282,6 @@ Template["views_send"].events({
   'change select[name="dapp-select-account"]': function(e) {
     let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
     TemplateVar.set("selectedAccount", selectedAccount);
-
   },
   /**
     Submit the form and send the transaction!
@@ -299,6 +295,7 @@ Template["views_send"].events({
         TemplateVar.getFrom(".dapp-select-account", "value")
       ];
     let password = TemplateVar.get("password");
+    let isMultiSig = Helpers.isMultiSig(selectedAccount);
 
     if (selectedAccount && !TemplateVar.get("sending")) {
       if (selectedAccount.eosBalance == 0)
@@ -317,16 +314,13 @@ Template["views_send"].events({
         console.log(tr);
         TemplateVar.set(template, "sending", false);
 
-        if(!from)
-          from = selectedAccount.account_name;
-        FlowRouter.go("account", {name: from});
+        if (!from) from = selectedAccount.account_name;
+        FlowRouter.go("account", { name: from });
         GlobalNotification.success({
           content: "i18n:wallet.send.transactionSent",
           duration: 20,
           ok: function() {
-            window.open(
-              `${transactionMonitor}/${tr.transaction_id}`
-            );
+            window.open(`${transactionMonitor}/${tr.transaction_id}`);
             return true;
           },
           okText: `TX#${tr.transaction_id.substr(0, 6)}..`
@@ -417,13 +411,11 @@ Template["views_send"].events({
       };
 
       // The function to send the transaction
-      var sendTransaction = function(_to, _amount, _memo, _proposer) {
+      var sendFunds = function(_to, _amount, _memo, _proposer) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
         try {
-          let isMultiSig = Helpers.isMultiSig(selectedAccount);
-
           if (!isMultiSig) {
             let provider = keystore.SignProvider(
               selectedAccount.account_name,
@@ -440,7 +432,8 @@ Template["views_send"].events({
                 selectedAccount.account_name,
                 _to,
                 _amount,
-                _memo || "transfer", {
+                _memo || "transfer",
+                {
                   authorization: `${selectedAccount.account_name}@active`,
                   broadcast: true,
                   sign: true
@@ -448,7 +441,10 @@ Template["views_send"].events({
               )
               .then(onSuccess, onError);
           } else {
-            let selectedProposer = TemplateVar.getFrom("[name=dapp-select-proposer]", "value");
+            let selectedProposer = TemplateVar.getFrom(
+              "[name=dapp-select-proposer]",
+              "value"
+            );
             let propose_provider = keystore.SignProvider(
               selectedProposer,
               password
@@ -488,12 +484,6 @@ Template["views_send"].events({
                     .propose(
                       selectedProposer,
                       proposal_name,
-                      // Array.prototype.map.call(permissions, item => {
-                      //   return {
-                      //     actor: item.actor,
-                      //     permission: item.permission
-                      //   };
-                      // }),
                       permissions,
                       transfer.transaction.transaction,
                       { authorization: `${selectedProposer}@active` }
@@ -526,7 +516,10 @@ Template["views_send"].events({
         TemplateVar.set(template, "sending", true);
 
         try {
-          let provider = keystore.SignProvider(selectedAccount.account_name, password);
+          let provider = keystore.SignProvider(
+            selectedAccount.account_name,
+            password
+          );
           const _eos = Eos({
             httpEndpoint: httpEndpoint,
             chainId: chainId,
@@ -673,7 +666,23 @@ Template["views_send"].events({
               amount: amount,
               memo: memo
             },
-            ok: () => sendTransaction(to, amount, memo),
+            ok: () => {
+              EthElements.Modal.question({
+                template: "authorized",
+                data: {
+                  title: new Spacebars.SafeString(
+                    TAPi18n.__("wallet.send.tradeRam.authtitle", {
+                      name: selectedAccount.account_name
+                    })
+                  ),
+                  account_name: selectedAccount.account_name,
+                  isMultiSig: isMultiSig,
+                  callback: ({ signProvider, proposer }) => {
+                    sendFunds(to, amount, memo, signProvider, proposer);
+                  }
+                }
+              });
+            },
             cancel: true
           },
           {

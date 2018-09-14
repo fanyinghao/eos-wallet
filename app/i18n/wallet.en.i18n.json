@@ -78,7 +78,7 @@
     },
     "account": {
       "multiSig": {
-        "notice": "Requires Propose MulitSig, Proposer"
+        "notice": "Requires Propose MulitSig, Select a Proposer"
       },
       "info": {
         "UnstakedBalance": "Unstaked Balance",

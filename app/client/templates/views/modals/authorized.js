@@ -5,9 +5,16 @@ Template Controllers
 @module Templates
 */
 
+Template.authorized.onCreated(function() {
+  TemplateVar.set("title", this.data.title.string);
+});
+
 Template.authorized.helpers({
   title: function() {
-    return this.title;
+    return TemplateVar.get("title");
+  },
+  isMultiSig: function() {
+    return this.isMultiSig;
   }
 });
 
@@ -16,6 +23,21 @@ Template.authorized.onRendered(() => {
 });
 
 Template.authorized.events({
+  /**
+    @event change select[name="dapp-select-proposer"]
+    */
+  'change select[name="dapp-select-proposer"]': function(e) {
+    let name = e.currentTarget.value;
+    TemplateVar.set("selectedProposer", name);
+    TemplateVar.set(
+      "title",
+      new Spacebars.SafeString(
+        TAPi18n.__("wallet.send.tradeRam.authtitle", {
+          name: name
+        })
+      ).string
+    );
+  },
   /**
       Set the password
   
@@ -48,10 +70,11 @@ Template.authorized.events({
       let signProvider = keystore.SignProvider(this.account_name, password);
 
       if (this.callback)
-        this.callback(
+        this.callback({
           signProvider,
-          this.requirePrivateKey ? sensitive.privateKey : null
-        );
+          privateKey: this.requirePrivateKey ? sensitive.privateKey : null,
+          proposer: TemplateVar.get("selectedProposer")
+        });
     } catch (e) {
       Helpers.handleError(e);
     }

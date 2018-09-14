@@ -1,9 +1,19 @@
 <template name="authorized">
     <form class="auth-form" action="about:blank" target="dapp-form-helper-iframe" autocomplete="on">
+        {{#if isMultiSig}}
+            <div class="row clear">
+                <h3>{{i18n 'wallet.account.multiSig.notice'}}</h3>
+
+                {{> selectAccount name="dapp-select-proposer" accounts=(selectAccounts true) class="dapp-select-proposer" }}
+            
+            </div>
+            <hr>
+        {{/if}}
+
         <div class="row clear">
             <div class="col col-12 mobile-full">
                 {{#with title}}
-                    <h4>{{string}}</h4>
+                    <h4>{{this}}</h4>
                 {{else}}
                     <h3>{{i18n 'wallet.newWallet.password.input'}}</h3>
                 {{/with}}
@@ -11,9 +21,6 @@
             </div>
             <div class="dapp-clear-fix"></div>
         </div>
-
-
-        <!-- a button type="submit" will send the form -->
 
         <button type="submit" class="dapp-block-button">
             {{i18n 'buttons.ok'}}

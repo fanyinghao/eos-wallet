@@ -74,7 +74,7 @@
     },
     "account": {
       "multiSig": {
-        "notice": "此账号需提案多重签名，提案者"
+        "notice": "交易须提案多重签名，选择提案者"
       },
       "info": {
         "UnstakedBalance": "可用余额",

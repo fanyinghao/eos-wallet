@@ -2,15 +2,4 @@
 
     {{> selectAccount accounts=(selectAccounts) value="{{value}}" class="dapp-select-account" }}
 
-    <div class="indented-box">
-        <br> 
-        {{#if isMultiSig (TemplateVar.get "value") }} 
-            <span>{{i18n 'wallet.account.multiSig.notice'}} </span>
-            <br> 
-            {{> selectAccount name="dapp-select-proposer" accounts=(selectAccounts true) class="dapp-select-account" }}
-        {{else}} 
-            <span>&nbsp;</span> 
-        {{/if}}
-    </div>
-
 </template>
