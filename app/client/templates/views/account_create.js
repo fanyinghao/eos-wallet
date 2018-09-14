@@ -1,5 +1,5 @@
-const ecc = require('eosjs-ecc');
-const keystore = require('../../lib/eos/keystore');
+const ecc = require("eosjs-ecc");
+const keystore = require("../../lib/eos/keystore");
 /**
 Template Controllers
 
@@ -13,23 +13,23 @@ The account create template
 @constructor
 */
 
-Template['views_account_create'].onCreated(function() {
-  TemplateVar.set('selectedSection', 'simple');
+Template["views_account_create"].onCreated(function() {
+  TemplateVar.set("selectedSection", "simple");
 });
 
-Template['views_account_create'].onRendered(function() {
+Template["views_account_create"].onRendered(function() {
   // focus the input
   this.$('input[name="accountName"]').focus();
 });
 
-Template['views_account_create'].helpers({
+Template["views_account_create"].helpers({
   /**
     Return TRUE, if the current section is selected
 
     @method (showSection)
     */
   showSection: function(section) {
-    return TemplateVar.get('selectedSection') === section;
+    return TemplateVar.get("selectedSection") === section;
   },
   /**
     Translates to 'owner address'
@@ -37,7 +37,7 @@ Template['views_account_create'].helpers({
     @method (i18nOwnerAddress)
     */
   i18nOwnerAddress: function() {
-    return TAPi18n.__('wallet.newWallet.accountType.multisig.ownerAddress');
+    return TAPi18n.__("wallet.newWallet.accountType.multisig.ownerAddress");
   },
   /**
     Translates to 'private key'
@@ -45,7 +45,7 @@ Template['views_account_create'].helpers({
     @method (i18nPrivateKey)
     */
   i18nPrivateKey: function() {
-    return TAPi18n.__('wallet.newWallet.accountType.import.privateKey');
+    return TAPi18n.__("wallet.newWallet.accountType.import.privateKey");
   },
   /**
     Is simple checked
@@ -53,7 +53,7 @@ Template['views_account_create'].helpers({
     @method (simpleCheck)
     */
   simpleCheck: function() {
-    return TemplateVar.get('selectedSection') === 'simple' ? 'checked' : '';
+    return TemplateVar.get("selectedSection") === "simple" ? "checked" : "";
   },
   /**
     Is multisig checked
@@ -61,30 +61,30 @@ Template['views_account_create'].helpers({
     @method (multisigCheck)
     */
   multisigCheck: function() {
-    return TemplateVar.get('selectedSection') === 'multisig' ? 'checked' : '';
+    return TemplateVar.get("selectedSection") === "multisig" ? "checked" : "";
   }
 });
 
-Template['views_account_create'].events({
+Template["views_account_create"].events({
   /**
     Select the current section, based on the radio inputs value.
 
     @event change input[type="radio"]
     */
   'change input[type="radio"]': function(e) {
-    TemplateVar.set('selectedSection', e.currentTarget.value);
+    TemplateVar.set("selectedSection", e.currentTarget.value);
   },
   /**
     input password, based on the password inputs value.
 
     @event change input[type="password"]
     */
-  'change input[name=rePassword]': function(e, template) {
+  "change input[name=rePassword]": function(e, template) {
     let password = template.find('input[name="password"]').value;
     let rePassword = e.currentTarget.value;
     if (password !== rePassword)
       return GlobalNotification.warning({
-        content: 'i18n:wallet.accounts.matchPassword',
+        content: "i18n:wallet.accounts.matchPassword",
         duration: 2
       });
   },
@@ -94,49 +94,48 @@ Template['views_account_create'].events({
     @event submit
     */
   submit: function(e, template) {
-    var type = TemplateVar.get('selectedSection');
+    var type = TemplateVar.get("selectedSection");
 
     try {
-      if (!TemplateVar.get('sending')) {
-
+      if (!TemplateVar.get("sending")) {
         // SIMPLE
-        if (type === 'simple') {
+        if (type === "simple") {
           let accountName = template.find('input[name="accountName"]').value;
           let password = template.find('input[name="password"]').value;
           let rePassword = template.find('input[name="rePassword"]').value;
 
           if (password.length === 0 || password !== rePassword)
             return GlobalNotification.warning({
-              content: 'i18n:wallet.accounts.matchPassword',
+              content: "i18n:wallet.accounts.matchPassword",
               duration: 2
             });
 
           if (accountName.trim().length !== 12)
             return GlobalNotification.warning({
-              content: 'i18n:wallet.newWallet.accountName',
+              content: "i18n:wallet.newWallet.accountName",
               duration: 2
             });
 
           let exists = keystore.Get(accountName);
-          if (exists)
+          if (exists && exists.encryptedData)
             return GlobalNotification.warning({
-              content: 'i18n:wallet.newWallet.error.alreadyExists',
+              content: "i18n:wallet.newWallet.error.alreadyExists",
               duration: 2
             });
 
-          TemplateVar.set('sending', true);
+          TemplateVar.set("sending", true);
 
           eos.getAccount(accountName).then(
             account => {
-              TemplateVar.set(template, 'sending', false);
+              TemplateVar.set(template, "sending", false);
 
               return GlobalNotification.warning({
-                content: 'i18n:wallet.newWallet.error.alreadyExists',
+                content: "i18n:wallet.newWallet.error.alreadyExists",
                 duration: 2
               });
             },
             err => {
-              TemplateVar.set(template, 'sending', false);
+              TemplateVar.set(template, "sending", false);
 
               ecc.randomKey().then(privateKey => {
                 let publicKey = ecc.privateToPublic(privateKey);
@@ -145,7 +144,7 @@ Template['views_account_create'].events({
 
                 EthElements.Modal.show(
                   {
-                    template: 'generateKey',
+                    template: "generateKey",
                     data: {
                       accountName: accountName,
                       keys: {
@@ -155,7 +154,7 @@ Template['views_account_create'].events({
                     }
                   },
                   {
-                    class: 'modal-small'
+                    class: "modal-small"
                   }
                 );
               });
@@ -164,7 +163,7 @@ Template['views_account_create'].events({
         }
 
         // IMPORT
-        if (type === 'import') {
+        if (type === "import") {
           let password = template.find('input[name="password"]').value;
           let rePassword = template.find('input[name="rePassword"]').value;
           let privateKey = template.find('input[name="privateKey"]').value;
@@ -172,54 +171,62 @@ Template['views_account_create'].events({
 
           if (password.length === 0 || password !== rePassword)
             return GlobalNotification.warning({
-              content: 'i18n:wallet.accounts.matchPassword',
+              content: "i18n:wallet.accounts.matchPassword",
               duration: 2
             });
 
-          
-          TemplateVar.set('sending', true);
-          
-          eos.getKeyAccounts(publicKey).then(accounts => {
-            TemplateVar.set(template, 'sending', false);
+          TemplateVar.set("sending", true);
 
-            if (accounts.account_names.length === 0) {
-              return GlobalNotification.error({
-                content: 'wrong key',
-                duration: 20
-              });
-            }
+          eos.getKeyAccounts(publicKey).then(
+            accounts => {
+              TemplateVar.set(template, "sending", false);
 
-            accounts.account_names.forEach(name => {
-              // storage private key
-              keystore.SetKey(name, password, privateKey, publicKey);
-            });
-
-            EthElements.Modal.show({
-              template: 'importKey',
-              data: {
-                accounts: accounts
+              if (accounts.account_names.length === 0) {
+                return GlobalNotification.error({
+                  content: "wrong key",
+                  duration: 20
+                });
               }
-            });
-          }, err=>{
-            TemplateVar.set(template, 'sending', false);
 
-            if (err.message) {
-              GlobalNotification.error({
-                content: err.message,
-                duration: 20
+              accounts.account_names.forEach(name => {
+                // storage private key
+                keystore.SetKey(name, password, privateKey, publicKey);
+
+                eos.getControlledAccounts(name).then(_accounts => {
+                  _accounts.controlled_accounts.forEach(_name => {
+                    if (!keystore.Get(_name)) keystore.SetAccount(_name);
+                  });
+                });
               });
-            } else {
-              let error = JSON.parse(err);
-              GlobalNotification.error({
-                content: Helpers.translateExternalErrorMessage(error.error),
-                duration: 20
+
+              EthElements.Modal.show({
+                template: "importKey",
+                data: {
+                  accounts: accounts
+                }
               });
+            },
+            err => {
+              TemplateVar.set(template, "sending", false);
+
+              if (err.message) {
+                GlobalNotification.error({
+                  content: err.message,
+                  duration: 20
+                });
+              } else {
+                let error = JSON.parse(err);
+                GlobalNotification.error({
+                  content: Helpers.translateExternalErrorMessage(error.error),
+                  duration: 20
+                });
+              }
             }
-          });
+          );
         }
       }
     } catch (err) {
-      TemplateVar.set(template, 'sending', false);
+      TemplateVar.set(template, "sending", false);
 
       if (err.message) {
         GlobalNotification.error({

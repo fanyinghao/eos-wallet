@@ -48,7 +48,7 @@ Template["views_account"].helpers({
     return TemplateVar.get("account");
   },
   isOwner: function() {
-    return keystore.Get(this.account_name);
+    return keystore.Get(this.account_name).encryptedData;
   },
   /**
     Get the tokens balance
