@@ -187,7 +187,7 @@ Template["views_account_authorize"].events({
                 duration: 2
               });
 
-              FlowRouter.go("/dashboard/");
+              FlowRouter.go("account", { name: self.account.account_name });
             },
             err => {
               TemplateVar.set(template, "sending", false);
