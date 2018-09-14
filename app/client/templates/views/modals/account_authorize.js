@@ -16,7 +16,6 @@ The account authorize template
 Template["views_account_authorize"].onCreated(function() {
   // number of owners of the account
   var maxOwners = this.data.owners.length;
-  if (maxOwners) maxOwners++;
   TemplateVar.set("multisigSignees", maxOwners || 3);
 
   // number of required signatures
@@ -51,7 +50,7 @@ Template["views_account_authorize"].helpers({
     let insert = TemplateVar.get("multisigSignees") - owners.length;
     if (insert < 0) {
       insert = TemplateVar.get("multisigSignees");
-      owners = new Array(insert).fill("");
+      owners = owners.slice(0, insert);
     } else {
       owners = owners.concat(new Array(insert).fill(""));
     }
