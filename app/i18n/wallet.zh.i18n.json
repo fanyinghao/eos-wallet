@@ -247,7 +247,7 @@
     },
     "newWallet": {
       "title": "<strong>新增账户</strong>",
-      "accountName": "账户名称（必须12位，数字或者字母）",
+      "accountName": "账户名称（必须12位，数字或者字母）或者公钥",
       "password": {
         "title": "请记住你的密码",
         "newPassword": "输入密码",

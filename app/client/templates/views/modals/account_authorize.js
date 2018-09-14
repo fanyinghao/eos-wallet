@@ -1,5 +1,5 @@
-const keystore = require('../../../lib/eos/keystore');
-const ecc = require('eosjs-ecc');
+const keystore = require("../../../lib/eos/keystore");
+const ecc = require("eosjs-ecc");
 /**
 Template Controllers
 
@@ -13,25 +13,25 @@ The account authorize template
 @constructor
 */
 
-Template['views_account_authorize'].onCreated(function() {
+Template["views_account_authorize"].onCreated(function() {
   // number of owners of the account
   var maxOwners = this.data.owners.length;
   if (maxOwners) maxOwners++;
-  TemplateVar.set('multisigSignees', maxOwners || 3);
+  TemplateVar.set("multisigSignees", maxOwners || 3);
 
   // number of required signatures
   TemplateVar.set(
-    'multisigSignatures',
-    Number(FlowRouter.getQueryParam('requiredSignatures')) || 2
+    "multisigSignatures",
+    Number(FlowRouter.getQueryParam("requiredSignatures")) || 2
   );
 });
 
-Template['views_account_authorize'].onRendered(function() {
+Template["views_account_authorize"].onRendered(function() {
   // focus the input`
   this.$('input[name="accountName"]').focus();
 });
 
-Template['views_account_authorize'].helpers({
+Template["views_account_authorize"].helpers({
   /**
     Return the selectedAccount
 
@@ -48,18 +48,18 @@ Template['views_account_authorize'].helpers({
     */
   signees: function() {
     let owners = this.owners;
-    let insert = TemplateVar.get('multisigSignees') - owners.length;
+    let insert = TemplateVar.get("multisigSignees") - owners.length;
     if (insert < 0) {
-      insert = TemplateVar.get('multisigSignees');
-      owners = new Array(insert).fill('');
+      insert = TemplateVar.get("multisigSignees");
+      owners = new Array(insert).fill("");
     } else {
-      owners = owners.concat(new Array(insert).fill(''));
+      owners = owners.concat(new Array(insert).fill(""));
     }
 
     if (
-      TemplateVar.get('multisigSignatures') > TemplateVar.get('multisigSignees')
+      TemplateVar.get("multisigSignatures") > TemplateVar.get("multisigSignees")
     ) {
-      TemplateVar.set('multisigSignatures', TemplateVar.get('multisigSignees'));
+      TemplateVar.set("multisigSignatures", TemplateVar.get("multisigSignees"));
     }
 
     return owners;
@@ -70,7 +70,7 @@ Template['views_account_authorize'].helpers({
     @method (importValidClass)
     */
   importValidClass: function() {
-    return TemplateVar.get('importWalletOwners') ? 'valid' : 'invalid';
+    return TemplateVar.get("importWalletOwners") ? "valid" : "invalid";
   },
   /**
     Get the number of required multisignees (account owners)
@@ -94,7 +94,7 @@ Template['views_account_authorize'].helpers({
     @method (multisigSignatures)
     */
   multisigSignatures: function() {
-    var signees = TemplateVar.get('multisigSignees');
+    var signees = TemplateVar.get("multisigSignees");
     var returnArray = [];
 
     for (i = 1; i <= signees; i++) {
@@ -105,14 +105,14 @@ Template['views_account_authorize'].helpers({
   }
 });
 
-Template['views_account_authorize'].events({
+Template["views_account_authorize"].events({
   /**
     Change the number of signatures
 
     @event click span[name="multisigSignatures"] .simple-modal button
     */
   'click span[name="multisigSignatures"] .simple-modal button': function(e) {
-    TemplateVar.set('multisigSignatures', $(e.currentTarget).data('value'));
+    TemplateVar.set("multisigSignatures", $(e.currentTarget).data("value"));
   },
   /**
     Change the number of signees
@@ -120,7 +120,7 @@ Template['views_account_authorize'].events({
     @event click span[name="multisigSignees"] .simple-modal button
     */
   'click span[name="multisigSignees"] .simple-modal button': function(e) {
-    TemplateVar.set('multisigSignees', $(e.currentTarget).data('value'));
+    TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
   },
   /**
     Create the account
@@ -128,13 +128,13 @@ Template['views_account_authorize'].events({
     @event submit
     */
   submit: function(e, template) {
-    let formValues = InlineForm('.inline-form');
-    let threshold = TemplateVar.get('multisigSignatures');
+    let formValues = InlineForm(".inline-form");
+    let threshold = TemplateVar.get("multisigSignatures");
     let self = this;
 
     function updateauth(privateKey) {
       try {
-        TemplateVar.set(template, 'sending', true);
+        TemplateVar.set(template, "sending", true);
 
         const _eos = Eos({
           httpEndpoint: httpEndpoint,
@@ -144,22 +144,33 @@ Template['views_account_authorize'].events({
         });
 
         let required_auth = {
-          accounts: Array.prototype.map.call(owners, function(obj) {
-            return {
-              permission: { actor: obj, permission: 'active' },
-              weight: 1
-            };
-          }),
+          accounts: [],
+          keys: [],
           threshold: threshold
         };
+
+        owners.forEach(val => {
+          val = val.trim();
+          if (val.length === 12) {
+            required_auth.accounts.push({
+              permission: { actor: val, permission: "active" },
+              weight: 1
+            });
+          } else {
+            required_auth.keys.push({
+              key: val,
+              weight: 1
+            });
+          }
+        });
 
         _eos
           .transaction(tr => {
             tr.updateauth(
               {
                 account: self.account.account_name,
-                permission: 'active',
-                parent: 'owner',
+                permission: "active",
+                parent: "owner",
                 auth: required_auth
               },
               { authorization: `${self.account.account_name}@owner` }
@@ -168,18 +179,18 @@ Template['views_account_authorize'].events({
           .then(
             tr => {
               console.log(tr);
-              TemplateVar.set(template, 'sending', false);
+              TemplateVar.set(template, "sending", false);
               EthElements.Modal.hide();
 
               GlobalNotification.success({
-                content: 'i18n:wallet.authMultiSig.success',
+                content: "i18n:wallet.authMultiSig.success",
                 duration: 2
               });
 
-              FlowRouter.go('/dashboard/');
+              FlowRouter.go("/dashboard/");
             },
             err => {
-              TemplateVar.set(template, 'sending', false);
+              TemplateVar.set(template, "sending", false);
 
               if (err.message) {
                 GlobalNotification.error({
@@ -197,7 +208,7 @@ Template['views_account_authorize'].events({
           );
       } catch (e) {
         console.log(e);
-        TemplateVar.set(template, 'sending', false);
+        TemplateVar.set(template, "sending", false);
         if (err.message) {
           GlobalNotification.error({
             content: err.message,
@@ -213,10 +224,10 @@ Template['views_account_authorize'].events({
       }
     }
 
-    if (this.account && !TemplateVar.get('sending')) {
+    if (this.account && !TemplateVar.get("sending")) {
       var owners = _.uniq(
         _.compact(
-          _.map(template.findAll('input.owners'), function(item) {
+          _.map(template.findAll("input.owners"), function(item) {
             return item.value;
           })
         )
@@ -224,17 +235,16 @@ Template['views_account_authorize'].events({
 
       if (owners.length != formValues.multisigSignees)
         return GlobalNotification.warning({
-          content: 'i18n:wallet.newWallet.error.emptySignees',
+          content: "i18n:wallet.newWallet.error.emptySignees",
           duration: 2
         });
 
       EthElements.Modal.show({
-        template: 'authorized',
+        template: "authorized",
         data: {
           account_name: self.account.account_name,
-          callback: (privateKey) => {
-
-            updateauth(privateKey)
+          callback: privateKey => {
+            updateauth(privateKey);
             //refresh account
 
             return true;

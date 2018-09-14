@@ -261,7 +261,7 @@
         "rePassword": "enter again",
         "input": "enter password"
       },
-      "accountName": "Account name(requires 12 charactors)",
+      "accountName": "Account name(requires 12 charactors) or Public KEY",
       "accountType": {
         "title": "Import type",
         "simple": {

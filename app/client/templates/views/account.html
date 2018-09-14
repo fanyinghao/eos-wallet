@@ -17,14 +17,13 @@
                     <h1></h1>
                     <h2 class="account-permissions">{{walletIcon}}
                         <b>{{perm_name}}</b><span>({{i18n "wallet.account.info.threshold"}} {{required_auth.threshold}})</span>
-                        <br /> {{#each required_auth.keys}}
-                        <span>{{key}}</span>
-                        {{/each}}
+                        <br /> 
                         <ul>
+                            {{#each required_auth.keys}}
+                            <li>{{key}}</li>({{i18n "wallet.account.info.weight"}} {{weight}})
+                            {{/each}}
                             {{#each required_auth.accounts}}
-                            <li><a href="{{pathFor route='account' name=(permission.actor)}}">{{permission.actor}}</a> ({{i18n "wallet.account.info.weight"}}
-                                {{weight}})
-                            </li>
+                            <li><a href="{{pathFor route='account' name=(permission.actor)}}">{{permission.actor}}</a>:{{permission.permission}} ({{i18n "wallet.account.info.weight"}} {{weight}})</li>
                             {{/each}}
                         </ul>
                     </h2>
