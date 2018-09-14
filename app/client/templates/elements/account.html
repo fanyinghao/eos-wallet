@@ -21,7 +21,11 @@
 
             <h3 class="not-ens-name">
                 <span class="red">
-                    <i class="icon-user"></i>
+                    {{#if isMultiSig this }}
+                        <i class="icon-key"></i>
+                    {{else}}
+                        <i class="icon-user"></i>
+                    {{/if}}
                     {{account_name}}
                 </span>
             </h3>
