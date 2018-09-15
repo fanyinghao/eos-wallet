@@ -1,5 +1,3 @@
-const keystore = require("../../../lib/eos/keystore");
-const ecc = require("eosjs-ecc");
 /**
 Template Controllers
 
@@ -26,11 +24,14 @@ Template["views_account_authorize"].onCreated(function() {
 });
 
 Template["views_account_authorize"].onRendered(function() {
-  // focus the input`
-  this.$('input[name="accountName"]').focus();
+  this.$("input.owners").focus();
+  TemplateVar.set("type", "active");
 });
 
 Template["views_account_authorize"].helpers({
+  checked: function(type) {
+    return TemplateVar.get("type") === type;
+  },
   /**
     Return the selectedAccount
 
@@ -46,7 +47,19 @@ Template["views_account_authorize"].helpers({
     @return {Array} e.g. [1,2,3,4]
     */
   signees: function() {
-    let owners = this.owners;
+    let type = TemplateVar.get("type");
+    let permission = this.account.permissions.filter(item => {
+      return item.perm_name === type;
+    })[0];
+
+    let owners = Array.prototype.concat(
+      permission.required_auth.keys.map(val => {
+        return val.key;
+      }),
+      permission.required_auth.accounts.map(val => {
+        return val.permission.actor;
+      })
+    );
     let insert = TemplateVar.get("multisigSignees") - owners.length;
     if (insert < 0) {
       insert = TemplateVar.get("multisigSignees");
@@ -64,20 +77,18 @@ Template["views_account_authorize"].helpers({
     return owners;
   },
   /**
-    Returns the class valid for valid addresses and invalid for non wallet addresses.
-
-    @method (importValidClass)
-    */
-  importValidClass: function() {
-    return TemplateVar.get("importWalletOwners") ? "valid" : "invalid";
-  },
-  /**
     Get the number of required multisignees (account owners)
 
     @method (multisigSignees)
     */
   multisigSignees: function() {
-    var maxOwners = this.owners.length;
+    let type = TemplateVar.get("type");
+    let permission = this.account.permissions.filter(item => {
+      return item.perm_name === type;
+    })[0];
+    var maxOwners =
+      permission.required_auth.keys.length +
+      permission.required_auth.accounts.length;
     if (maxOwners) maxOwners++;
     maxOwners = Math.max(maxOwners || 10, 10);
 
@@ -122,6 +133,14 @@ Template["views_account_authorize"].events({
     TemplateVar.set("multisigSignees", $(e.currentTarget).data("value"));
   },
   /**
+  Select the current section, based on the radio inputs value.
+
+  @event change input[name="choose-type"]
+  */
+  'change input[name="choose-type"]': function(e, template) {
+    TemplateVar.set("type", e.currentTarget.value);
+  },
+  /**
     Create the account
 
     @event submit
@@ -129,6 +148,7 @@ Template["views_account_authorize"].events({
   submit: function(e, template) {
     let formValues = InlineForm(".inline-form");
     let threshold = TemplateVar.get("multisigSignatures");
+    let type = TemplateVar.get("type");
     let self = this;
 
     function updateauth(signProvider) {
@@ -168,8 +188,8 @@ Template["views_account_authorize"].events({
             tr.updateauth(
               {
                 account: self.account.account_name,
-                permission: "active",
-                parent: "owner",
+                permission: type,
+                parent: type === "owner" ? "" : "owner",
                 auth: required_auth
               },
               { authorization: `${self.account.account_name}@owner` }

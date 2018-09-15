@@ -6,7 +6,7 @@ Template Controllers
 */
 
 Template.authorized.onCreated(function() {
-  TemplateVar.set("title", this.data.title.string);
+  if (this.data.title) TemplateVar.set("title", this.data.title.string);
 });
 
 Template.authorized.helpers({

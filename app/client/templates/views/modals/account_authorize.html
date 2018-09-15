@@ -15,7 +15,18 @@
         </div>
 
         <h2>{{i18n 'wallet.authMultiSig.multisigSigneesTitle'}}</h2>
-
+        <div class="row clear">
+            <div class="indented-box">
+                {{#each selectedAccount.permissions}} 
+                <div class="col col-3 mobile-full">
+                    <label>
+                        <input type="radio" value="{{perm_name}}" name="choose-type" checked="{{checked perm_name }}" />
+                        <h3>{{perm_name}}</h3>
+                    </label>
+                </div>
+                {{/each}}
+            </div>
+        </div>
         <div class="row clear">
             <div class="indented-box">
                 <p>{{i18n 'wallet.newWallet.accountType.multisig.text1'}} {{> InlineForm name="multisigSignees" items=multisigSignees
