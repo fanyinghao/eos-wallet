@@ -222,17 +222,6 @@ Template["views_send"].events({
     TemplateVar.set("proposer", e.currentTarget.value);
   },
   /**
-    Set the password
-
-    @event keyup keyup input[name="password"], change input[name="password"], input input[name="password"]
-    */
-  'keyup input[name="password"], change input[name="password"], input input[name="password"]': function(
-    e,
-    template
-  ) {
-    TemplateVar.set("password", e.currentTarget.value);
-  },
-  /**
     Select the current section, based on the radio inputs value.
 
     @event change input[name="choose-type"]
@@ -294,19 +283,12 @@ Template["views_send"].events({
       ObservableAccounts.accounts[
         TemplateVar.getFrom(".dapp-select-account", "value")
       ];
-    let password = TemplateVar.get("password");
     let isMultiSig = Helpers.isMultiSig(selectedAccount);
 
     if (selectedAccount && !TemplateVar.get("sending")) {
       if (selectedAccount.eosBalance == 0)
         return GlobalNotification.warning({
           content: "i18n:wallet.send.error.emptyWallet",
-          duration: 2
-        });
-
-      if (!password || password.length === 0)
-        return GlobalNotification.warning({
-          content: "i18n:wallet.accounts.wrongPassword",
           duration: 2
         });
 
@@ -411,20 +393,16 @@ Template["views_send"].events({
       };
 
       // The function to send the transaction
-      var sendFunds = function(_to, _amount, _memo, _proposer) {
+      var sendFunds = function(_to, _amount, _memo, signProvider, _proposer) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
         try {
           if (!isMultiSig) {
-            let provider = keystore.SignProvider(
-              selectedAccount.account_name,
-              password
-            );
             const _eos = Eos({
               httpEndpoint: httpEndpoint,
               chainId: chainId,
-              signProvider: provider,
+              signProvider: signProvider,
               verbose: false
             });
             _eos
@@ -441,25 +419,16 @@ Template["views_send"].events({
               )
               .then(onSuccess, onError);
           } else {
-            let selectedProposer = TemplateVar.getFrom(
-              "[name=dapp-select-proposer]",
-              "value"
-            );
-            let propose_provider = keystore.SignProvider(
-              selectedProposer,
-              password
-            );
             const propose_eos = Eos({
               httpEndpoint: httpEndpoint,
               chainId: chainId,
-              signProvider: propose_provider,
+              signProvider: signProvider,
               verbose: false
             });
 
             let permissions = selectedAccount.multiSig_perm;
 
-            if (!selectedProposer)
-              throw new Error("i18n:wallet.accounts.noProposer");
+            if (!_proposer) throw new Error("i18n:wallet.accounts.noProposer");
 
             if (!permissions || permissions.length === 0)
               throw new Error("not ready");
@@ -482,11 +451,11 @@ Template["views_send"].events({
                   const proposal_name = `tr${randomWord(false, 10)}`;
                   msig
                     .propose(
-                      selectedProposer,
+                      _proposer,
                       proposal_name,
                       permissions,
                       transfer.transaction.transaction,
-                      { authorization: `${selectedProposer}@active` }
+                      { authorization: `${_proposer}@active` }
                     )
                     .then(tx => {
                       EthElements.Modal.question(
@@ -495,7 +464,7 @@ Template["views_send"].events({
                             proposeName: proposal_name
                           }),
                           ok: function() {
-                            onSuccess(tx, selectedProposer);
+                            onSuccess(tx, _proposer);
                           }
                         },
                         {
@@ -511,19 +480,15 @@ Template["views_send"].events({
         }
       };
 
-      var createAccount = function(_name, _owner, _active) {
+      var createAccount = function(_name, _owner, _active, signProvider) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
         try {
-          let provider = keystore.SignProvider(
-            selectedAccount.account_name,
-            password
-          );
           const _eos = Eos({
             httpEndpoint: httpEndpoint,
             chainId: chainId,
-            signProvider: provider,
+            signProvider: signProvider,
             verbose: false
           });
 
@@ -571,15 +536,11 @@ Template["views_send"].events({
         }
       };
 
-      var approveProposal = function(_proposer, _name) {
+      var approveProposal = function(_proposer, _name, signProvider) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
         try {
-          let signProvider = keystore.SignProvider(
-            selectedAccount.account_name,
-            password
-          );
           const _eos_app = Eos({
             httpEndpoint: httpEndpoint,
             chainId: chainId,
@@ -705,7 +666,21 @@ Template["views_send"].events({
             duration: 2
           });
 
-        createAccount(accountName, publicKey, publicKey);
+        EthElements.Modal.question({
+          template: "authorized",
+          data: {
+            title: new Spacebars.SafeString(
+              TAPi18n.__("wallet.send.tradeRam.authtitle", {
+                name: selectedAccount.account_name
+              })
+            ),
+            account_name: selectedAccount.account_name,
+            isMultiSig: isMultiSig,
+            callback: ({ signProvider, proposer }) => {
+              createAccount(accountName, publicKey, publicKey, signProvider);
+            }
+          }
+        });
       } else if (send_type === "propose") {
         let proposer = TemplateVar.get("proposer");
         let proposeName = TemplateVar.get("proposeName");
@@ -720,7 +695,22 @@ Template["views_send"].events({
             content: "i18n:wallet.send.error.noProposeName",
             duration: 2
           });
-        approveProposal(proposer, proposeName);
+
+        EthElements.Modal.question({
+          template: "authorized",
+          data: {
+            title: new Spacebars.SafeString(
+              TAPi18n.__("wallet.send.tradeRam.authtitle", {
+                name: selectedAccount.account_name
+              })
+            ),
+            account_name: selectedAccount.account_name,
+            isMultiSig: isMultiSig,
+            callback: ({ signProvider }) => {
+              approveProposal(proposer, proposeName, signProvider);
+            }
+          }
+        });
       }
     }
   }

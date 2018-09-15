@@ -18,8 +18,25 @@ Template.authorized.helpers({
   }
 });
 
-Template.authorized.onRendered(() => {
+Template.authorized.onRendered(function() {
   this.$('input[name="password"]').focus();
+
+  if (this.data.isMultiSig) {
+    let selectedProposer = TemplateVar.getFrom(
+      "[name=dapp-select-proposer]",
+      "value"
+    );
+
+    TemplateVar.set("selectedProposer", selectedProposer);
+    TemplateVar.set(
+      "title",
+      new Spacebars.SafeString(
+        TAPi18n.__("wallet.send.tradeRam.authtitle", {
+          name: selectedProposer
+        })
+      ).string
+    );
+  }
 });
 
 Template.authorized.events({
@@ -56,6 +73,9 @@ Template.authorized.events({
     */
   "submit form": function(e, template) {
     let password = TemplateVar.get("password");
+    let account_name = this.isMultiSig
+      ? TemplateVar.get("selectedProposer")
+      : this.account_name;
 
     if (!password || password.length === 0)
       return GlobalNotification.warning({
@@ -64,10 +84,10 @@ Template.authorized.events({
       });
 
     try {
-      let sensitive = keystore.Get(this.account_name, password).sensitive;
+      let sensitive = keystore.Get(account_name, password).sensitive;
       if (!sensitive) throw new Error("wrong password");
 
-      let signProvider = keystore.SignProvider(this.account_name, password);
+      let signProvider = keystore.SignProvider(account_name, password);
 
       if (this.callback)
         this.callback({
