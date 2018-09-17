@@ -19,6 +19,6 @@ Template["generateKey"].events({
       back to dashboard
     */
   'click a[name="go-send"]': function(e) {
-    FlowRouter.go("send", { new: this });
+    FlowRouter.go("newaccount", { new: this });
   }
 });

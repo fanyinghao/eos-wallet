@@ -150,8 +150,10 @@
                 <h2>{{{i18n 'wallet.newAccount.create'}}}</h2>
                 <h3>{{{i18n 'wallet.newAccount.accountName'}}}</h3>
                 <input type="text" name="accountName" value="{{accountName}}" autocomplete="accountName" />
-                <h3>{{{i18n 'wallet.newAccount.publicKey'}}}</h3>
-                <input type="text" name="publicKey" value="{{publicKey}}" />
+                <h3>Active{{{i18n 'wallet.newAccount.publicKey'}}}</h3>
+                <input type="text" name="active_publicKey" />
+                <h3>Owner{{{i18n 'wallet.newAccount.publicKey'}}}</h3>
+                <input type="text" name="owner_publicKey" />
             </div>
             <div class="dapp-clear-fix"></div>
         </div>

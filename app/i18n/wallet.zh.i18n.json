@@ -426,7 +426,7 @@
     "newAccount": {
       "create": "创建",
       "accountName": "账户名称",
-      "publicKey": "公钥密码",
+      "publicKey": "公钥地址",
       "privateKey": "私钥密码",
       "writedown": "第一步：请牢记以下信息",
       "transferTitle": "第二步：请邀请协助或者点击以下链接完成创建",
