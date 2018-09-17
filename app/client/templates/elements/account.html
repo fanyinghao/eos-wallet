@@ -30,7 +30,17 @@
                 </span>
             </h3>
             
-            <span class="account-id">{{publicKey}}</span>                
+            <span class="account-id">
+                {{#with publicKey.owner}}
+                    <label>owner</label><span class="hide" style="display: none;">{{this}}</span>
+                {{/with}}
+                {{#with publicKey.active}}
+                    <label>active</label><span class="hide" style="display: none;">{{this}}</span>
+                {{/with}}
+                {{#if isMultiSig this }}
+                    <label>MultiSig</label>
+                {{/if}}
+            </span>
 
             {{#unless creating}}
                 {{> elements_balance balance=formattedTokenBalance}}

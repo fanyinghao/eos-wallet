@@ -1,5 +1,5 @@
-const keystore = require('../../lib/eos/keystore');
-import { extend } from '../../lib/utils';
+const keystore = require("../../lib/eos/keystore");
+import { extend } from "../../lib/utils";
 
 /**
 Template Controllers
@@ -27,12 +27,25 @@ Template.elements_account.onRendered(function() {
     };
     if (item) {
       account.publicKey = item.publicKey;
-      TemplateVar.set(self, 'account', account);
+      TemplateVar.set(self, "account", account);
     }
     ObservableAccounts.refresh(account).then(
       _account => {
+        if (typeof account.publicKey === "string" && _account.permissions) {
+          _account.permissions.forEach(item => {
+            if (
+              item.required_auth.keys.some(k => {
+                return k.key === account.publicKey;
+              })
+            ) {
+              if (!_account.publicKey) _account.publicKey = {};
+              _account.publicKey[item.perm_name] = account.publicKey;
+            }
+          });
+        }
+
         account = extend({}, account, _account);
-        TemplateVar.set(self, 'account', account);
+        TemplateVar.set(self, "account", account);
       },
       err => {
         console.error(err);
@@ -44,7 +57,7 @@ Template.elements_account.onRendered(function() {
 Template.elements_account.rendered = function() {
   // initiate the geo pattern
   var pattern = GeoPattern.generate(this.data.name);
-  this.$('.account-pattern').css('background-image', pattern.toDataUrl());
+  this.$(".account-pattern").css("background-image", pattern.toDataUrl());
 };
 
 Template.elements_account.helpers({
@@ -55,7 +68,7 @@ Template.elements_account.helpers({
     */
   account: function() {
     const tpl = Template.instance();
-    let account = TemplateVar.get('account');
+    let account = TemplateVar.get("account");
     if (
       tpl.reactiveAccountName &&
       tpl.data.name !== tpl.reactiveAccountName.get()
@@ -72,7 +85,7 @@ Template.elements_account.helpers({
     */
   formattedTokenBalance: function(e) {
     const tpl = Template.instance();
-    let account = TemplateVar.get('account');
+    let account = TemplateVar.get("account");
     if (
       tpl.reactiveAccountName &&
       tpl.data.name !== tpl.reactiveAccountName.get()
@@ -80,7 +93,7 @@ Template.elements_account.helpers({
       tpl.reactiveAccountName.set(tpl.data.name);
       return;
     }
-    if (!account || !account.eosBalance) return ['0.0000 EOS'];
+    if (!account || !account.eosBalance) return ["0.0000 EOS"];
     return `${account.eosBalance.value} ${account.eosBalance.symbol}`;
   },
   /**
@@ -93,10 +106,19 @@ Template.elements_account.helpers({
   }
 });
 
-Template['elements_account'].events({
-  'click .creating': function(e) {
-    console.log('click');
+Template["elements_account"].events({
+  "click .creating": function(e) {
+    console.log("click");
     e.preventDefault();
-    Helpers.copyAddress(e.currentTarget.querySelector('.account-id'));
+    let nodes = e.currentTarget
+      .querySelector(".account-id")
+      .querySelectorAll(".hide");
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].style.display = "block";
+    }
+    Helpers.copyAddress(e.currentTarget.querySelector(".account-id"));
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].style.display = "none";
+    }
   }
 });
