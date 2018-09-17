@@ -1,22 +1,22 @@
 // configure
-BlazeLayout.setRoot('body');
+BlazeLayout.setRoot("body");
 
 FlowRouter.notFound = {
   action: function() {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'layout_notFound'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "layout_notFound"
     });
   }
 };
 
 // redirect on start to dahsboard on file protocol
-if (location.origin === 'file://') {
+if (location.origin === "file://") {
   FlowRouter.wait();
   FlowRouter.initialize({ hashbang: true });
 
   Meteor.startup(function() {
-    FlowRouter.go('dashboard');
+    FlowRouter.go("dashboard");
   });
 }
 
@@ -24,7 +24,7 @@ FlowRouter.triggers.enter([
   function() {
     EthElements.Modal.hide();
     $(window).scrollTop(0);
-  },
+  }
 ]);
 
 // ROUTES
@@ -34,12 +34,12 @@ The receive route, showing the wallet overview
 
 @method dashboard
 */
-FlowRouter.route('/', {
-  name: 'dashboard',
+FlowRouter.route("/", {
+  name: "dashboard",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_dashboard'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_dashboard"
     });
   }
 });
@@ -49,12 +49,12 @@ The send route.
 
 @method send
 */
-FlowRouter.route('/send', {
-  name: 'send',
+FlowRouter.route("/send", {
+  name: "send",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_send"
     });
   }
 });
@@ -64,12 +64,12 @@ The send newaccount.
 
 @method tokens
 */
-FlowRouter.route('/send/:newaccount/:publickey', {
-  name: 'newaccount',
+FlowRouter.route("/send/:newaccount", {
+  name: "newaccount",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_send"
     });
   }
 });
@@ -79,12 +79,12 @@ The send route.
 
 @method send
 */
-FlowRouter.route('/send/:address', {
-  name: 'sendTo',
+FlowRouter.route("/send/:address", {
+  name: "sendTo",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_send"
     });
   }
 });
@@ -94,12 +94,12 @@ The send route.
 
 @method send
 */
-FlowRouter.route('/send-from/', {
-  name: 'sendFrom',
+FlowRouter.route("/send-from/", {
+  name: "sendFrom",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_send"
     });
   }
 });
@@ -109,12 +109,12 @@ The send route.
 
 @method send
 */
-FlowRouter.route('/send-from/:from', {
-  name: 'sendFrom',
+FlowRouter.route("/send-from/:from", {
+  name: "sendFrom",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_send'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_send"
     });
   }
 });
@@ -124,12 +124,12 @@ The create account route.
 
 @method send
 */
-FlowRouter.route('/account/new', {
-  name: 'createAccount',
+FlowRouter.route("/account/new", {
+  name: "createAccount",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_account_create'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_account_create"
     });
   }
 });
@@ -139,12 +139,12 @@ The account route.
 
 @method send
 */
-FlowRouter.route('/account/:name', {
-  name: 'account',
+FlowRouter.route("/account/:name", {
+  name: "account",
   action: function(params, queryParams) {
-    BlazeLayout.render('layout_main', {
-      header: 'layout_header',
-      main: 'views_account'
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_account"
     });
   }
 });

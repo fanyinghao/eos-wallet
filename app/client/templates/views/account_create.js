@@ -137,26 +137,50 @@ Template["views_account_create"].events({
             err => {
               TemplateVar.set(template, "sending", false);
 
-              ecc.randomKey().then(privateKey => {
-                let publicKey = ecc.privateToPublic(privateKey);
-                // storage private key
-                keystore.SetKey(accountName, password, privateKey, publicKey);
+              ecc.randomKey().then(active_privateKey => {
+                let active_publicKey = ecc.privateToPublic(active_privateKey);
 
-                EthElements.Modal.show(
-                  {
-                    template: "generateKey",
-                    data: {
-                      accountName: accountName,
-                      keys: {
-                        publicKey: publicKey,
-                        privateKey
-                      }
+                ecc.randomKey().then(owner_privateKey => {
+                  let owner_publicKey = ecc.privateToPublic(owner_privateKey);
+                  let active = {
+                    privateKey: active_privateKey,
+                    publicKey: active_publicKey
+                  };
+                  let owner = {
+                    privateKey: owner_privateKey,
+                    publicKey: owner_publicKey
+                  };
+
+                  keystore.SetKey(
+                    accountName,
+                    password,
+                    {
+                      active: active_privateKey,
+                      owner: owner_privateKey
+                    },
+                    {
+                      active: active_publicKey,
+                      owner: owner_publicKey
                     }
-                  },
-                  {
-                    class: "modal-small"
-                  }
-                );
+                  );
+
+                  EthElements.Modal.show(
+                    {
+                      template: "generateKey",
+                      data: {
+                        accountName: accountName,
+                        keys: {
+                          owner,
+                          active
+                        }
+                      }
+                    },
+                    {
+                      closeable: false,
+                      class: "modal-small"
+                    }
+                  );
+                });
               });
             }
           );
@@ -199,12 +223,17 @@ Template["views_account_create"].events({
                 });
               });
 
-              EthElements.Modal.show({
-                template: "importKey",
-                data: {
-                  accounts: accounts
+              EthElements.Modal.show(
+                {
+                  template: "importKey",
+                  data: {
+                    accounts: accounts
+                  }
+                },
+                {
+                  closeable: false
                 }
-              });
+              );
             },
             err => {
               TemplateVar.set(template, "sending", false);

@@ -105,7 +105,7 @@
       "accountNote": "Accounts can't display incoming transactions, but can receive, hold and send Ether. To see incoming transactions <a href=\"/account/new\">create a wallet contract</a> to store ether.",
       "outOfSyncNote": "If your balance doesn't seem updated, make sure that you are in sync with the network.",
       "walletNote": "Most exchanges don't support receiving ether from a contract wallet yet. Be sure to move your balance to an account address first!",
-      "addressCopiedToClipboard": "Public KEY copied to clipboard",
+      "addressCopiedToClipboard": "KEYS copied to clipboard",
       "addressNotCopiedToClipboard": "Error copying address to clipboard. Please try again.",
       "qrCodeLabel": "Point a compatible mobile app to this code",
       "dailyLimit": "Daily limit",
@@ -261,7 +261,7 @@
         "rePassword": "enter again",
         "input": "enter password"
       },
-      "accountName": "Account name(requires 12 charactors) or Public KEY",
+      "accountName": "Account name(requires 12 charactors)",
       "accountType": {
         "title": "Import type",
         "simple": {
@@ -448,8 +448,8 @@
       "accountName": "Account Name",
       "publicKey": "Public Key",
       "privateKey": "Private Key",
-      "writedown": "Please Remember This Information",
-      "transferTitle": "Ask assistant or follow below to complete creation",
+      "writedown": "Step 1: Please Remember This Information",
+      "transferTitle": "Step 2: Ask assistant or follow below to complete creation",
       "sendNewAccount": "Go to send transaction",
       "transfer": "transfer",
       "importedTitle": "Imported Account"

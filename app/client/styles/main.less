@@ -1,7 +1,7 @@
 // libs
-@import '{ethereum:dapp-styles}/dapp-styles.less';
+@import "{ethereum:dapp-styles}/dapp-styles.less";
 
-@import 'elements.import.less';
+@import "elements.import.less";
 
 /**********************************/
 /* START FORMATTING YOUR APP HERE */
@@ -496,7 +496,7 @@ body {
         }
       }
 
-      &[contenteditable='true'] {
+      &[contenteditable="true"] {
         border-bottom: 2px dotted @colorTextTertiary;
       }
     }
@@ -516,7 +516,7 @@ body {
     color: @colorTextSecondary;
   }
 
-  input[type='checkbox'] {
+  input[type="checkbox"] {
     float: left;
     margin-right: @defaultMargin / 2;
   }
@@ -613,11 +613,11 @@ body {
         top: -30px;
       }
 
-      input:not([type='checkbox']),
+      input:not([type="checkbox"]),
       select {
         width: 100%;
       }
-      input[type='checkbox'] {
+      input[type="checkbox"] {
         float: left;
         margin-right: @defaultMargin / 2;
       }
@@ -644,7 +644,7 @@ body {
         color: @colorTextSecondary;
       }
 
-      input[type='text'] {
+      input[type="text"] {
         width: 100%;
         margin-bottom: @defaultMargin / 2;
       }
@@ -763,7 +763,7 @@ body {
     padding-left: @gridWidth;
     cursor: pointer;
 
-    input[type='radio'] {
+    input[type="radio"] {
       position: absolute;
       left: 0;
       top: 0;
@@ -929,8 +929,8 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial,
-    'sans-serif';
+  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial,
+    "sans-serif";
 }
 
 .dapp-flex-content {
@@ -1049,7 +1049,7 @@ table.transactions {
 .data-table .data-item:before,
 .data-table .data-item:after {
   display: table;
-  content: '';
+  content: "";
   zoom: 1;
 }
 .data-table .data-item:after {
@@ -1344,4 +1344,18 @@ td.transaction-data pre {
   float: right;
   color: grey;
   font-size: 10px;
+}
+
+.gen_keys {
+  h2 {
+    margin: 10px;
+  }
+
+  h3 {
+    margin: 20px 0px 2px;
+  }
+
+  button {
+    margin: 10px;
+  }
 }

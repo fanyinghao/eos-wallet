@@ -100,7 +100,7 @@
       "matchPassword": "密码不一致",
       "accountNote": "账户没法显示正在进行的交易，但是可以显示余额和送出去的以太币。要看进账的交易，创建 <a href=\"/account/new\">钱包合约</a> 來存储以太币。",
       "walletNote": "大多数交易尚未支持从从合约钱包接受以太币。请务必先把钱转移到一个账户地址！",
-      "addressCopiedToClipboard": "公钥已复制到剪贴板",
+      "addressCopiedToClipboard": "已复制到剪贴板",
       "addressNotCopiedToClipboard": "复制到剪贴板出错。请再试一遍。",
       "qrCodeLabel": "请相互兼容的手机应用指向这个二维码",
       "dailyLimit": "每日限额",
@@ -247,7 +247,7 @@
     },
     "newWallet": {
       "title": "<strong>新增账户</strong>",
-      "accountName": "账户名称（必须12位，数字或者字母）或者公钥",
+      "accountName": "账户名称（必须12位，数字或者字母）",
       "password": {
         "title": "请记住你的密码",
         "newPassword": "输入密码",
@@ -428,8 +428,8 @@
       "accountName": "账户名称",
       "publicKey": "公钥密码",
       "privateKey": "私钥密码",
-      "writedown": "请牢记以下信息",
-      "transferTitle": "请邀请协助或者点击以下链接完成创建",
+      "writedown": "第一步：请牢记以下信息",
+      "transferTitle": "第二步：请邀请协助或者点击以下链接完成创建",
       "sendNewAccount": "去发送创建账号事务",
       "transfer": "转账",
       "importedTitle": "已导入账号"

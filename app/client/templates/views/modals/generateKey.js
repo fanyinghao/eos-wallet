@@ -5,23 +5,20 @@ The template to display qrCode.
 @constructor
 */
 
-Template["generateKey"].onRendered(function() {
-  if (this.data && this.data.keys) {
-    this.find('input[name="accountName"]').value = this.data.accountName;
-    this.find(
-      'input[name="publicKey"]'
-    ).value = this.data.keys.publicKey;
-    this.find(
-      'input[name="privateKey"]'
-    ).value = this.data.keys.privateKey;
+Template["generateKey"].helpers({
+  data: function() {
+    return this;
   }
 });
 
 Template["generateKey"].events({
+  'click button.dapp-block-button[name="btn_copy"]': function(e) {
+    Helpers.copyAddress(e.currentTarget.parentNode.querySelector(".keys"));
+  },
   /**
       back to dashboard
     */
-  'click button.dapp-block-button[name="btn_back"]': function(e) {
-    FlowRouter.go("dashboard", { new: this.accountName });
+  'click a[name="go-send"]': function(e) {
+    FlowRouter.go("send", { new: this });
   }
 });

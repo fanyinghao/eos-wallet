@@ -1,24 +1,36 @@
 <template name="generateKey">
-  <h1>{{{i18n 'wallet.newAccount.writedown'}}}</h1>
+  {{#with data}}
+  <div class="gen_keys">
+    <h1>{{{i18n 'wallet.newAccount.writedown'}}}</h1>
 
-  <h2>{{{i18n 'wallet.newAccount.accountName'}}}</h2>
-  <input type="text" readonly name="accountName" value="{{accountName}}" autocomplete="accountName" />
-  <h2>{{{i18n 'wallet.newAccount.publicKey'}}}</h2>
-  <input type="text" readonly name="publicKey" value="{{publicKey}}" />
-  <h2>{{{i18n 'wallet.newAccount.privateKey'}}}</h2>
-  <input type="text" readonly name="privateKey" value="{{privateKey}}" />
+    <div class="keys">
 
-  <hr>
+      <h2>{{{i18n 'wallet.newAccount.accountName'}}}</h2>
+      <input type="text" readonly name="accountName" value="{{accountName}}" autocomplete="accountName" />
 
-  <h1>{{{i18n 'wallet.newAccount.transferTitle'}}}</h1>
-  <p> 
-    <a href="/send/{{accountName}}/{{keys.publicKey}}" >
-      <i class="icon-arrow-up"></i>
-      <span>{{{i18n 'wallet.newAccount.sendNewAccount'}}}</span>
-    </a>
-  </p>
+      <h3>active</h3>
+      <h2>{{{i18n 'wallet.newAccount.publicKey'}}}</h2>
+      <input type="text" readonly name="publicKey" value="{{keys.active.publicKey}}" />
+      <h2>{{{i18n 'wallet.newAccount.privateKey'}}}</h2>
+      <input type="text" readonly name="privateKey" value="{{keys.active.privateKey}}" />
+      
+      <h3>owner</h3>
+      <h2>{{{i18n 'wallet.newAccount.publicKey'}}}</h2>
+      <input type="text" readonly name="publicKey" value="{{keys.owner.publicKey}}" />
+      <h2>{{{i18n 'wallet.newAccount.privateKey'}}}</h2>
+      <input type="text" readonly name="privateKey" value="{{keys.owner.privateKey}}" />
+    </div>
 
-  <hr>
+    <button name="btn_copy" class="dapp-block-button">{{i18n 'buttons.copy'}}</button>
+    <hr>
 
-  <button name="btn_back" class="dapp-block-button">{{i18n 'buttons.back'}}</button>
+    <h1>{{{i18n 'wallet.newAccount.transferTitle'}}}</h1>
+    <p> 
+      <a name="go-send" href="#" >
+        <i class="icon-arrow-up"></i>
+        <span>{{{i18n 'wallet.newAccount.sendNewAccount'}}}</span>
+      </a>
+    </p>
+  </div>
+  {{/with}}
 </template>
