@@ -134,7 +134,10 @@
     <td class="account-name">
         <h3>{{action_trace.act.data.permission}}</h3>
     </td>
-    <td class="" colspan="2">
+    <td class="account-name">
+        →
+    </td>
+    <td class="">
         {{#each action_trace.act.data.auth.accounts}}
             {{> elements_account_link name=(permission.actor)}}
         {{/each}}
