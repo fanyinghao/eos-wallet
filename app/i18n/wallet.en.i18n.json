@@ -121,7 +121,7 @@
         "viewOnExplorer": "EOS Monitor",
         "copyAddress": "Copy address",
         "exportKey": "Export Private Key",
-        "authorize": "Multi Signatures",
+        "authorize": "Authorize Permissions",
         "buyRAM": "Buy & Sell RAM",
         "stake": "Stake & Unstake",
         "remove": "Remove Account",
@@ -247,11 +247,13 @@
       }
     },
     "authMultiSig": {
-      "title": "Authorize MultiSigture",
-      "selectOwner": "Select owner",
-      "multisigSigneesTitle": "Modify Multisig Signees",
+      "title": "Authorize Permissions",
+      "selectOwner": "Selected owner",
+      "multisigSigneesTitle": "Authorize Account Permissions",
       "accountName": "Account name",
-      "success": "Authorize MultSig success"
+      "success": "Authorize permissions success",
+      "requireOwner": "Requires Owner permission",
+      "requireImport": "Authorize permissions success, you need import the new private key for the owner changes."
     },
     "newWallet": {
       "title": "New <strong>Account</strong>",
@@ -272,7 +274,7 @@
         "multisig": {
           "title": "Multisignature wallet contract",
           "description": "A contract controlled by multiple accounts",
-          "text1": "The multisig account controlled by",
+          "text1": "The account controlled by",
           "text2": "owners. Any transaction requires the confirmation of",
           "text5": "owners.",
           "accountOwnersTitle": "Account owners",

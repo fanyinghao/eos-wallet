@@ -226,8 +226,11 @@ Template["views_account_authorize"].events({
               EthElements.Modal.hide();
 
               GlobalNotification.success({
-                content: "i18n:wallet.authMultiSig.success",
-                duration: 2
+                content:
+                  type !== "owner"
+                    ? "i18n:wallet.authMultiSig.success"
+                    : "i18n:wallet.authMultiSig.requireImport",
+                duration: type !== "owner" ? 2 : 10
               });
 
               FlowRouter.go("account", { name: self.account.account_name });

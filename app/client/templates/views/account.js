@@ -185,6 +185,15 @@ Template["views_account"].events({
     e.preventDefault();
     let account = this;
 
+    let keys = keystore.Get(this.account_name).publicKey;
+
+    if (!keys.owner) {
+      return GlobalNotification.warning({
+        content: "i18n:wallet.authMultiSig.requireOwner",
+        duration: 2
+      });
+    }
+
     // Open a modal showing the QR Code
     EthElements.Modal.show(
       {
