@@ -16,6 +16,17 @@ export function SetKey(accountName, password, privateKey, publicKey) {
   );
 }
 
+export function UpdateKey(accountName, data) {
+  const storage = new SecureStorage({ id: STORGE_ID + chainId });
+  let item = storage.get(accountName);
+
+  if (data.sensitive) delete data.sensitive;
+  if (data.encryptedData) delete data.encryptedData;
+
+  item = Object.assign(item, data);
+  storage.set(accountName, item);
+}
+
 export function SetAccount(accountName) {
   const storage = new SecureStorage({ id: STORGE_ID + chainId });
   storage.set(accountName, { accountName });

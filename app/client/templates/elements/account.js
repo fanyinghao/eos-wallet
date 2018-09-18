@@ -40,6 +40,8 @@ Template.elements_account.onRendered(function() {
             ) {
               if (!_account.publicKey) _account.publicKey = {};
               _account.publicKey[item.perm_name] = account.publicKey;
+
+              keystore.UpdateKey(name, { publicKey: _account.publicKey });
             }
           });
         }
