@@ -20,6 +20,7 @@ Template.stake.events({
     TemplateVar.set("to", e.target.value);
   },
   "click button": function(e, template) {
+    let self = this;
     let from = this.from;
     let to = TemplateVar.get("to");
     let stake_cpu = TemplateVar.get("stake_cpu");
@@ -41,6 +42,8 @@ Template.stake.events({
       console.log(tr);
       EthElements.Modal.hide();
       TemplateVar.set(template, "sending", true);
+
+      if (self.callback) self.callback();
 
       GlobalNotification.success({
         content: "i18n:wallet.send.transactionSent",
@@ -140,7 +143,7 @@ Template.stake.events({
             TAPi18n.__("wallet.send.stake.authtitle", { name: from })
           ),
           account_name: from,
-          callback: signProvider => {
+          callback: ({ signProvider }) => {
             if (!TemplateVar.get("sending")) {
               if (e.target.name === "stake") {
                 stake(signProvider);

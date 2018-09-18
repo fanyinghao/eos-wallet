@@ -225,6 +225,8 @@ Template["views_account_authorize"].events({
               TemplateVar.set(template, "sending", false);
               EthElements.Modal.hide();
 
+              if (self.callback) self.callback();
+
               GlobalNotification.success({
                 content:
                   type !== "owner"
@@ -232,8 +234,6 @@ Template["views_account_authorize"].events({
                     : "i18n:wallet.authMultiSig.requireImport",
                 duration: type !== "owner" ? 2 : 10
               });
-
-              FlowRouter.go("account", { name: self.account.account_name });
             },
             err => {
               TemplateVar.set(template, "sending", false);

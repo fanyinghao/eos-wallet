@@ -5,6 +5,8 @@ Template Controllers
 @module Templates
 */
 
+var reactive_refresh = new ReactiveVar(true);
+
 Template.views_account.onRendered(function() {
   let self = this;
 
@@ -12,6 +14,8 @@ Template.views_account.onRendered(function() {
 
   Tracker.autorun(function() {
     if (FlowRouter.getRouteName() !== "account") return;
+
+    let isRefresh = reactive_refresh.get();
 
     let name = FlowRouter.getParam("name");
     TemplateVar.set(self, "account_name", name);
@@ -35,6 +39,12 @@ Template.views_account.onRendered(function() {
     );
   });
 });
+
+function forceRefresh() {
+  let isRefresh = reactive_refresh.get();
+  reactive_refresh.set(!isRefresh);
+  TemplateVar.set("refreshTx", !TemplateVar.get("refreshTx"));
+}
 
 Template["views_account"].onRendered(function() {});
 
@@ -83,15 +93,15 @@ Template["views_account"].events({
     @event click button.remove-button
     */
   "click button.buy-button": function(e, template) {
+    forceRefresh();
     let account_name = TemplateVar.get("account_name");
-    // Open a modal showing the QR Code
     EthElements.Modal.show(
       {
         template: "tradeRam",
         data: {
           from: account_name,
           callback: () => {
-            return true;
+            forceRefresh();
           }
         }
       },
@@ -114,7 +124,7 @@ Template["views_account"].events({
         data: {
           from: account_name,
           callback: () => {
-            return true;
+            forceRefresh();
           }
         }
       },
@@ -199,7 +209,10 @@ Template["views_account"].events({
       {
         template: "views_account_authorize",
         data: {
-          account: account
+          account: account,
+          callback: () => {
+            forceRefresh();
+          }
         }
       },
       {
