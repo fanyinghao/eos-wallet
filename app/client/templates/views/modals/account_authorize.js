@@ -11,21 +11,36 @@ The account authorize template
 @constructor
 */
 
-Template["views_account_authorize"].onCreated(function() {
-  // number of owners of the account
-  var maxOwners = this.data.owners.length;
-  TemplateVar.set("multisigSignees", maxOwners || 3);
-
-  // number of required signatures
-  TemplateVar.set(
-    "multisigSignatures",
-    Number(FlowRouter.getQueryParam("requiredSignatures")) || 2
-  );
-});
+Template["views_account_authorize"].onCreated(function() {});
 
 Template["views_account_authorize"].onRendered(function() {
+  let self = this;
+  let type = "active";
+  TemplateVar.set("type", type);
   this.$("input.owners").focus();
-  TemplateVar.set("type", "active");
+
+  Tracker.autorun(function() {
+    type = TemplateVar.get(self, "type");
+    let permission = self.data.account.permissions.filter(item => {
+      return item.perm_name === type;
+    })[0];
+
+    if (!permission) return;
+
+    TemplateVar.set(
+      self,
+      "multisigSignees",
+      permission.required_auth.keys.length +
+        permission.required_auth.accounts.length
+    );
+
+    // number of required signatures
+    TemplateVar.set(
+      self,
+      "multisigSignatures",
+      permission.required_auth.threshold
+    );
+  });
 });
 
 Template["views_account_authorize"].helpers({
@@ -51,6 +66,8 @@ Template["views_account_authorize"].helpers({
     let permission = this.account.permissions.filter(item => {
       return item.perm_name === type;
     })[0];
+
+    if (!permission) return [];
 
     let owners = Array.prototype.concat(
       permission.required_auth.keys.map(val => {
@@ -86,6 +103,9 @@ Template["views_account_authorize"].helpers({
     let permission = this.account.permissions.filter(item => {
       return item.perm_name === type;
     })[0];
+
+    if (!permission) return [];
+
     var maxOwners =
       permission.required_auth.keys.length +
       permission.required_auth.accounts.length;
@@ -192,7 +212,11 @@ Template["views_account_authorize"].events({
                 parent: type === "owner" ? "" : "owner",
                 auth: required_auth
               },
-              { authorization: `${self.account.account_name}@owner` }
+              {
+                authorization: `${self.account.account_name}@owner`,
+                broadcast: true,
+                sign: true
+              }
             );
           })
           .then(
@@ -262,7 +286,7 @@ Template["views_account_authorize"].events({
         template: "authorized",
         data: {
           account_name: self.account.account_name,
-          callback: signProvider => {
+          callback: ({ signProvider }) => {
             updateauth(signProvider);
             //refresh account
 
