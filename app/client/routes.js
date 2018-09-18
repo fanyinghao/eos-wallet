@@ -64,7 +64,7 @@ The send newaccount.
 
 @method tokens
 */
-FlowRouter.route("/send/:newaccount", {
+FlowRouter.route("/send/newaccount", {
   name: "newaccount",
   action: function(params, queryParams) {
     BlazeLayout.render("layout_main", {

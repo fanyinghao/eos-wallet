@@ -19,6 +19,10 @@ Template["generateKey"].events({
       back to dashboard
     */
   'click a[name="go-send"]': function(e) {
-    FlowRouter.go("newaccount", { new: this });
+    FlowRouter.go("newaccount", null, {
+      accountName: this.accountName,
+      owner: this.keys.owner.publicKey,
+      active: this.keys.active.publicKey
+    });
   }
 });

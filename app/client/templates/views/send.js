@@ -60,15 +60,11 @@ Template.views_send.onRendered(function() {
 
   if (FlowRouter.getRouteName() === "newaccount") {
     template.autorun(function(c) {
-      var newaccount = FlowRouter.getParam("newaccount");
-      var publickey = FlowRouter.getParam("publickey");
-      if (newaccount && publickey) {
-        template.find('input[name="accountName"]').value = newaccount;
-        template.find('input[name="publicKey"]').value = publickey;
-        template.$('input[name="accountName"]').trigger("input");
-        template.$('input[name="publicKey"]').trigger("input");
-        TemplateVar.set("accountName", newaccount);
-        TemplateVar.set("publicKey", publickey);
+      debugger;
+
+      var newaccount = FlowRouter.current().queryParams;
+      if (newaccount) {
+        TemplateVar.set("newaccount", newaccount);
       } else if (!template.data) {
         template.$('input[name="accountName"]').focus();
       }
@@ -144,6 +140,10 @@ Template["views_send"].helpers({
           console.log(err);
         }
       );
+  },
+  newAccount: function() {
+    var newaccount = TemplateVar.get("newaccount");
+    return newaccount;
   }
 });
 
