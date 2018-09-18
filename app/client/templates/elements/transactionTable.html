@@ -132,7 +132,7 @@
 <template name="elements_transactions_row_updateauth">
     {{#with item}}
     <td class="account-name">
-        <h3>{{walletIcon}} {{action_trace.act.data.permission}}</h3>
+        <h3>{{action_trace.act.data.permission}}</h3>
     </td>
     <td class="" colspan="2">
         {{#each action_trace.act.data.auth.accounts}}
