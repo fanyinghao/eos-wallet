@@ -120,5 +120,10 @@ Template["elements_account"].events({
     for (let i = 0; i < nodes.length; i++) {
       nodes[i].style.display = "none";
     }
+    FlowRouter.go("newaccount", null, {
+      accountName: this.account_name,
+      owner: this.publicKey.owner,
+      active: this.publicKey.active
+    });
   }
 });

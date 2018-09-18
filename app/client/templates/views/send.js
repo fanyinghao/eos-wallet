@@ -60,8 +60,6 @@ Template.views_send.onRendered(function() {
 
   if (FlowRouter.getRouteName() === "newaccount") {
     template.autorun(function(c) {
-      debugger;
-
       var newaccount = FlowRouter.current().queryParams;
       if (newaccount) {
         TemplateVar.set("newaccount", newaccount);
