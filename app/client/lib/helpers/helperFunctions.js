@@ -1,3 +1,5 @@
+const Fcbuffer = require("fcbuffer");
+
 /**
 Helper functions
 
@@ -21,8 +23,8 @@ Reruns functions reactively, based on an interval. Use it like so:
 @method rerun
 **/
 Helpers.rerun = {
-  '10s': new ReactiveTimer(10),
-  '1s': new ReactiveTimer(1)
+  "10s": new ReactiveTimer(10),
+  "1s": new ReactiveTimer(1)
 };
 
 /**
@@ -62,7 +64,7 @@ Make a ID out of a given hash and prefix.
 */
 Helpers.makeId = function(prefix, hash) {
   return _.isString(hash)
-    ? prefix + '_' + hash.replace('0x', '').substr(0, 10)
+    ? prefix + "_" + hash.replace("0x", "").substr(0, 10)
     : null;
 };
 
@@ -72,7 +74,7 @@ Display logs in the console for events.
 @method eventLogs
 */
 Helpers.eventLogs = function() {
-  console.log('EVENT LOG: ', arguments);
+  console.log("EVENT LOG: ", arguments);
 };
 
 /**
@@ -83,18 +85,18 @@ Shows a notification and plays a sound
 @param {Object} the i18n values passed to the i18n text
 */
 Helpers.showNotification = function(i18nText, values, callback) {
-  if (Notification.permission === 'granted') {
+  if (Notification.permission === "granted") {
     var notification = new Notification(
-      TAPi18n.__(i18nText + '.title', values),
+      TAPi18n.__(i18nText + ".title", values),
       {
         // icon: 'http://cdn.sstatic.net/stackexchange/img/logos/so/so-icon.png',
-        body: TAPi18n.__(i18nText + '.text', values)
+        body: TAPi18n.__(i18nText + ".text", values)
       }
     );
 
     if (_.isFunction(callback)) notification.onclick = callback;
   }
-  if (typeof mist !== 'undefined') mist.sounds.bip();
+  if (typeof mist !== "undefined") mist.sounds.bip();
 };
 
 /**
@@ -123,11 +125,11 @@ Returns a error handler
 Helpers.handleError = e => {
   console.log(e);
   if (
-    e.message === 'wrong password' ||
+    e.message === "wrong password" ||
     e.message === "gcm: tag doesn't match"
   ) {
     GlobalNotification.warning({
-      content: 'i18n:wallet.accounts.wrongPassword',
+      content: "i18n:wallet.accounts.wrongPassword",
       duration: 2
     });
     return;
@@ -149,13 +151,13 @@ Helpers.isMultiSig = function(account) {
   let isMultiSig = false;
   let _account = account;
 
-  if (typeof account === 'string')
+  if (typeof account === "string")
     _account = ObservableAccounts.accounts[account];
 
   if (!_account || !_account.permissions) return false;
 
   _account.permissions.map(item => {
-    if (item.perm_name === 'active') {
+    if (item.perm_name === "active") {
       isMultiSig = item.required_auth.threshold > 1;
     }
   });
@@ -189,7 +191,7 @@ Helpers.moment = function(time) {
   // react to language changes as well
   TAPi18n.getLanguage();
 
-  time = time + '+0000';
+  time = time + "+0000";
   if (_.isFinite(time) && moment.unix(time).isValid()) return moment.unix(time);
   else return moment(time);
 };
@@ -212,17 +214,17 @@ Helpers.formatTime = function(time, format) {
 
   if (time) {
     if (_.isString(format) && !_.isEmpty(format)) {
-      if (format.toLowerCase() === 'iso')
+      if (format.toLowerCase() === "iso")
         time = Helpers.moment(time).toISOString();
-      else if (format.toLowerCase() === 'fromnow') {
+      else if (format.toLowerCase() === "fromnow") {
         // make reactive updating
-        Helpers.rerun['10s'].tick();
+        Helpers.rerun["10s"].tick();
         time = Helpers.moment(time).fromNow();
       } else time = Helpers.moment(time).format(format);
     }
 
     return time;
-  } else return '';
+  } else return "";
 };
 
 /**
@@ -255,22 +257,22 @@ Helpers.formatTransactionBalance = function(value, exchangeRates, unit) {
   if (unit instanceof Spacebars.kw) unit = null;
 
   var unit = unit || EthTools.getUnit(),
-    format = '0,0.00';
+    format = "0,0.00";
 
   if (
-    (unit === 'usd' || unit === 'eur' || unit === 'btc') &&
+    (unit === "usd" || unit === "eur" || unit === "btc") &&
     exchangeRates &&
     exchangeRates[unit]
   ) {
-    if (unit === 'btc') format += '[000000]';
-    else format += '[0]';
+    if (unit === "btc") format += "[000000]";
+    else format += "[0]";
 
     var price = new BigNumber(String(value), 10).times(
       exchangeRates[unit].price
     );
-    return EthTools.formatNumber(price, format) + ' ' + unit.toUpperCase();
+    return EthTools.formatNumber(price, format) + " " + unit.toUpperCase();
   } else {
-    return EthTools.formatBalance(value, format + '[0000000000000000] UNIT');
+    return EthTools.formatBalance(value, format + "[0000000000000000] UNIT");
   }
 };
 
@@ -279,7 +281,7 @@ Helpers.getActions = (name, pos, offset, callback) => {
     callback(
       res.actions
         .filter(item => {
-          if (item.action_trace.act.name !== 'transfer') return true;
+          if (item.action_trace.act.name !== "transfer") return true;
           else if (item.action_trace.act.data.to === name) return true;
           return (
             item.action_trace.act.data.from ===
@@ -305,7 +307,7 @@ Helpers.getActiveKeys = account => {
   if (!_account || !_account.permissions) return [];
 
   _account.permissions.forEach(item => {
-    if (item.perm_name === 'active') {
+    if (item.perm_name === "active") {
       ret = ret.concat(
         item.required_auth.accounts.map(account => {
           return account.permission.actor;
@@ -322,9 +324,9 @@ Helpers.getProposals = account => {
   let func = keys.map(key =>
     eos.getTableRows({
       json: true,
-      code: 'eosio.msig',
+      code: "eosio.msig",
       scope: key,
-      table: 'approvals',
+      table: "approvals",
       limit: 0
     })
   );
@@ -340,18 +342,54 @@ Helpers.copyAddress = element => {
   selection.addRange(range);
 
   try {
-    document.execCommand('copy');
+    document.execCommand("copy");
 
     GlobalNotification.info({
-      content: 'i18n:wallet.accounts.addressCopiedToClipboard',
+      content: "i18n:wallet.accounts.addressCopiedToClipboard",
       duration: 3
     });
   } catch (err) {
     GlobalNotification.error({
-      content: 'i18n:wallet.accounts.addressNotCopiedToClipboard',
+      content: "i18n:wallet.accounts.addressNotCopiedToClipboard",
       closeable: false,
       duration: 3
     });
   }
   selection.removeAllRanges();
+};
+
+Helpers.getLatestProposals = name => {
+  return new Promise((resolve, reject) => {
+    eos.getActions(name, -1, -100).then(
+      res => {
+        resolve(
+          res.actions
+            .filter(item => {
+              return item.action_trace.act.name === "propose";
+            })
+            .map(item => {
+              item.action_trace.act.data.trx.actions = Array.prototype.map.call(
+                item.action_trace.act.data.trx.actions,
+                action => {
+                  action.origin_data = Fcbuffer.fromBuffer(
+                    eos.fc.abiCache.abi(action.account).structs[action.name],
+                    Buffer.from(action.data, "hex")
+                  );
+                  return action;
+                }
+              );
+              return item;
+            })
+            .sort((a, b) => {
+              if (a.account_action_seq > b.account_action_seq) return -1;
+              if (a.account_action_seq < b.account_action_seq) return 1;
+              return 0;
+            })
+        );
+      },
+      err => {
+        reject(err);
+      }
+    );
+  });
 };
