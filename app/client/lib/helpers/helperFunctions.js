@@ -371,11 +371,24 @@ Helpers.getLatestProposals = name => {
               item.action_trace.act.data.trx.actions = Array.prototype.map.call(
                 item.action_trace.act.data.trx.actions,
                 action => {
-                  action.origin_data = Fcbuffer.fromBuffer(
-                    eos.fc.abiCache.abi(action.account).structs[action.name],
-                    Buffer.from(action.data, "hex")
-                  );
-                  return action;
+                  try {
+                    action.origin_data = Fcbuffer.fromBuffer(
+                      eos.fc.abiCache.abi(action.account).structs[action.name],
+                      Buffer.from(action.data, "hex")
+                    );
+                    return action;
+                  } catch (e) {
+                    // Abi 'eosio.xxxx' is not cached
+                    eos.getAbi(action.account).then(res => {
+                      action.origin_data = Fcbuffer.fromBuffer(
+                        eos.fc.abiCache.abi(action.account).structs[
+                          action.name
+                        ],
+                        Buffer.from(action.data, "hex")
+                      );
+                      return action;
+                    });
+                  }
                 }
               );
               return item;
