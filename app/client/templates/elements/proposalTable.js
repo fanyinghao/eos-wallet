@@ -42,7 +42,6 @@ Template.elements_proposal_table.onRendered(function() {
         );
       }
     });
-    console.log(account_names);
     Array.prototype.forEach.call(Object.keys(account_names), name => {
       Helpers.getLatestProposals(name).then(res => {
         proposals = proposals.concat(res);
@@ -67,10 +66,6 @@ Template["elements_proposal_table"].helpers({
     let proposals = reactive_proposals.get();
     return proposals.length > 0;
   }
-});
-
-Template["elements_proposal_table"].events({
-  "click button.show-more": function(e, template) {}
 });
 
 /**
@@ -118,6 +113,89 @@ Template["elements_proposals_row"].events({
         },
         {
           class: "transaction-info"
+        }
+      );
+    }
+  },
+  "click button.dapp-block-button.approve": function(e) {
+    let self = this;
+    let action = this.action_trace.act.data.trx.actions[0];
+
+    if (action.name === "transfer") {
+      EthElements.Modal.question(
+        {
+          template: "views_modals_sendTransactionInfo",
+          data: {
+            from: action.origin_data.from,
+            to: action.origin_data.to,
+            amount: action.origin_data.amount,
+            memo: action.origin_data.memo
+          },
+          ok: () => {
+            pop_auth(self.action_trace.act.data);
+          },
+          cancel: true
+        },
+        {
+          class: "send-transaction-info"
+        }
+      );
+    } else {
+      pop_auth(self.action_trace.act.data);
+    }
+
+    function pop_auth(data) {
+      EthElements.Modal.question({
+        template: "authorized",
+        data: {
+          isMultiSig: true,
+          range: data.requested.map(item => {
+            return item.actor;
+          }),
+          callback: ({ signProvider, proposer }) => {
+            EthElements.Modal.hide();
+            push_transaction(
+              data.proposer,
+              data.proposal_name,
+              proposer,
+              signProvider
+            );
+          }
+        }
+      });
+    }
+
+    function push_transaction(proposer, proposal, from, signProvider) {
+      Helpers.approveProposal(
+        proposer,
+        proposal,
+        from,
+        signProvider,
+        tr => {
+          GlobalNotification.success({
+            content: "i18n:wallet.send.transactionSent",
+            duration: 20,
+            ok: function() {
+              window.open(`${transactionMonitor}/${tr.transaction_id}`);
+              return true;
+            },
+            okText: `TX#${tr.transaction_id.substr(0, 6)}..`
+          });
+        },
+        err => {
+          EthElements.Modal.hide();
+          if (err.message) {
+            GlobalNotification.error({
+              content: err.message,
+              duration: 20
+            });
+          } else {
+            let error = JSON.parse(err);
+            GlobalNotification.error({
+              content: Helpers.translateExternalErrorMessage(error.error),
+              duration: 20
+            });
+          }
         }
       );
     }

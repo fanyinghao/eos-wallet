@@ -406,3 +406,54 @@ Helpers.getLatestProposals = name => {
     );
   });
 };
+
+Helpers.approveProposal = (
+  proposer,
+  proposal,
+  from,
+  signProvider,
+  onSuccess,
+  onError
+) => {
+  try {
+    const _eos_app = Eos({
+      httpEndpoint: httpEndpoint,
+      chainId: chainId,
+      signProvider: signProvider,
+      verbose: false
+    });
+
+    _eos_app.contract("eosio.msig").then(msig => {
+      msig
+        .approve(
+          proposer,
+          name,
+          {
+            actor: from,
+            permission: "active"
+          },
+          {
+            broadcast: true,
+            authorization: `${from}@active`
+          }
+        )
+        .then(tx => {
+          msig
+            .exec(proposer, proposal, from, {
+              broadcast: true,
+              authorization: `${from}@active`
+            })
+            .then(
+              exec_tx => {
+                onSuccess(exec_tx);
+              },
+              () => {
+                onSuccess(tx);
+              }
+            );
+        }, onError);
+    });
+  } catch (e) {
+    handleError(e);
+  }
+};

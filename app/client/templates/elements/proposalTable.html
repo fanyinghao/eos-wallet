@@ -49,12 +49,24 @@
             {{/each}}
 
         </td>
-        <td class="trx-type">
-            <p>
-                <span>
-                    <button><i class="fa fa-check"></i>approve</button>
-                </span>
-            </p>
+        <td class="trx-type button">
+            <!-- {{#unless approved}}
+            <td class="button">
+                <button class="dapp-block-button approve">
+                    {{i18n "wallet.transactions.buttons.approve"}}
+                </button>
+            </td><td class="button">
+                <button class="dapp-block-button revoke">
+                    {{i18n "wallet.transactions.buttons.revoke"}}
+                </button>
+            </td>
+            {{else}} -->
+            <td class="button" colspan="2">
+                <button class="dapp-block-button approve">
+                    {{i18n "wallet.transactions.buttons.approve"}}
+                </button>
+            </td>
+            <!-- {{/unless}} -->
         </td>
     </tr>
 </template>
