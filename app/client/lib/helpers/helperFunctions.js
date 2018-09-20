@@ -365,7 +365,12 @@ Helpers.getLatestProposals = name => {
         resolve(
           res.actions
             .filter(item => {
-              return item.action_trace.act.name === "propose";
+              if (item.action_trace.act.name === "propose")
+                return (
+                  moment.utc(item.action_trace.act.data.trx.expiration) >
+                  moment.utc()
+                );
+              return false;
             })
             .map(item => {
               item.action_trace.act.data.trx.actions = Array.prototype.map.call(
