@@ -15,6 +15,9 @@ Template.authorized.helpers({
   },
   isMultiSig: function() {
     return this.isMultiSig;
+  },
+  range: function() {
+    return this.range;
   }
 });
 
