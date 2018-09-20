@@ -41,6 +41,7 @@ ethereum:elements@1.2.0
 ethereum:tools@1.0.0
 ethereum:web3@1.0.0-beta1
 fastclick@1.0.13
+fortawesome:fontawesome@4.7.0
 frozeman:animation-helper@0.2.6
 frozeman:global-notifications@0.2.1
 frozeman:inline-form@0.1.0

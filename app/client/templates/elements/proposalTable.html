@@ -27,36 +27,62 @@
             </p>
         </td>
         <td class="trx-type">
-            <h3>{{i18n "wallet.proposals.approve"}}</h3>
             <p>
                 <span>
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
+                    <strong>{{> elements_account_link name=(action_trace.act.data.proposer)}}</strong> {{i18n "wallet.transactions.message.proposed"}}
                 </span>
+                <span>{{i18n "wallet.transactions.message.proposal"}} <i class="icon-support"></i><strong>{{action_trace.act.data.proposal_name}}</strong></span>
             </p>
+            {{#each action_trace.act.data.trx.actions}}
+            <p>
+                <td><i class="fa fa-quote-left"></i></td>
+                <td><h3>{{i18n typeName }}</h3></td>
+
+                {{#if $eq name "transfer"}}
+                    {{> elements_proposals_row_transfer item=this}}
+                {{/if}}
+
+                <td><i class="fa fa-quote-right"></i></td>
+            </p>
+            {{/each}}
+
         </td>
         <td class="trx-type">
-            <h3>{{i18n "wallet.proposals.pending"}}</h3>
             <p>
                 <span>
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
-                    TX#{{parseTrascationId action_trace.trx_id}}
+                    <button><i class="fa fa-check"></i>approve</button>
                 </span>
             </p>
         </td>
     </tr>
 </template>
+
+
+<template name="elements_proposals_row_transfer">
+    {{#with item}}
+    <td class="account-name">
+        <p>
+            <strong>
+            {{> elements_account_link name=(origin_data.from)}}
+            </strong>
+
+            <span class="arrow">→</span> 
+
+            {{#if origin_data.to}}
+                {{> elements_account_link name=(origin_data.to)}}
+            {{/if}}
+        </p>
+    </td>
+
+    <td class="transaction-amount plus">
+        <strong>{{origin_data.quantity}}</strong>
+    </td>
+    
+    <td class="memo">
+        {{#if origin_data.memo}}
+            <pre><strong>MEMO:</strong>{{origin_data.memo}}</pre>
+        {{/if}}
+    </td>
+    {{/with}}
+</template>
+    

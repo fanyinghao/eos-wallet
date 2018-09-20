@@ -17,6 +17,7 @@ The account template
 Template.elements_account.onRendered(function() {
   let self = this;
   self.reactiveAccountName = new ReactiveVar(this.data.name);
+  self.reactive_accounts = Blaze.currentView.parentView.parentView.parentView.parentView.templateInstance().reactiveVar;
 
   Tracker.autorun(() => {
     let name = self.reactiveAccountName.get();
@@ -48,6 +49,10 @@ Template.elements_account.onRendered(function() {
 
         account = extend({}, account, _account);
         TemplateVar.set(self, "account", account);
+
+        let reactive_accounts = self.reactive_accounts.get();
+        reactive_accounts[account.account_name] = account;
+        self.reactive_accounts.set(reactive_accounts);
       },
       err => {
         console.error(err);

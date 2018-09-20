@@ -15,6 +15,9 @@ var reactive_node = new ReactiveVar(localStorage.getItem("chain_node"));
 var reactiveAccounts = new ReactiveVar([]);
 
 Template.views_dashboard.created = function() {
+  let self = this;
+  self.reactiveVar = new ReactiveVar({});
+
   Tracker.autorun(() => {
     let _node = reactive_node.get();
     let _accounts = [];
