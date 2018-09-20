@@ -1,4 +1,5 @@
 <template name="elements_proposal_table">
+    {{#if hasItems}}
     <div class="accounts-transactions">
         <h2>{{i18n 'wallet.proposals.latest'}}</h2>
 
@@ -14,6 +15,7 @@
             </tbody>
         </table>
     </div>
+    {{/if}}
 </template>
 
 <template name="elements_proposals_row">
