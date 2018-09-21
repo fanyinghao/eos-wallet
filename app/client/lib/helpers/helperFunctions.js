@@ -412,6 +412,27 @@ Helpers.getLatestProposals = name => {
   });
 };
 
+Helpers.getApprovals = name => {
+  return new Promise((resolve, reject) => {
+    eos
+      .getTableRows({
+        json: true,
+        code: "eosio.msig",
+        scope: name,
+        table: "approvals",
+        limit: 0
+      })
+      .then(
+        res => {
+          resolve(res.rows);
+        },
+        err => {
+          reject(err);
+        }
+      );
+  });
+};
+
 Helpers.approveProposal = (
   proposer,
   proposal,

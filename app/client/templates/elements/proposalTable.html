@@ -19,6 +19,7 @@
 </template>
 
 <template name="elements_proposals_row">
+    {{#if $eq done false }}
     <tr data-action-seq="{{account_action_seq}}">
 
         <td class="trx-type">
@@ -47,7 +48,20 @@
                 <td><i class="fa fa-quote-right"></i></td>
             </p>
             {{/each}}
-
+            <p>
+                {{#with getApproval action_trace.act.data.proposer action_trace.act.data.proposal_name}}
+                    {{#each provided_approvals}}
+                    <span class="approval-provided" style="color:#8bc34a">
+                        <i class="fa fa-check"></i><a href="{{pathFor route='account' name=(actor)}}" style="color:#8bc34a">{{actor}}</a> 
+                    </span>
+                    {{/each}}
+                    {{#each requested_approvals}}
+                    <span>
+                        <i class="fa fa-user-times" style="color:rgba(130, 122, 122, 0.7)"></i><a href="{{pathFor route='account' name=(actor)}}" style="color:rgba(130, 122, 122, 0.7)">{{actor}}</a>
+                    </span>
+                    {{/each}}
+                {{/with}}
+            </p>
         </td>
         <td class="trx-type button">
             <!-- {{#unless approved}}
@@ -69,6 +83,7 @@
             <!-- {{/unless}} -->
         </td>
     </tr>
+    {{/if}}
 </template>
 
 

@@ -19,6 +19,7 @@ The default limit, of none is given.
 */
 var defaultLimit = 30;
 var reactive_proposals = new ReactiveVar();
+var reactive_approvals = new ReactiveVar();
 Template.elements_proposal_table.onRendered(function() {
   let self = this;
   self.reactive_accounts = Blaze.currentView.parentView.templateInstance().reactiveVar;
@@ -26,6 +27,7 @@ Template.elements_proposal_table.onRendered(function() {
   Tracker.autorun(function() {
     let accounts = self.reactive_accounts.get();
     let proposals = [];
+    let approvals = {};
     let account_names = {};
     Array.prototype.forEach.call(Object.keys(accounts), account => {
       if (accounts[account].permissions) {
@@ -46,6 +48,12 @@ Template.elements_proposal_table.onRendered(function() {
       Helpers.getLatestProposals(name).then(res => {
         proposals = proposals.concat(res);
         reactive_proposals.set(proposals);
+      });
+      Helpers.getApprovals(name).then(res => {
+        Array.prototype.forEach.call(res, item => {
+          approvals[`${name}.${item.proposal_name}`] = item;
+        });
+        reactive_approvals.set(approvals);
       });
     });
   });
@@ -94,6 +102,35 @@ Template["elements_proposals_row"].helpers({
   },
   typeName: function() {
     return `wallet.transactions.types.${this.name}`;
+  },
+  getApproval: function(proposer, proposal) {
+    let approvals = reactive_approvals.get();
+    return approvals[`${proposer}.${proposal}`];
+  },
+  done: function() {
+    let actor = this.action_trace.act.data.trx.actions[0].authorization[0]
+      .actor;
+    let permission = this.action_trace.act.data.trx.actions[0].authorization[0]
+      .permission;
+    let owner = ObservableAccounts.accounts[actor];
+    let approvals = reactive_approvals.get();
+    let approval =
+      approvals[
+        `${this.action_trace.act.data.proposer}.${
+          this.action_trace.act.data.proposal_name
+        }`
+      ];
+    let threshold;
+    if (!approval) return false;
+
+    owner.permissions.forEach(item => {
+      if (item.perm_name === permission) {
+        threshold = item.required_auth.threshold;
+        return;
+      }
+    });
+
+    return threshold < approval.provided_approvals.length;
   }
 });
 
