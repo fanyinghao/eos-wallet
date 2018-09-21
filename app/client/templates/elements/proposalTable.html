@@ -75,11 +75,13 @@
                 </button>
             </td>
             {{else}} -->
+            {{#if canSign}}
             <td class="button" colspan="2">
                 <button class="dapp-block-button approve">
                     {{i18n "wallet.transactions.buttons.approve"}}
                 </button>
             </td>
+            {{/if}}
             <!-- {{/unless}} -->
         </td>
     </tr>

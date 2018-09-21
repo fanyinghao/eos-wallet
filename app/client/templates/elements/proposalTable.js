@@ -131,6 +131,21 @@ Template["elements_proposals_row"].helpers({
     });
 
     return threshold < approval.provided_approvals.length;
+  },
+  canSign: function() {
+    let approvals = reactive_approvals.get();
+    let approval =
+      approvals[
+        `${this.action_trace.act.data.proposer}.${
+          this.action_trace.act.data.proposal_name
+        }`
+      ];
+
+    if (!approval) return true;
+
+    return approval.requested_approvals.some(item => {
+      return ObservableAccounts.accounts[item.actor];
+    });
   }
 });
 
