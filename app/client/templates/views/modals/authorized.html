@@ -2,8 +2,11 @@
     <form class="auth-form" action="about:blank" target="dapp-form-helper-iframe" autocomplete="on">
         {{#if isMultiSig}}
             <div class="row clear">
+                {{#if multiSigMsg}}
+                <h3>{{multiSigMsg}}</h3>
+                {{else}}
                 <h3>{{i18n 'wallet.account.multiSig.notice'}}</h3>
-
+                {{/if}}
                 {{> selectAccount name="dapp-select-proposer" accounts=(selectAccounts true range) class="dapp-select-proposer" }}
             
             </div>

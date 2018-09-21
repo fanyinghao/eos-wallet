@@ -74,6 +74,7 @@
     },
     "account": {
       "multiSig": {
+        "approve": "批准提案，选择批准签名者",
         "notice": "交易须提案多重签名，选择提案者"
       },
       "info": {

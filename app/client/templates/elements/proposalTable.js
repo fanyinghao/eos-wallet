@@ -201,6 +201,7 @@ Template["elements_proposals_row"].events({
         template: "authorized",
         data: {
           isMultiSig: true,
+          multiSigMsg: TAPi18n.__("wallet.account.multiSig.approve"),
           range: data.requested.map(item => {
             return item.actor;
           }),

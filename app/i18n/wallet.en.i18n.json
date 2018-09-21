@@ -78,6 +78,7 @@
     },
     "account": {
       "multiSig": {
+        "approve": "Approve a proposal, Select a Signee",
         "notice": "Requires Propose MulitSig, Select a Proposer"
       },
       "info": {
