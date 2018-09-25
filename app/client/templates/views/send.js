@@ -255,11 +255,22 @@ Template["views_send"].events({
 
     @event keyup keyup input[name="publicKey"], change input[name="publicKey"], input input[name="publicKey"]
     */
-  'keyup input[name="publicKey"], change input[name="publicKey"], input input[name="publicKey"]': function(
+  'keyup input[name="active_publicKey"], change input[name="active_publicKey"], input input[name="active_publicKey"]': function(
     e,
     template
   ) {
-    TemplateVar.set("publicKey", e.currentTarget.value);
+    TemplateVar.set("active_publicKey", e.currentTarget.value);
+  },
+  /**
+    Set the to while typing
+
+    @event keyup keyup input[name="publicKey"], change input[name="publicKey"], input input[name="publicKey"]
+    */
+  'keyup input[name="owner_publicKey"], change input[name="owner_publicKey"], input input[name="owner_publicKey"]': function(
+    e,
+    template
+  ) {
+    TemplateVar.set("owner_publicKey", e.currentTarget.value);
   },
   /**
     
@@ -615,8 +626,13 @@ Template["views_send"].events({
           }
         );
       } else if (send_type === "newaccount") {
-        let accountName = TemplateVar.get("accountName");
-        let publicKey = TemplateVar.get("publicKey");
+        let newaccount = TemplateVar.get("newaccount");
+        let accountName =
+          TemplateVar.get("accountName") || newaccount.accountName;
+        let active_publicKey =
+          TemplateVar.get("active_publicKey") || newaccount.active;
+        let owner_publicKey =
+          TemplateVar.get("owner_publicKey") || newaccount.owner;
 
         if (!accountName)
           return GlobalNotification.warning({
@@ -624,7 +640,7 @@ Template["views_send"].events({
             duration: 2
           });
 
-        if (!publicKey)
+        if (!active_publicKey || !owner_publicKey)
           return GlobalNotification.warning({
             content: "i18n:wallet.send.error.noPublicKey",
             duration: 2
@@ -642,7 +658,12 @@ Template["views_send"].events({
             isMultiSig: isMultiSig,
             permission: permission,
             callback: ({ signProvider, proposer }) => {
-              createAccount(accountName, publicKey, publicKey, signProvider);
+              createAccount(
+                accountName,
+                owner_publicKey,
+                active_publicKey,
+                signProvider
+              );
             }
           }
         });
