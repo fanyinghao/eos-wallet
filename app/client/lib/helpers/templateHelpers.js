@@ -139,7 +139,10 @@ Template.registerHelper("selectAccounts", function(ignoreMultiSig, range) {
       return (
         !item.creating &&
         !(ignoreMultiSig && Helpers.isMultiSig(item)) &&
-        (!range || range.includes(item.account_name))
+        (!(
+          range && Object.prototype.toString.call(range) === "[object Array]"
+        ) ||
+          range.includes(item.account_name))
       );
     })
     .sort((a, b) => {

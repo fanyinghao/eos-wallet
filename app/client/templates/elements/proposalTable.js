@@ -68,10 +68,12 @@ Template["elements_proposal_table"].helpers({
     */
   items: function() {
     let proposals = reactive_proposals.get();
+    if (!proposals) return [];
     return proposals;
   },
   hasItems: function() {
     let proposals = reactive_proposals.get();
+    if (!proposals) return false;
     return proposals.length > 0;
   }
 });
