@@ -32,23 +32,9 @@ Template.elements_account.onRendered(function() {
     }
     ObservableAccounts.refresh(account).then(
       _account => {
-        if (typeof account.publicKey === "string" && _account.permissions) {
-          _account.permissions.forEach(item => {
-            if (
-              item.required_auth.keys.some(k => {
-                return k.key === account.publicKey;
-              })
-            ) {
-              if (!_account.publicKey) _account.publicKey = {};
-              _account.publicKey[item.perm_name] = account.publicKey;
-
-              keystore.UpdateKey(name, { publicKey: _account.publicKey });
-            }
-          });
-        }
-
         account = extend({}, account, _account);
         TemplateVar.set(self, "account", account);
+        ObservableAccounts.accounts[name] = account;
 
         let reactive_accounts = self.reactive_accounts.get();
         reactive_accounts[account.account_name] = account;

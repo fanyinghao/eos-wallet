@@ -90,16 +90,34 @@ Template.authorized.events({
       });
 
     try {
-      let sensitive = keystore.Get(account_name, password).sensitive;
+      let permission = this.permission;
+      let key = keystore.Get(account_name, password);
+      let sensitive = key.sensitive;
       if (!sensitive) throw new Error("wrong password");
 
-      let signProvider = keystore.SignProvider(account_name, password);
+      if (!permission) {
+        if (key.publicKey.active) permission = "active";
+        else if (key.publicKey.owner) permission = "owner";
+      }
+
+      if (!permission)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.send.notdeterminepermission",
+          duration: 2
+        });
+
+      let signProvider = keystore.SignProvider(
+        account_name,
+        password,
+        permission
+      );
 
       if (this.callback)
         this.callback({
           signProvider,
           privateKey: this.requirePrivateKey ? sensitive.privateKey : null,
-          proposer: TemplateVar.get("selectedProposer")
+          proposer: TemplateVar.get("selectedProposer"),
+          permission
         });
     } catch (e) {
       Helpers.handleError(e);

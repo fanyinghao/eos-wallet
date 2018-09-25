@@ -213,8 +213,22 @@ Template["views_account_create"].events({
               }
 
               accounts.account_names.forEach(name => {
-                // storage private key
-                keystore.SetKey(name, password, privateKey, publicKey);
+                eos.getAccount(name).then(_account => {
+                  let _tmp_pub = {};
+                  let _tmp_priv = {};
+                  _account.permissions.forEach(item => {
+                    if (
+                      item.required_auth.keys.some(k => {
+                        return k.key === publicKey;
+                      })
+                    ) {
+                      _tmp_pub[item.perm_name] = publicKey;
+                      _tmp_priv[item.perm_name] = privateKey;
+                    }
+                  });
+                  // storage private key
+                  keystore.SetKey(name, password, _tmp_priv, _tmp_pub);
+                });
 
                 eos.getControlledAccounts(name).then(_accounts => {
                   _accounts.controlled_accounts.forEach(_name => {

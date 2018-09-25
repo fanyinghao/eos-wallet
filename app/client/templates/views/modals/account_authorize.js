@@ -285,10 +285,17 @@ Template["views_account_authorize"].events({
           duration: 2
         });
 
+      if (!this.account.publicKey.owner)
+        return GlobalNotification.warning({
+          content: "i18n:wallet.accounts.auth.requireOwner",
+          duration: 2
+        });
+
       EthElements.Modal.show({
         template: "authorized",
         data: {
           account_name: self.account.account_name,
+          permission: "owner",
           callback: ({ signProvider }) => {
             updateauth(signProvider);
             //refresh account

@@ -480,6 +480,49 @@ Helpers.approveProposal = (
         }, onError);
     });
   } catch (e) {
-    handleError(e);
+    Helpers.handleError(e);
   }
+};
+
+Helpers.randomWord = (randomFlag, min, max) => {
+  var str = "",
+    range = min,
+    arr = [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z"
+    ];
+
+  // 随机产生
+  if (randomFlag) {
+    range = Math.round(Math.random() * (max - min)) + min;
+  }
+  for (var i = 0; i < range; i++) {
+    pos = Math.round(Math.random() * (arr.length - 1));
+    str += arr[pos];
+  }
+  return str;
 };

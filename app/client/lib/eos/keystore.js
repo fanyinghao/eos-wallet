@@ -42,11 +42,17 @@ export function Remove(accountName) {
   return storage.remove(accountName);
 }
 
-export function SignProvider(accountName, password) {
+export function SignProvider(accountName, password, permission) {
   const storage = new SecureStorage({ id: STORGE_ID + chainId });
   let sensitive = storage.get(accountName, password).sensitive;
   if (!sensitive) throw new Error("wrong password");
-  let provider = ({ sign, buf }) => sign(buf, sensitive.privateKey);
+  let provider = ({ sign, buf }) =>
+    sign(
+      buf,
+      typeof sensitive.privateKey === "string"
+        ? sensitive.privateKey
+        : sensitive.privateKey[permission]
+    );
   return provider;
 }
 

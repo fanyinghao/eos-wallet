@@ -290,6 +290,13 @@ Template["views_send"].events({
           duration: 2
         });
 
+      let permission = "";
+      if (selectedAccount.publicKey.active) {
+        permission = "active";
+      } else if (selectedAccount.publicKey.owner) {
+        permission = "owner";
+      }
+
       var onSuccess = (tr, from) => {
         console.log(tr);
         TemplateVar.set(template, "sending", false);
@@ -326,72 +333,15 @@ Template["views_send"].events({
         return;
       };
 
-      function randomWord(randomFlag, min, max) {
-        var str = "",
-          range = min,
-          arr = [
-            "a",
-            "b",
-            "c",
-            "d",
-            "e",
-            "f",
-            "g",
-            "h",
-            "i",
-            "j",
-            "k",
-            "l",
-            "m",
-            "n",
-            "o",
-            "p",
-            "q",
-            "r",
-            "s",
-            "t",
-            "u",
-            "v",
-            "w",
-            "x",
-            "y",
-            "z"
-          ];
-
-        // 随机产生
-        if (randomFlag) {
-          range = Math.round(Math.random() * (max - min)) + min;
-        }
-        for (var i = 0; i < range; i++) {
-          pos = Math.round(Math.random() * (arr.length - 1));
-          str += arr[pos];
-        }
-        return str;
-      }
-
-      var handleError = function(e) {
-        console.log(e);
-        TemplateVar.set(template, "sending", false);
-        if (
-          e.message === "wrong password" ||
-          e.message === "gcm: tag doesn't match"
-        ) {
-          GlobalNotification.warning({
-            content: "i18n:wallet.accounts.wrongPassword",
-            duration: 2
-          });
-          return;
-        } else {
-          GlobalNotification.warning({
-            content: e.message,
-            duration: 2
-          });
-          return;
-        }
-      };
-
       // The function to send the transaction
-      var sendFunds = function(_to, _amount, _memo, signProvider, _proposer) {
+      var sendFunds = function(
+        _to,
+        _amount,
+        _memo,
+        signProvider,
+        _proposer,
+        _permission
+      ) {
         // show loading
         TemplateVar.set(template, "sending", true);
 
@@ -410,7 +360,9 @@ Template["views_send"].events({
                 _amount,
                 _memo || "transfer",
                 {
-                  authorization: `${selectedAccount.account_name}@active`,
+                  authorization: `${
+                    selectedAccount.account_name
+                  }@${permission}`,
                   broadcast: true,
                   sign: true
                 }
@@ -438,7 +390,11 @@ Template["views_send"].events({
                   _to,
                   _amount,
                   _memo || "transfer",
-                  { broadcast: false, sign: false }
+                  {
+                    authorization: `${selectedAccount.account_name}@active`,
+                    broadcast: false,
+                    sign: false
+                  }
                 )
                 .then(transfer => {
                   transfer.transaction.transaction.max_net_usage_words = 0;
@@ -446,14 +402,14 @@ Template["views_send"].events({
                     Date.parse(new Date()) + 1000 * 60 * 60 //60mins
                   );
                   console.log(transfer.transaction.transaction);
-                  const proposal_name = `tr${randomWord(false, 10)}`;
+                  const proposal_name = `tr${Helpers.randomWord(false, 10)}`;
                   msig
                     .propose(
                       _proposer,
                       proposal_name,
                       permissions,
                       transfer.transaction.transaction,
-                      { authorization: `${_proposer}@active` }
+                      { authorization: `${_proposer}@${_permission}` }
                     )
                     .then(tx => {
                       EthElements.Modal.question(
@@ -474,7 +430,7 @@ Template["views_send"].events({
             });
           }
         } catch (e) {
-          handleError(e);
+          Helpers.handleError(e);
         }
       };
 
@@ -500,7 +456,7 @@ Template["views_send"].events({
                   active: _active
                 },
                 {
-                  authorization: `${selectedAccount.account_name}@active`
+                  authorization: `${selectedAccount.account_name}@${permission}`
                 }
               );
 
@@ -511,7 +467,7 @@ Template["views_send"].events({
                   quant: "0.6295 EOS"
                 },
                 {
-                  authorization: `${selectedAccount.account_name}@active`
+                  authorization: `${selectedAccount.account_name}@${permission}`
                 }
               );
 
@@ -524,13 +480,13 @@ Template["views_send"].events({
                   transfer: 0
                 },
                 {
-                  authorization: `${selectedAccount.account_name}@active`
+                  authorization: `${selectedAccount.account_name}@${permission}`
                 }
               );
             })
             .then(onSuccess, onError);
         } catch (e) {
-          handleError(e);
+          Helpers.handleError(e);
         }
       };
 
@@ -553,18 +509,20 @@ Template["views_send"].events({
                 _name,
                 {
                   actor: selectedAccount.account_name,
-                  permission: "active"
+                  permission: permission
                 },
                 {
                   broadcast: true,
-                  authorization: `${selectedAccount.account_name}@active`
+                  authorization: `${selectedAccount.account_name}@${permission}`
                 }
               )
               .then(tx => {
                 msig
                   .exec(_proposer, _name, selectedAccount.account_name, {
                     broadcast: true,
-                    authorization: `${selectedAccount.account_name}@active`
+                    authorization: `${
+                      selectedAccount.account_name
+                    }@${permission}`
                   })
                   .then(
                     exec_tx => {
@@ -577,7 +535,7 @@ Template["views_send"].events({
               }, onError);
           });
         } catch (e) {
-          handleError(e);
+          Helpers.handleError(e);
         }
       };
 
@@ -636,8 +594,16 @@ Template["views_send"].events({
                   ),
                   account_name: selectedAccount.account_name,
                   isMultiSig: isMultiSig,
-                  callback: ({ signProvider, proposer }) => {
-                    sendFunds(to, amount, memo, signProvider, proposer);
+                  permission: isMultiSig ? "" : permission,
+                  callback: ({ signProvider, proposer, permission }) => {
+                    sendFunds(
+                      to,
+                      amount,
+                      memo,
+                      signProvider,
+                      proposer,
+                      permission
+                    );
                   }
                 }
               });
@@ -674,6 +640,7 @@ Template["views_send"].events({
             ),
             account_name: selectedAccount.account_name,
             isMultiSig: isMultiSig,
+            permission: permission,
             callback: ({ signProvider, proposer }) => {
               createAccount(accountName, publicKey, publicKey, signProvider);
             }
@@ -704,6 +671,7 @@ Template["views_send"].events({
             ),
             account_name: selectedAccount.account_name,
             isMultiSig: isMultiSig,
+            permission: permission,
             callback: ({ signProvider }) => {
               approveProposal(proposer, proposeName, signProvider);
             }

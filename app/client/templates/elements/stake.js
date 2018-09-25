@@ -27,6 +27,12 @@ Template.stake.events({
     let stake_net = TemplateVar.get("stake_net");
     let unstake_cpu = TemplateVar.get("unstake_cpu");
     let unstake_net = TemplateVar.get("unstake_net");
+    let permission = "";
+    if (self.publicKey.active) {
+      permission = "active";
+    } else if (self.publicKey.owner) {
+      permission = "owner";
+    }
 
     function get_eos(signProvider) {
       const _eos = Eos({
@@ -99,7 +105,7 @@ Template.stake.events({
                 transfer: 0
               },
               {
-                authorization: `${from}@active`
+                authorization: `${from}@${permission}`
               }
             );
           })
@@ -125,7 +131,7 @@ Template.stake.events({
                 transfer: 0
               },
               {
-                authorization: `${from}@active`
+                authorization: `${from}@${permission}`
               }
             );
           })

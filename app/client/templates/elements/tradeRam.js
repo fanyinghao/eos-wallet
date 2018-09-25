@@ -32,6 +32,12 @@ Template.tradeRam.events({
     let to = TemplateVar.get("to");
     let buy_ram = TemplateVar.get("buy_ram");
     let sell_bytes = TemplateVar.get("sell_bytes");
+    let permission = "";
+    if (self.publicKey.active) {
+      permission = "active";
+    } else if (self.publicKey.owner) {
+      permission = "owner";
+    }
 
     function get_eos(signProvider) {
       const _eos = Eos({
@@ -103,7 +109,7 @@ Template.tradeRam.events({
                 quant: toAmount(buy_ram)
               },
               {
-                authorization: `${from}@active`
+                authorization: `${from}@${permission}`
               }
             );
           })
@@ -126,7 +132,7 @@ Template.tradeRam.events({
                 bytes: parseInt(sell_bytes) * 1024
               },
               {
-                authorization: `${from}@active`
+                authorization: `${from}@${permission}`
               }
             );
           })
