@@ -123,7 +123,7 @@ Template["elements_proposals_row"].helpers({
         }`
       ];
     let threshold;
-    if (!approval) return false;
+    if (!approval) return true;
 
     owner.permissions.forEach(item => {
       if (item.perm_name === permission) {
