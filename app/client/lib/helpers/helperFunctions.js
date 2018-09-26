@@ -453,7 +453,7 @@ Helpers.approveProposal = (
       msig
         .approve(
           proposer,
-          name,
+          proposal,
           {
             actor: from,
             permission: "active"

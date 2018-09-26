@@ -301,11 +301,11 @@ Template["views_send"].events({
           duration: 2
         });
 
-      let permission = "";
-      if (selectedAccount.publicKey.active) {
-        permission = "active";
-      } else if (selectedAccount.publicKey.owner) {
-        permission = "owner";
+      let permission = "active";
+      if (selectedAccount.publicKey) {
+        if (selectedAccount.publicKey.owner) {
+          permission = "owner";
+        }
       }
 
       var onSuccess = (tr, from) => {
