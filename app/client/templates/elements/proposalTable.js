@@ -20,12 +20,14 @@ The default limit, of none is given.
 var defaultLimit = 30;
 var reactive_proposals = new ReactiveVar();
 var reactive_approvals = new ReactiveVar();
+var reactive_force_refresh = new ReactiveVar(true);
 Template.elements_proposal_table.onRendered(function() {
   let self = this;
   self.reactive_accounts = Blaze.currentView.parentView.templateInstance().reactiveVar;
 
   Tracker.autorun(function() {
     let accounts = self.reactive_accounts.get();
+    let force_refresh = reactive_force_refresh.get();
     let proposals = [];
     let approvals = {};
     let account_names = {};
@@ -227,6 +229,7 @@ Template["elements_proposals_row"].events({
         from,
         signProvider,
         tr => {
+          reactive_force_refresh.set(!reactive_force_refresh.get());
           GlobalNotification.success({
             content: "i18n:wallet.send.transactionSent",
             duration: 20,
@@ -238,6 +241,7 @@ Template["elements_proposals_row"].events({
           });
         },
         err => {
+          reactive_force_refresh.set(!reactive_force_refresh.get());
           EthElements.Modal.hide();
           if (err.message) {
             GlobalNotification.error({
