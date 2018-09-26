@@ -165,18 +165,24 @@ Template["views_account"].events({
     // Open a modal showing the QR Code
     EthElements.Modal.show({
       template: "authorized",
-      requirePrivateKey: true,
       data: {
+        requirePrivateKey: true,
         account_name: account_name,
-        callback: (signProvider, privateKey) => {
-          EthElements.Modal.hide();
-          EthElements.Modal.question(
+        callback: ({ privateKey }) => {
+          EthElements.Modal.show(
             {
-              text: privateKey,
+              template: "jsonView",
+              data: {
+                json: JSON.stringify(privateKey)
+                  .replace(/\n[\s| | ]*\r/g, "\n")
+                  .replace(/[\r\n]/g, "")
+                  .trim(),
+                options: { collapsed: false }
+              },
               ok: () => {}
             },
             {
-              closeable: false,
+              closeable: true,
               class: "modal-medium"
             }
           );
