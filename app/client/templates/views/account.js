@@ -38,9 +38,11 @@ Template.views_account.onRendered(function() {
 });
 
 function forceRefresh() {
+  // const tpl = Template.instance();
+
   let isRefresh = reactive_refresh.get();
   reactive_refresh.set(!isRefresh);
-  TemplateVar.set("refreshTx", !TemplateVar.get("refreshTx"));
+  // TemplateVar.set(tpl, "refreshTx", !TemplateVar.get(tpl, "refreshTx"));
 }
 
 Template["views_account"].onRendered(function() {});
