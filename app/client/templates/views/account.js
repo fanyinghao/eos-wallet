@@ -18,20 +18,16 @@ Template.views_account.onRendered(function() {
     let isRefresh = reactive_refresh.get();
 
     let name = FlowRouter.getParam("name");
+    let account = {
+      account_name: name
+    };
     TemplateVar.set(self, "account_name", name);
-    eos.getAccount(name).then(
-      account => {
-        account.creating = false;
-        TemplateVar.set(self, "account", account);
-
-        eos.getCurrencyBalance("eosio.token", name).then(
-          res => {
-            TemplateVar.set(self, "balance", res);
-          },
-          err => {
-            console.log(err);
-          }
-        );
+    ObservableAccounts.refresh(account).then(
+      _account => {
+        TemplateVar.set(self, "account", _account);
+        if (_account.eosBalance)
+          TemplateVar.set(self, "balance", _account.eosBalance.value);
+        else TemplateVar.set(self, "balance", "");
       },
       err => {
         FlowRouter.go("/notfound");
@@ -67,8 +63,8 @@ Template["views_account"].helpers({
     */
   formattedBalance: function(e) {
     var balance = TemplateVar.get("balance");
-    if (!balance || balance.length === 0) balance = ["0.0000 EOS"];
-    return balance[0];
+    if (!balance || balance.length === 0) balance = "0.0000";
+    return balance;
   },
   refundBalance: function(e) {
     let account = TemplateVar.get("account");
@@ -99,6 +95,7 @@ Template["views_account"].events({
       {
         template: "tradeRam",
         data: {
+          account: this,
           from: account_name,
           callback: () => {
             forceRefresh();
@@ -122,6 +119,7 @@ Template["views_account"].events({
       {
         template: "stake",
         data: {
+          account: this,
           from: account_name,
           callback: () => {
             forceRefresh();

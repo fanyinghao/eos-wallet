@@ -1,6 +1,3 @@
-const keystore = require("../../lib/eos/keystore");
-import { extend } from "../../lib/utils";
-
 /**
 Template Controllers
 
@@ -21,23 +18,17 @@ Template.elements_account.onRendered(function() {
 
   Tracker.autorun(() => {
     let name = self.reactiveAccountName.get();
-    let item = keystore.Get(name);
     let account = {
       loading: true,
       account_name: name
     };
-    if (item) {
-      account.publicKey = item.publicKey;
-      TemplateVar.set(self, "account", account);
-    }
+    TemplateVar.set(self, "account", account);
+
     ObservableAccounts.refresh(account).then(
       _account => {
-        account = extend({}, account, _account);
-        TemplateVar.set(self, "account", account);
-        ObservableAccounts.accounts[name] = account;
-
+        TemplateVar.set(self, "account", _account);
         let reactive_accounts = self.reactive_accounts.get();
-        reactive_accounts[account.account_name] = account;
+        reactive_accounts[account.account_name] = _account;
         self.reactive_accounts.set(reactive_accounts);
       },
       err => {

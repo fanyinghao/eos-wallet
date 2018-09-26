@@ -28,14 +28,15 @@ Template.tradeRam.events({
   },
   "click button": function(e, template) {
     let self = this;
+    let account = this.account;
     let from = this.from;
     let to = TemplateVar.get("to");
     let buy_ram = TemplateVar.get("buy_ram");
     let sell_bytes = TemplateVar.get("sell_bytes");
     let permission = "";
-    if (self.publicKey.active) {
+    if (account.publicKey.active) {
       permission = "active";
-    } else if (self.publicKey.owner) {
+    } else if (account.publicKey.owner) {
       permission = "owner";
     }
 

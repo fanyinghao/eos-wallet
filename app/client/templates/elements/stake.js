@@ -21,6 +21,7 @@ Template.stake.events({
   },
   "click button": function(e, template) {
     let self = this;
+    let account = this.account;
     let from = this.from;
     let to = TemplateVar.get("to");
     let stake_cpu = TemplateVar.get("stake_cpu");
@@ -28,9 +29,9 @@ Template.stake.events({
     let unstake_cpu = TemplateVar.get("unstake_cpu");
     let unstake_net = TemplateVar.get("unstake_net");
     let permission = "";
-    if (self.publicKey.active) {
+    if (account.publicKey.active) {
       permission = "active";
-    } else if (self.publicKey.owner) {
+    } else if (account.publicKey.owner) {
       permission = "owner";
     }
 

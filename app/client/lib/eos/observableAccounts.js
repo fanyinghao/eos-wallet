@@ -1,3 +1,5 @@
+import { extend } from "../../lib/utils";
+const keystore = require("../../lib/eos/keystore");
 /**
 observable accounts and setup subscriptions
 
@@ -15,6 +17,10 @@ function removed(account) {}
 function refresh(account) {
   let self = this;
   return new Promise((resolve, reject) => {
+    let item = keystore.Get(account.account_name);
+    if (item) {
+      account.publicKey = item.publicKey;
+    }
     eos.getAccount(account.account_name).then(
       _account => {
         _account.account_name = account.account_name;
@@ -23,6 +29,8 @@ function refresh(account) {
         _account.creating = false;
         _account.loading = false;
         _account.multiSig_perm = _getPerms(_account);
+        _account = extend({}, account, _account);
+
         self.accounts[account.account_name] = _account;
         eos.getCurrencyBalance("eosio.token", account.account_name).then(
           res => {
