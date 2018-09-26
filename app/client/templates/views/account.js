@@ -5,18 +5,19 @@ Template Controllers
 @module Templates
 */
 
-var reactive_refresh = new ReactiveVar(true);
+var _reactive_refresh = new ReactiveVar(true);
 
 Template.views_account.onRendered(function() {
   const tpl = Template.instance();
   let self = this;
+  self.reactive_refresh = _reactive_refresh;
 
   TemplateVar.set(self, "showPermissions", false);
 
   Tracker.autorun(function() {
     if (FlowRouter.getRouteName() !== "account") return;
 
-    let isRefresh = reactive_refresh.get();
+    let isRefresh = self.reactive_refresh.get();
 
     let name = FlowRouter.getParam("name");
     let account = {
@@ -38,11 +39,7 @@ Template.views_account.onRendered(function() {
 });
 
 function forceRefresh() {
-  // const tpl = Template.instance();
-
-  let isRefresh = reactive_refresh.get();
-  reactive_refresh.set(!isRefresh);
-  // TemplateVar.set(tpl, "refreshTx", !TemplateVar.get(tpl, "refreshTx"));
+  _reactive_refresh.set(!_reactive_refresh.get());
 }
 
 Template["views_account"].onRendered(function() {});

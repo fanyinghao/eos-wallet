@@ -20,29 +20,31 @@ The default limit, of none is given.
 var defaultLimit = 30;
 var reactive_account_name = new ReactiveVar();
 
-Template['elements_transactions_table'].onCreated(function() {
+Template["elements_transactions_table"].onCreated(function() {
   let self = this;
+  self.reactive_force_refresh = Blaze.currentView.parentView.parentView.parentView.parentView.parentView.templateInstance().reactive_refresh;
 
   reactive_account_name.set(self.data.account_name);
 
   Tracker.autorun(function() {
     let account_name = reactive_account_name.get();
+    let force_refresh = self.reactive_force_refresh.get();
 
     Helpers.getActions(account_name, -1, -defaultLimit, actions => {
-      TemplateVar.set(self, 'actions', actions);
+      TemplateVar.set(self, "actions", actions);
       if (actions.length > 0) {
-        TemplateVar.set(self, 'lastSeq', actions[0].account_action_seq);
+        TemplateVar.set(self, "lastSeq", actions[0].account_action_seq);
         TemplateVar.set(
           self,
-          'position',
+          "position",
           actions[actions.length - 1].account_action_seq
         );
-      } else TemplateVar.set(self, 'position', -1);
+      } else TemplateVar.set(self, "position", -1);
     });
   });
 });
 
-Template['elements_transactions_table'].helpers({
+Template["elements_transactions_table"].helpers({
   /**
     Changes the limit of the given cursor
 
@@ -50,7 +52,7 @@ Template['elements_transactions_table'].helpers({
     @return {Object} The items cursor
     */
   items: function() {
-    let actions = TemplateVar.get('actions');
+    let actions = TemplateVar.get("actions");
     let account_name = reactive_account_name.get();
     if (this.account_name != account_name) {
       reactive_account_name.set(this.account_name);
@@ -65,19 +67,19 @@ Template['elements_transactions_table'].helpers({
     @return {Boolean}
     */
   hasMore: function() {
-    let lastSeq = TemplateVar.get('lastSeq');
-    let actions = TemplateVar.get('actions');
-    let position = TemplateVar.get('position');
+    let lastSeq = TemplateVar.get("lastSeq");
+    let actions = TemplateVar.get("actions");
+    let position = TemplateVar.get("position");
 
     if (position === -1 || position === 0) return false;
     return actions && actions.length !== lastSeq + 1;
   }
 });
 
-Template['elements_transactions_table'].events({
-  'click button.show-more': function(e, template) {
-    let position = TemplateVar.get('position');
-    let actions = TemplateVar.get('actions');
+Template["elements_transactions_table"].events({
+  "click button.show-more": function(e, template) {
+    let position = TemplateVar.get("position");
+    let actions = TemplateVar.get("actions");
 
     if (position === -1) return;
 
@@ -87,10 +89,10 @@ Template['elements_transactions_table'].events({
       defaultLimit,
       _actions => {
         actions = actions.concat(_actions);
-        TemplateVar.set(template, 'actions', actions);
+        TemplateVar.set(template, "actions", actions);
         TemplateVar.set(
           template,
-          'position',
+          "position",
           actions[actions.length - 1].account_action_seq
         );
       }
@@ -105,7 +107,7 @@ The transaction row template
 @constructor
 */
 
-Template['elements_transactions_row'].helpers({
+Template["elements_transactions_row"].helpers({
   jsonOptions: function() {
     return {
       collapsed: true
@@ -118,31 +120,31 @@ Template['elements_transactions_row'].helpers({
     @return {String}
     */
   fromNowTime: function() {
-    Helpers.rerun['10s'].tick();
-    var diff = moment().diff(moment.unix(this.block_time), 'hours');
-    return diff < 23 ? ' ' + moment.unix(this.block_time).fromNow() : '';
+    Helpers.rerun["10s"].tick();
+    var diff = moment().diff(moment.unix(this.block_time), "hours");
+    return diff < 23 ? " " + moment.unix(this.block_time).fromNow() : "";
   },
   typeName: function() {
     return `wallet.transactions.types.${this.action_trace.act.name}`;
   }
 });
 
-Template['elements_transactions_row'].events({
+Template["elements_transactions_row"].events({
   /**
     Open transaction details on click of the <tr>
 
     @event click tr
     */
-  'click tr:not(.pending)': function(e) {
+  "click tr:not(.pending)": function(e) {
     var $element = $(e.target);
-    if (!$element.is('button') && !$element.is('a')) {
+    if (!$element.is("button") && !$element.is("a")) {
       EthElements.Modal.show(
         {
-          template: 'views_modals_transactionInfo',
+          template: "views_modals_transactionInfo",
           data: this
         },
         {
-          class: 'transaction-info'
+          class: "transaction-info"
         }
       );
     }
