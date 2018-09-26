@@ -1,4 +1,4 @@
-const keystore = require("../../../lib/eos/keystore");
+const keystore = require('../../../lib/eos/keystore');
 /**
 Template Controllers
 
@@ -6,12 +6,12 @@ Template Controllers
 */
 
 Template.authorized.onCreated(function() {
-  if (this.data.title) TemplateVar.set("title", this.data.title.string);
+  if (this.data.title) TemplateVar.set('title', this.data.title.string);
 });
 
 Template.authorized.helpers({
   title: function() {
-    return TemplateVar.get("title");
+    return TemplateVar.get('title');
   },
   isMultiSig: function() {
     return this.isMultiSig;
@@ -29,15 +29,15 @@ Template.authorized.onRendered(function() {
 
   if (this.data.isMultiSig) {
     let selectedProposer = TemplateVar.getFrom(
-      "[name=dapp-select-proposer]",
-      "value"
+      '[name=dapp-select-proposer]',
+      'value'
     );
 
-    TemplateVar.set("selectedProposer", selectedProposer);
+    TemplateVar.set('selectedProposer', selectedProposer);
     TemplateVar.set(
-      "title",
+      'title',
       new Spacebars.SafeString(
-        TAPi18n.__("wallet.send.tradeRam.authtitle", {
+        TAPi18n.__('wallet.send.tradeRam.authtitle', {
           name: selectedProposer
         })
       ).string
@@ -51,11 +51,11 @@ Template.authorized.events({
     */
   'change select[name="dapp-select-proposer"]': function(e) {
     let name = e.currentTarget.value;
-    TemplateVar.set("selectedProposer", name);
+    TemplateVar.set('selectedProposer', name);
     TemplateVar.set(
-      "title",
+      'title',
       new Spacebars.SafeString(
-        TAPi18n.__("wallet.send.tradeRam.authtitle", {
+        TAPi18n.__('wallet.send.tradeRam.authtitle', {
           name: name
         })
       ).string
@@ -70,22 +70,22 @@ Template.authorized.events({
     e,
     template
   ) {
-    TemplateVar.set("password", e.currentTarget.value);
+    TemplateVar.set('password', e.currentTarget.value);
   },
   /**
     Submit the form
 
     @event submit form
     */
-  "submit form": function(e, template) {
-    let password = TemplateVar.get("password");
+  'submit form': function(e, template) {
+    let password = TemplateVar.get('password');
     let account_name = this.isMultiSig
-      ? TemplateVar.get("selectedProposer")
+      ? TemplateVar.get('selectedProposer')
       : this.account_name;
 
     if (!password || password.length === 0)
       return GlobalNotification.warning({
-        content: "i18n:wallet.accounts.wrongPassword",
+        content: 'i18n:wallet.accounts.wrongPassword',
         duration: 2
       });
 
@@ -93,16 +93,16 @@ Template.authorized.events({
       let permission = this.permission;
       let key = keystore.Get(account_name, password);
       let sensitive = key.sensitive;
-      if (!sensitive) throw new Error("wrong password");
+      if (!sensitive) throw new Error('wrong password');
 
       if (!permission) {
-        if (key.publicKey.active) permission = "active";
-        else if (key.publicKey.owner) permission = "owner";
+        if (key.publicKey.active) permission = 'active';
+        else if (key.publicKey.owner) permission = 'owner';
       }
 
-      if (!permission)
+      if (!permission && this.requirePrivateKey)
         return GlobalNotification.warning({
-          content: "i18n:wallet.send.notdeterminepermission",
+          content: 'i18n:wallet.send.notdeterminepermission',
           duration: 2
         });
 
@@ -116,7 +116,7 @@ Template.authorized.events({
         this.callback({
           signProvider,
           privateKey: this.requirePrivateKey ? sensitive.privateKey : null,
-          proposer: TemplateVar.get("selectedProposer"),
+          proposer: TemplateVar.get('selectedProposer'),
           permission
         });
     } catch (e) {
