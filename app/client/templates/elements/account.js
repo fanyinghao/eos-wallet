@@ -12,7 +12,9 @@ The account template
 */
 
 Template.elements_account.onRendered(function() {
+  const tpl = Template.instance();
   let self = this;
+
   self.reactiveAccountName = new ReactiveVar(this.data.name);
   self.reactive_accounts = Blaze.currentView.parentView.parentView.parentView.parentView.templateInstance().reactiveVar;
 
@@ -22,11 +24,11 @@ Template.elements_account.onRendered(function() {
       loading: true,
       account_name: name
     };
-    TemplateVar.set(self, "account", account);
+    TemplateVar.set(tpl, "account", account);
 
     ObservableAccounts.refresh(account).then(
       _account => {
-        TemplateVar.set(self, "account", _account);
+        TemplateVar.set(tpl, "account", _account);
         let reactive_accounts = self.reactive_accounts.get();
         reactive_accounts[account.account_name] = _account;
         self.reactive_accounts.set(reactive_accounts);

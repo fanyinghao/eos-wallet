@@ -31,14 +31,15 @@ function refresh(account) {
         _account.multiSig_perm = _getPerms(_account);
         _account = extend({}, account, _account);
 
-        self.accounts[account.account_name] = _account;
         eos.getCurrencyBalance("eosio.token", account.account_name).then(
           res => {
-            if (res.length > 0)
-              self.accounts[account.account_name].eosBalance = {
+            if (res.length > 0) {
+              _account.eosBalance = {
                 value: res[0].split(" ")[0],
                 symbol: res[0].split(" ")[1]
               };
+            }
+            self.accounts[account.account_name] = _account;
             resolve(_account);
           },
           err => {

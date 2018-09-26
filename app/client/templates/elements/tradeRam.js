@@ -30,7 +30,7 @@ Template.tradeRam.events({
     let self = this;
     let account = this.account;
     let from = this.from;
-    let to = TemplateVar.get("to");
+    let to = TemplateVar.get("to") || from;
     let buy_ram = TemplateVar.get("buy_ram");
     let sell_bytes = TemplateVar.get("sell_bytes");
     let permission = "";

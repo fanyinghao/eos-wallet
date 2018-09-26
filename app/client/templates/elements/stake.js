@@ -23,7 +23,7 @@ Template.stake.events({
     let self = this;
     let account = this.account;
     let from = this.from;
-    let to = TemplateVar.get("to");
+    let to = TemplateVar.get("to") || from;
     let stake_cpu = TemplateVar.get("stake_cpu");
     let stake_net = TemplateVar.get("stake_net");
     let unstake_cpu = TemplateVar.get("unstake_cpu");

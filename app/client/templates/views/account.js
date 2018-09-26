@@ -8,6 +8,7 @@ Template Controllers
 var reactive_refresh = new ReactiveVar(true);
 
 Template.views_account.onRendered(function() {
+  const tpl = Template.instance();
   let self = this;
 
   TemplateVar.set(self, "showPermissions", false);
@@ -21,13 +22,13 @@ Template.views_account.onRendered(function() {
     let account = {
       account_name: name
     };
-    TemplateVar.set(self, "account_name", name);
+    TemplateVar.set(tpl, "account_name", name);
     ObservableAccounts.refresh(account).then(
       _account => {
-        TemplateVar.set(self, "account", _account);
+        TemplateVar.set(tpl, "account", _account);
         if (_account.eosBalance)
-          TemplateVar.set(self, "balance", _account.eosBalance.value);
-        else TemplateVar.set(self, "balance", "");
+          TemplateVar.set(tpl, "balance", _account.eosBalance.value);
+        else TemplateVar.set(tpl, "balance", "");
       },
       err => {
         FlowRouter.go("/notfound");
