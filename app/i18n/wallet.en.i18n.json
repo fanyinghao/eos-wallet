@@ -254,7 +254,8 @@
       "accountName": "Account name",
       "success": "Authorize permissions success",
       "requireOwner": "Requires Owner permission",
-      "requireImport": "Authorize permissions success, you need import the new private key for the owner changes."
+      "requireImport": "Authorize permissions success, you need import the new private key for the owner changes.",
+      "disallowkey": "MultiSig not allowed authorize to key"
     },
     "newWallet": {
       "title": "New <strong>Account</strong>",

@@ -1,3 +1,4 @@
+const ecc = require("eosjs-ecc");
 /**
 Template Controllers
 
@@ -170,6 +171,12 @@ Template["views_account_authorize"].events({
     let threshold = TemplateVar.get("multisigSignatures");
     let type = TemplateVar.get("type");
     let self = this;
+    let required_auth = {
+      accounts: [],
+      keys: [],
+      threshold: threshold
+    };
+    let is_err = false;
 
     function updateauth(signProvider) {
       try {
@@ -180,27 +187,6 @@ Template["views_account_authorize"].events({
           chainId: chainId,
           signProvider: signProvider,
           verbose: false
-        });
-
-        let required_auth = {
-          accounts: [],
-          keys: [],
-          threshold: threshold
-        };
-
-        owners.forEach(val => {
-          val = val.trim();
-          if (val.length === 12) {
-            required_auth.accounts.push({
-              permission: { actor: val, permission: "active" },
-              weight: 1
-            });
-          } else {
-            required_auth.keys.push({
-              key: val,
-              weight: 1
-            });
-          }
         });
 
         _eos
@@ -290,6 +276,45 @@ Template["views_account_authorize"].events({
           content: "i18n:wallet.accounts.auth.requireOwner",
           duration: 2
         });
+
+      owners.forEach(val => {
+        val = val.trim();
+        if (ecc.isValidPublic(val)) {
+          if (owners.length > 0) {
+            is_err = true;
+            return GlobalNotification.warning({
+              content: "i18n:wallet.authMultiSig.disallowkey",
+              duration: 2
+            });
+          }
+
+          required_auth.keys.push({
+            key: val,
+            weight: 1
+          });
+        } else {
+          if (
+            !eos.modules.format.isName(val, err => {
+              return GlobalNotification.warning({
+                content: err.message,
+                duration: 2
+              });
+            })
+          ) {
+            is_err = true;
+            return;
+          }
+
+          required_auth.accounts.push({
+            permission: { actor: val, permission: "active" },
+            weight: 1
+          });
+        }
+      });
+
+      if (is_err) {
+        return;
+      }
 
       EthElements.Modal.show({
         template: "authorized",

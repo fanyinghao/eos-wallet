@@ -246,7 +246,8 @@
       "multisigSigneesTitle": "修改账户权限",
       "requireOwner": "需要Owner权限",
       "success": "权限修改成功",
-      "requireImport": "权限修改成功，您需要重新导入私钥才能管理此账户（新的私钥会直接覆盖）"
+      "requireImport": "权限修改成功，您需要重新导入私钥才能管理此账户（新的私钥会直接覆盖）",
+      "disallowkey": "权限多签不允许使用密钥"
     },
     "newWallet": {
       "title": "<strong>新增账户</strong>",
