@@ -100,7 +100,9 @@ Template["views_account_create"].events({
       if (!TemplateVar.get("sending")) {
         // SIMPLE
         if (type === "simple") {
-          let accountName = template.find('input[name="accountName"]').value;
+          let accountName = template
+            .find('input[name="accountName"]')
+            .value.trim();
           let password = template.find('input[name="password"]').value;
           let rePassword = template.find('input[name="rePassword"]').value;
 
@@ -110,11 +112,16 @@ Template["views_account_create"].events({
               duration: 2
             });
 
-          if (accountName.trim().length !== 12)
-            return GlobalNotification.warning({
-              content: "i18n:wallet.newWallet.accountName",
-              duration: 2
-            });
+          if (
+            accountName.length !== 12 &&
+            !eos.modules.format.isName(accountName, err => {
+              return GlobalNotification.warning({
+                content: err.message,
+                duration: 2
+              });
+            })
+          )
+            return;
 
           let exists = keystore.Get(accountName);
           if (exists && exists.encryptedData)
