@@ -280,7 +280,7 @@ Template["views_account_authorize"].events({
       owners.forEach(val => {
         val = val.trim();
         if (ecc.isValidPublic(val)) {
-          if (owners.length > 0) {
+          if (owners.length > 1) {
             is_err = true;
             return GlobalNotification.warning({
               content: "i18n:wallet.authMultiSig.disallowkey",
