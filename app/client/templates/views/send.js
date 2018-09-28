@@ -46,6 +46,7 @@ Template["views_send"].onCreated(function() {
 });
 
 function reload_from(template) {
+  if (template.view.isDestroyed) return;
   let keys = Object.keys(ObservableAccounts.accounts).sort();
   if (keys.length > 0) {
     let from = FlowRouter.getParam("from");
