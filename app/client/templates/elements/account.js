@@ -16,7 +16,8 @@ Template.elements_account.onRendered(function() {
   let self = this;
 
   self.reactiveAccountName = new ReactiveVar(this.data.name);
-  self.reactive_accounts = Blaze.currentView.parentView.parentView.parentView.parentView.templateInstance().reactiveVar;
+  self.reactive_proposer = Blaze.currentView.parentView.parentView.parentView.parentView.templateInstance().reactive_proposer;
+  self.reactive_refreshed_count = Blaze.currentView.parentView.parentView.parentView.parentView.templateInstance().reactive_refreshed_count;
 
   Tracker.autorun(() => {
     let name = self.reactiveAccountName.get();
@@ -29,9 +30,16 @@ Template.elements_account.onRendered(function() {
     ObservableAccounts.refresh(account).then(
       _account => {
         TemplateVar.set(tpl, "account", _account);
-        let reactive_accounts = self.reactive_accounts.get();
-        reactive_accounts[account.account_name] = _account;
-        self.reactive_accounts.set(reactive_accounts);
+        let reactive_accounts = self.reactive_proposer.get();
+        if (_account.multiSig_perm.length > 0) {
+          Array.prototype.forEach.call(_account.multiSig_perm, acc => {
+            reactive_accounts[acc.actor] = "";
+          });
+          self.reactive_proposer.set(reactive_accounts);
+        }
+        self.reactive_refreshed_count.set(
+          self.reactive_refreshed_count.get() + 1
+        );
       },
       err => {
         console.error(err);

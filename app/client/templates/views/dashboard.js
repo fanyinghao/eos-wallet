@@ -16,7 +16,9 @@ var reactiveAccounts = new ReactiveVar([]);
 
 Template.views_dashboard.created = function() {
   let self = this;
-  self.reactiveVar = new ReactiveVar({});
+  self.reactive_proposer = new ReactiveVar({});
+  self.reactive_refreshed_count = new ReactiveVar(0);
+  self.reactive_refreshed_done = new ReactiveVar(false);
 
   Tracker.autorun(() => {
     let _node = reactive_node.get();
@@ -40,6 +42,9 @@ Template.views_dashboard.created = function() {
       }
     }
     reactiveAccounts.set(_accounts);
+    self.reactive_refreshed_done.set(
+      self.reactive_refreshed_count.get() === _accounts.length
+    );
     reactive_node.set(_node);
   });
 };

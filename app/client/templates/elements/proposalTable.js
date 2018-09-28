@@ -23,30 +23,19 @@ var reactive_approvals = new ReactiveVar();
 var reactive_force_refresh = new ReactiveVar(true);
 Template.elements_proposal_table.onRendered(function() {
   let self = this;
-  self.reactive_accounts = Blaze.currentView.parentView.templateInstance().reactiveVar;
+  self.reactive_proposer = Blaze.currentView.parentView.templateInstance().reactive_proposer;
+  self.reactive_refreshed_done = Blaze.currentView.parentView.templateInstance().reactive_refreshed_done;
 
   Tracker.autorun(function() {
-    let accounts = self.reactive_accounts.get();
+    if (!self.reactive_refreshed_done.get()) return;
+
+    let accounts = self.reactive_proposer.get();
     let force_refresh = reactive_force_refresh.get();
     let proposals = [];
     let approvals = {};
-    let account_names = {};
-    Array.prototype.forEach.call(Object.keys(accounts), account => {
-      if (accounts[account].permissions) {
-        Array.prototype.forEach.call(
-          accounts[account].permissions,
-          permission => {
-            Array.prototype.forEach.call(
-              permission.required_auth.accounts,
-              acc => {
-                account_names[acc.permission.actor] = "";
-              }
-            );
-          }
-        );
-      }
-    });
-    Array.prototype.forEach.call(Object.keys(account_names), name => {
+
+    console.log(accounts);
+    Array.prototype.forEach.call(Object.keys(accounts), name => {
       Helpers.getLatestProposals(name).then(res => {
         proposals = proposals.concat(res);
         reactive_proposals.set(proposals);
