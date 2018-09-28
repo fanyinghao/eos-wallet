@@ -168,7 +168,7 @@ Template["views_account_authorize"].events({
     */
   submit: function(e, template) {
     let formValues = InlineForm(".inline-form");
-    let threshold = TemplateVar.get("multisigSignatures");
+    let threshold = formValues.multisigSignatures;
     let type = TemplateVar.get("type");
     let self = this;
     let required_auth = {
