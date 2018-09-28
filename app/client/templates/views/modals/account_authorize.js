@@ -284,7 +284,7 @@ Template["views_account_authorize"].events({
             is_err = true;
             return GlobalNotification.warning({
               content: "i18n:wallet.authMultiSig.disallowkey",
-              duration: 2
+              duration: 5
             });
           }
 
@@ -296,8 +296,8 @@ Template["views_account_authorize"].events({
           if (
             !eos.modules.format.isName(val, err => {
               return GlobalNotification.warning({
-                content: err.message,
-                duration: 2
+                content: `"${val}" ${err.message}`,
+                duration: 5
               });
             })
           ) {

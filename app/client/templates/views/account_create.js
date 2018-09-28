@@ -116,8 +116,8 @@ Template["views_account_create"].events({
             accountName.length !== 12 &&
             !eos.modules.format.isName(accountName, err => {
               return GlobalNotification.warning({
-                content: err.message,
-                duration: 2
+                content: `"${accountName}" ${err.message}`,
+                duration: 5
               });
             })
           )
