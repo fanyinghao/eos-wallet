@@ -96,6 +96,7 @@ Template["views_dashboard"].helpers({
     return ret;
   },
   version: function() {
+    if (!Meteor.settings.public.commit) return "";
     return Meteor.settings.public.commit.substring(0, 7);
   }
 });
