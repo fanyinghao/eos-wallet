@@ -34,7 +34,6 @@ Template.elements_proposal_table.onRendered(function() {
     let proposals = [];
     let approvals = {};
 
-    console.log(accounts);
     Array.prototype.forEach.call(Object.keys(accounts), name => {
       Helpers.getLatestProposals(name).then(res => {
         proposals = proposals.concat(res);
