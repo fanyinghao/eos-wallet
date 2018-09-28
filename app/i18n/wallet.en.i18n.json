@@ -253,6 +253,7 @@
       "multisigSigneesTitle": "Authorize Account Permissions",
       "accountName": "Account name",
       "success": "Authorize permissions success",
+      "requireActive": "Requires Active permission",
       "requireOwner": "Requires Owner permission",
       "requireImport": "Authorize permissions success, you need import the new private key for the owner changes.",
       "disallowkey": "MultiSig not allowed authorize to key, please modify"

@@ -132,10 +132,23 @@ Template["elements_proposals_row"].helpers({
           this.action_trace.act.data.proposal_name
         }`
       ];
-
     if (!approval) return true;
 
     return approval.requested_approvals.some(item => {
+      return ObservableAccounts.accounts[item.actor];
+    });
+  },
+  canRevoke: function() {
+    let approvals = reactive_approvals.get();
+    let approval =
+      approvals[
+        `${this.action_trace.act.data.proposer}.${
+          this.action_trace.act.data.proposal_name
+        }`
+      ];
+    if (!approval) return true;
+
+    return approval.provided_approvals.some(item => {
       return ObservableAccounts.accounts[item.actor];
     });
   }
@@ -161,11 +174,12 @@ Template["elements_proposals_row"].events({
       );
     }
   },
-  "click button.dapp-block-button.approve": function(e) {
+  "click button.dapp-block-button": function(e) {
     let self = this;
     let action = this.action_trace.act.data.trx.actions[0];
+    let type = e.target.dataset.type;
 
-    if (action.name === "transfer") {
+    if (action.name === "transfer" && type === "approve") {
       EthElements.Modal.question(
         {
           template: "views_modals_sendTransactionInfo",
@@ -189,17 +203,45 @@ Template["elements_proposals_row"].events({
     }
 
     function pop_auth(data) {
+      let range = [];
+      let approvals = reactive_approvals.get();
+      let approval = approvals[`${data.proposer}.${data.proposal_name}`];
+
+      debugger;
+      if (!approval) {
+        if (type === "approve")
+          range = data.requested.map(item => {
+            return item.actor;
+          });
+      } else {
+        if (type === "approve")
+          range = approval.requested_approvals
+            .filter(item => {
+              return ObservableAccounts.accounts[item.actor];
+            })
+            .map(item => {
+              return item.actor;
+            });
+        else if (type === "revoke")
+          range = approval.provided_approvals
+            .filter(item => {
+              return ObservableAccounts.accounts[item.actor];
+            })
+            .map(item => {
+              return item.actor;
+            });
+      }
+
       EthElements.Modal.question({
         template: "authorized",
         data: {
           isMultiSig: true,
           multiSigMsg: TAPi18n.__("wallet.account.multiSig.approve"),
-          range: data.requested.map(item => {
-            return item.actor;
-          }),
+          range: range,
           callback: ({ signProvider, proposer }) => {
             EthElements.Modal.hide();
             push_transaction(
+              type,
               data.proposer,
               data.proposal_name,
               proposer,
@@ -210,41 +252,77 @@ Template["elements_proposals_row"].events({
       });
     }
 
-    function push_transaction(proposer, proposal, from, signProvider) {
-      Helpers.approveProposal(
-        proposer,
-        proposal,
-        from,
-        signProvider,
-        tr => {
-          reactive_force_refresh.set(!reactive_force_refresh.get());
-          GlobalNotification.success({
-            content: "i18n:wallet.send.transactionSent",
-            duration: 20,
-            ok: function() {
-              window.open(`${transactionMonitor}/${tr.transaction_id}`);
-              return true;
-            },
-            okText: `TX#${tr.transaction_id.substr(0, 6)}..`
-          });
-        },
-        err => {
-          reactive_force_refresh.set(!reactive_force_refresh.get());
-          EthElements.Modal.hide();
-          if (err.message) {
-            GlobalNotification.error({
-              content: err.message,
-              duration: 20
+    function push_transaction(type, proposer, proposal, from, signProvider) {
+      if (type === "approve")
+        Helpers.approveProposal(
+          proposer,
+          proposal,
+          from,
+          signProvider,
+          tr => {
+            reactive_force_refresh.set(!reactive_force_refresh.get());
+            GlobalNotification.success({
+              content: "i18n:wallet.send.transactionSent",
+              duration: 20,
+              ok: function() {
+                window.open(`${transactionMonitor}/${tr.transaction_id}`);
+                return true;
+              },
+              okText: `TX#${tr.transaction_id.substr(0, 6)}..`
             });
-          } else {
-            let error = JSON.parse(err);
-            GlobalNotification.error({
-              content: Helpers.translateExternalErrorMessage(error.error),
-              duration: 20
-            });
+          },
+          err => {
+            reactive_force_refresh.set(!reactive_force_refresh.get());
+            EthElements.Modal.hide();
+            if (err.message) {
+              GlobalNotification.error({
+                content: err.message,
+                duration: 20
+              });
+            } else {
+              let error = JSON.parse(err);
+              GlobalNotification.error({
+                content: Helpers.translateExternalErrorMessage(error.error),
+                duration: 20
+              });
+            }
           }
-        }
-      );
+        );
+      else if (type === "revoke")
+        Helpers.unapproveProposal(
+          proposer,
+          proposal,
+          from,
+          signProvider,
+          tr => {
+            reactive_force_refresh.set(!reactive_force_refresh.get());
+            GlobalNotification.success({
+              content: "i18n:wallet.send.transactionSent",
+              duration: 20,
+              ok: function() {
+                window.open(`${transactionMonitor}/${tr.transaction_id}`);
+                return true;
+              },
+              okText: `TX#${tr.transaction_id.substr(0, 6)}..`
+            });
+          },
+          err => {
+            reactive_force_refresh.set(!reactive_force_refresh.get());
+            EthElements.Modal.hide();
+            if (err.message) {
+              GlobalNotification.error({
+                content: err.message,
+                duration: 20
+              });
+            } else {
+              let error = JSON.parse(err);
+              GlobalNotification.error({
+                content: Helpers.translateExternalErrorMessage(error.error),
+                duration: 20
+              });
+            }
+          }
+        );
     }
   }
 });

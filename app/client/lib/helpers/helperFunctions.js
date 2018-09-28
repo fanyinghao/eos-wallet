@@ -501,6 +501,45 @@ Helpers.approveProposal = (
   }
 };
 
+Helpers.unapproveProposal = (
+  proposer,
+  proposal,
+  from,
+  signProvider,
+  onSuccess,
+  onError
+) => {
+  try {
+    const _eos_app = Eos({
+      httpEndpoint: httpEndpoint,
+      chainId: chainId,
+      signProvider: signProvider,
+      verbose: false
+    });
+
+    _eos_app.contract("eosio.msig").then(msig => {
+      msig
+        .unapprove(
+          proposer,
+          proposal,
+          {
+            actor: from,
+            permission: "active"
+          },
+          {
+            broadcast: true,
+            authorization: `${from}@active`
+          }
+        )
+        .then(tx => {
+          onSuccess(tx);
+        }, onError);
+    });
+  } catch (e) {
+    Helpers.handleError(e);
+  }
+};
+
 Helpers.randomWord = (randomFlag, min, max) => {
   var str = "",
     range = min,

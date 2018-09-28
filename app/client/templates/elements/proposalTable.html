@@ -64,25 +64,20 @@
             </p>
         </td>
         <td class="trx-type button">
-            <!-- {{#unless approved}}
-            <td class="button">
-                <button class="dapp-block-button approve">
-                    {{i18n "wallet.transactions.buttons.approve"}}
-                </button>
-            </td><td class="button">
-                <button class="dapp-block-button revoke">
-                    {{i18n "wallet.transactions.buttons.revoke"}}
-                </button>
-            </td>
-            {{else}} -->
             {{#if canSign}}
-            <td class="button" colspan="2">
-                <button class="dapp-block-button approve">
+            <td class="button" colspan="1">
+                <button class="dapp-block-button approve" data-type="approve">
                     {{i18n "wallet.transactions.buttons.approve"}}
                 </button>
             </td>
             {{/if}}
-            <!-- {{/unless}} -->
+            {{#if canRevoke}}
+            <td class="button" colspan="1">
+                <button class="dapp-block-button revoke" data-type="revoke">
+                    {{i18n "wallet.transactions.buttons.revoke"}}
+                </button>
+            </td>
+            {{/if}}
         </td>
     </tr>
     {{/if}}
