@@ -36,6 +36,14 @@ Template.elements_account.onRendered(function() {
             reactive_accounts[acc.actor] = "";
           });
           self.reactive_proposer.set(reactive_accounts);
+
+          if (Helpers.getActiveKeys(_account).length > 0) {
+            GlobalNotification.warning({
+              title: _account.account_name,
+              content: "i18n:wallet.authMultiSig.disallowkey",
+              duration: 5
+            });
+          }
         }
         self.reactive_refreshed_count.set(
           self.reactive_refreshed_count.get() + 1

@@ -309,6 +309,23 @@ Helpers.getActiveKeys = account => {
   _account.permissions.forEach(item => {
     if (item.perm_name === "active") {
       ret = ret.concat(
+        item.required_auth.keys.map(key => {
+          return key;
+        })
+      );
+    }
+  });
+  return ret;
+};
+
+Helpers.getActiveAccounts = account => {
+  let _account = account;
+  let ret = [];
+  if (!_account || !_account.permissions) return [];
+
+  _account.permissions.forEach(item => {
+    if (item.perm_name === "active") {
+      ret = ret.concat(
         item.required_auth.accounts.map(account => {
           return account.permission.actor;
         })
@@ -319,7 +336,7 @@ Helpers.getActiveKeys = account => {
 };
 
 Helpers.getProposals = account => {
-  let keys = Helpers.getActiveKeys(account);
+  let keys = Helpers.getActiveAccounts(account);
 
   let func = keys.map(key =>
     eos.getTableRows({
