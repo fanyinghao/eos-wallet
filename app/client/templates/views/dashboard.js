@@ -42,10 +42,30 @@ Template.views_dashboard.created = function() {
       }
     }
     reactiveAccounts.set(_accounts);
-    self.reactive_refreshed_done.set(
-      self.reactive_refreshed_count.get() === _accounts.length
-    );
     reactive_node.set(_node);
+
+    if (self.reactive_refreshed_count.get() === _accounts.length) {
+      self.reactive_refreshed_done.set(true);
+
+      let _inserted = {};
+
+      Array.prototype.forEach.call(_accounts, item => {
+        eos.getControlledAccounts(item.name).then(acc => {
+          acc.controlled_accounts.forEach(_name => {
+            if (!keystore.Get(_name) && !_inserted[_name]) {
+              let _acc = {
+                name: _name
+              };
+              _accounts.push(_acc);
+              reactiveAccounts.set(_accounts);
+
+              keystore.SetAccount(_name);
+              _inserted[_name] = "";
+            }
+          });
+        });
+      });
+    }
   });
 };
 
