@@ -31,7 +31,7 @@ Template.elements_account.onRendered(function() {
       _account => {
         TemplateVar.set(tpl, "account", _account);
         let reactive_accounts = self.reactive_proposer.get();
-        if (_account.multiSig_perm.length > 0) {
+        if (_account.multiSig_perm && _account.multiSig_perm.length > 0) {
           Array.prototype.forEach.call(_account.multiSig_perm, acc => {
             reactive_accounts[acc.actor] = "";
           });
