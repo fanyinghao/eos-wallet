@@ -159,6 +159,7 @@ Template["views_account"].events({
         account_name: account_name,
         callback: () => {
           keystore.Remove(account_name);
+          delete ObservableAccounts.accounts[account_name];
           FlowRouter.go("dashboard");
           return true;
         }

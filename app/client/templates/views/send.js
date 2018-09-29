@@ -607,6 +607,15 @@ Template["views_send"].events({
                   account_name: selectedAccount.account_name,
                   isMultiSig: isMultiSig,
                   permission: isMultiSig ? "" : permission,
+                  range: isMultiSig
+                    ? selectedAccount.multiSig_perm
+                        .map(item => {
+                          return item.actor;
+                        })
+                        .filter(item => {
+                          return ObservableAccounts.accounts[item];
+                        })
+                    : [],
                   callback: ({ signProvider, proposer, permission }) => {
                     sendFunds(
                       to,
