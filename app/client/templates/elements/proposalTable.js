@@ -23,8 +23,16 @@ var reactive_approvals = new ReactiveVar();
 var reactive_force_refresh = new ReactiveVar(true);
 Template.elements_proposal_table.onRendered(function() {
   let self = this;
-  self.reactive_proposer = Blaze.currentView.parentView.templateInstance().reactive_proposer;
-  self.reactive_refreshed_done = Blaze.currentView.parentView.templateInstance().reactive_refreshed_done;
+  let parentView = {};
+
+  if (FlowRouter.getRouteName() === "dashboard") {
+    parentView = Blaze.currentView.parentView.templateInstance();
+  } else if (FlowRouter.getRouteName() === "account") {
+    parentView = Blaze.currentView.parentView.parentView.parentView.parentView.templateInstance();
+  }
+
+  self.reactive_proposer = parentView.reactive_proposer;
+  self.reactive_refreshed_done = parentView.reactive_refreshed_done;
 
   Tracker.autorun(function() {
     if (!self.reactive_refreshed_done.get()) return;
@@ -207,7 +215,6 @@ Template["elements_proposals_row"].events({
       let approvals = reactive_approvals.get();
       let approval = approvals[`${data.proposer}.${data.proposal_name}`];
 
-      debugger;
       if (!approval) {
         if (type === "approve")
           range = data.requested.map(item => {

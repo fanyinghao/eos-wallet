@@ -12,6 +12,9 @@ Template.views_account.onRendered(function() {
   let self = this;
   self.reactive_refresh = _reactive_refresh;
 
+  self.reactive_proposer = new ReactiveVar({});
+  self.reactive_refreshed_done = new ReactiveVar(false);
+
   TemplateVar.set(self, "showPermissions", false);
 
   Tracker.autorun(function() {
@@ -30,6 +33,15 @@ Template.views_account.onRendered(function() {
         if (_account.eosBalance)
           TemplateVar.set(tpl, "balance", _account.eosBalance.value);
         else TemplateVar.set(tpl, "balance", "");
+
+        self.reactive_refreshed_done = new ReactiveVar(true);
+
+        let proposers = {};
+        _account.multiSig_perm.forEach(item => {
+          proposers[item.actor] = "";
+        });
+
+        self.reactive_proposer = new ReactiveVar(proposers);
       },
       err => {
         FlowRouter.go("/notfound");
