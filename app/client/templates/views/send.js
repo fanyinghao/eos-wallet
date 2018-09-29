@@ -51,7 +51,7 @@ function reload_from(template) {
   if (keys.length > 0) {
     let from = FlowRouter.getParam("from");
     if (!from) from = ObservableAccounts.accounts[keys[0]].account_name;
-    TemplateVar.setTo('select[name="dapp-select-account"]', "value", from);
+    template.$('select[name="dapp-select-account"]').val(from);
     template.$('select[name="dapp-select-account"]').trigger("change");
   }
 }
