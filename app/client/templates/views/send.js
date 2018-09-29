@@ -430,7 +430,7 @@ Template["views_send"].events({
                             proposeName: proposal_name
                           }),
                           ok: function() {
-                            onSuccess(tx, _proposer);
+                            onSuccess(tx);
                           }
                         },
                         {
