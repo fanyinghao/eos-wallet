@@ -71,6 +71,7 @@ Template.elements_proposal_table.onRendered(function() {
     let force_refresh = reactive_force_refresh.get();
     let proposals = [];
     let approvals = {};
+    reactive_proposals.set({});
 
     Array.prototype.forEach.call(Object.keys(accounts), name => {
       Helpers.getLatestProposals(name).then(res => {

@@ -140,6 +140,7 @@ Template["views_dashboard"].events({
     reload_chain(e.target.value);
     reactive_node.set(e.target.value);
     reactiveAccounts.set([]);
+    template.reactive_proposer.set({});
 
     console.log("clicked");
   },
