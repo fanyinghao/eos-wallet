@@ -270,7 +270,7 @@
           "title": "多重签名的钱包合约",
           "description": "一个受多个账户控制的合约。",
           "text1": "此账户受",
-          "text2": "个所有者控制。每次交易都需要",
+          "text2": "个所有者控制。每次交易需",
           "text5": "个所有账户确认。",
           "accountOwnersTitle": "账户所有者们",
           "ownerAddress": "所有者地址",
