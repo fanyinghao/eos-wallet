@@ -47,6 +47,10 @@ function is_done(item) {
   return threshold < approval.provided_approvals.length;
 }
 
+Template.elements_proposal_table.onCreated(function() {
+  reactive_proposals.set({});
+});
+
 Template.elements_proposal_table.onRendered(function() {
   let self = this;
   let parentView = {};
