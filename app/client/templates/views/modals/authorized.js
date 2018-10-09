@@ -97,6 +97,7 @@ Template.authorized.events({
 
       if (!permission) {
         if (key.publicKey.active) permission = "active";
+        else if (key.publicKey.owner) permission = "owner";
         else {
           GlobalNotification.error({
             content: "i18n:wallet.authMultiSig.requireActive",
