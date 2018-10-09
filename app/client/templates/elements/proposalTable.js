@@ -21,6 +21,32 @@ var defaultLimit = 30;
 var reactive_proposals = new ReactiveVar();
 var reactive_approvals = new ReactiveVar();
 var reactive_force_refresh = new ReactiveVar(true);
+
+function is_done(item) {
+  let actor = item.action_trace.act.data.trx.actions[0].authorization[0].actor;
+  let permission =
+    item.action_trace.act.data.trx.actions[0].authorization[0].permission;
+  let owner = ObservableAccounts.accounts[actor];
+  let approvals = reactive_approvals.get();
+  let approval =
+    approvals[
+      `${item.action_trace.act.data.proposer}.${
+        item.action_trace.act.data.proposal_name
+      }`
+    ];
+  let threshold;
+  if (!approval) return true;
+
+  owner.permissions.forEach(item => {
+    if (item.perm_name === permission) {
+      threshold = item.required_auth.threshold;
+      return;
+    }
+  });
+
+  return threshold < approval.provided_approvals.length;
+}
+
 Template.elements_proposal_table.onRendered(function() {
   let self = this;
   let parentView = {};
@@ -44,7 +70,9 @@ Template.elements_proposal_table.onRendered(function() {
 
     Array.prototype.forEach.call(Object.keys(accounts), name => {
       Helpers.getLatestProposals(name).then(res => {
-        proposals = proposals.concat(res);
+        proposals = proposals.concat(res).filter(item => {
+          return !is_done(item);
+        });
         reactive_proposals.set(proposals);
       });
       Helpers.getApprovals(name).then(res => {
@@ -106,31 +134,6 @@ Template["elements_proposals_row"].helpers({
   getApproval: function(proposer, proposal) {
     let approvals = reactive_approvals.get();
     return approvals[`${proposer}.${proposal}`];
-  },
-  done: function() {
-    let actor = this.action_trace.act.data.trx.actions[0].authorization[0]
-      .actor;
-    let permission = this.action_trace.act.data.trx.actions[0].authorization[0]
-      .permission;
-    let owner = ObservableAccounts.accounts[actor];
-    let approvals = reactive_approvals.get();
-    let approval =
-      approvals[
-        `${this.action_trace.act.data.proposer}.${
-          this.action_trace.act.data.proposal_name
-        }`
-      ];
-    let threshold;
-    if (!approval) return true;
-
-    owner.permissions.forEach(item => {
-      if (item.perm_name === permission) {
-        threshold = item.required_auth.threshold;
-        return;
-      }
-    });
-
-    return threshold < approval.provided_approvals.length;
   },
   canSign: function() {
     let approvals = reactive_approvals.get();
