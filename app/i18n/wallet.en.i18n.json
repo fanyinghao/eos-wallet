@@ -256,6 +256,7 @@
       "requireActive": "Requires Active permission",
       "requireOwner": "Requires Owner permission",
       "requireImport": "Authorize permissions success, you need import the new private key for the owner changes.",
+      "functionnotavailable": "This function is not available for multisig account",
       "disallowself": "Authorize account cannot be the self.",
       "disallowkey": "MultiSig not allowed authorize to key, please modify"
     },

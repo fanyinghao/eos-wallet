@@ -101,8 +101,13 @@ Template["views_account"].events({
     @event click button.remove-button
     */
   "click button.buy-button": function(e, template) {
-    forceRefresh();
     let account_name = TemplateVar.get("account_name");
+    if (Helpers.isMultiSig(this)) {
+      return GlobalNotification.warning({
+        content: "i18n:wallet.authMultiSig.functionnotavailable",
+        duration: 5
+      });
+    }
     EthElements.Modal.show(
       {
         template: "tradeRam",
