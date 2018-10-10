@@ -305,6 +305,14 @@ Template["views_account_authorize"].events({
             return;
           }
 
+          if (val === self.account.account_name) {
+            is_err = true;
+            return GlobalNotification.warning({
+              content: "i18n:wallet.authMultiSig.disallowself",
+              duration: 5
+            });
+          }
+
           required_auth.accounts.push({
             permission: { actor: val, permission: "active" },
             weight: 1
