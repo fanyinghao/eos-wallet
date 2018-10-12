@@ -143,6 +143,9 @@ Template["views_send"].helpers({
   newAccount: function() {
     var newaccount = TemplateVar.get("newaccount");
     return newaccount;
+  },
+  toNewAccount: function() {
+    return FlowRouter.getRouteName() === "newaccount";
   }
 });
 
