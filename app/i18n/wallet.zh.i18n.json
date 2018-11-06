@@ -18,7 +18,8 @@
         "receive": "接收",
         "addWallet": "新增钱包",
         "addAccount": "新增帐户",
-        "addToken": "查看代币"
+        "addToken": "查看代币",
+        "settings": "设置"
       },
       "texts": {
         "note": "备注",
@@ -440,6 +441,9 @@
       "sendNewAccount": "去发送创建账号事务",
       "transfer": "转账",
       "importedTitle": "已导入账号"
+    },
+    "settings": {
+      "title": "节点网络"
     }
   }
 }

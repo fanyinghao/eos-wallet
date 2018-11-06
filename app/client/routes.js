@@ -148,3 +148,18 @@ FlowRouter.route("/account/:name", {
     });
   }
 });
+
+/**
+The settings route.
+
+@method send
+*/
+FlowRouter.route("/settings", {
+  name: "settings",
+  action: function(params, queryParams) {
+    BlazeLayout.render("layout_main", {
+      header: "layout_header",
+      main: "views_settings"
+    });
+  }
+});

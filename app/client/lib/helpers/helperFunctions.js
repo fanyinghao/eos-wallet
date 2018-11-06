@@ -582,3 +582,21 @@ Helpers.randomWord = (randomFlag, min, max) => {
   }
   return str;
 };
+
+Helpers.getProducers = () => {
+  return new Promise((resolve, reject) => {
+    eos
+      .getProducers({
+        json: true,
+        limit: 21
+      })
+      .then(
+        res => {
+          resolve(res.rows);
+        },
+        err => {
+          reject(err);
+        }
+      );
+  });
+};

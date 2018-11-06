@@ -19,7 +19,8 @@
         "addWallet": "Add wallet contract",
         "addAccount": "Add account",
         "addToken": "Watch token",
-        "tokenAutoScan": "Auto-Scan"
+        "tokenAutoScan": "Auto-Scan",
+        "settings": "Settings"
       },
       "texts": {
         "note": "Note",
@@ -460,6 +461,9 @@
       "sendNewAccount": "Go to send transaction",
       "transfer": "transfer",
       "importedTitle": "Imported Account"
+    },
+    "settings": {
+      "title": "Peer Network"
     }
   }
 }

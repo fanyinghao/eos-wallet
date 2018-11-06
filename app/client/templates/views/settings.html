@@ -1,0 +1,51 @@
+<template name="views_settings">
+
+    <!-- we use a form, which posts into the "dapp-form-helper-iframe" iframe, so that the browser stores input fields for native autocomplete -->
+    <form class="account-send-form" action="about:blank" target="dapp-form-helper-iframe" autocomplete="on">
+        <h1>{{{i18n 'wallet.settings.title'}}}</h1>
+        <div class="row clear new-account">
+            <div class="col col-6 mobile-full from">
+                <table class="dapp-zebra transactions">
+                    <tbody>
+                        {{#each nodes }}
+                        <tr>
+                            <td>
+                                <span>
+                                    {{owner}}
+                                </span>
+                            </td>
+                            {{#if node}}
+                            <td>
+                                <span>
+                                    {{node}}
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    {{tls}}ms
+                                </span>
+                            </td>
+                            {{else}}
+                            <td colspan="2">
+                                <span>
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                            </td>
+                            {{/if}}
+                            <td>
+                                {{#if $eq curNode.owner owner}}
+                                <span>
+                                    <i class="fa fa-check-circle" style="font-size:24px;color:green"></i>
+                                </span>
+                                {{/if}}
+                            </td>
+                        </tr>
+
+                        {{/each}}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+</template>

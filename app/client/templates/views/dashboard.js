@@ -11,7 +11,7 @@ The dashboard template
 @class [template] views_dashboard
 @constructor
 */
-var reactive_node = new ReactiveVar(localStorage.getItem("chain_node"));
+var reactive_node = new ReactiveVar(localStorage.getItem("cur_chain"));
 var reactiveAccounts = new ReactiveVar([]);
 
 Template.views_dashboard.created = function() {
@@ -117,7 +117,7 @@ Template["views_dashboard"].helpers({
     return Object.keys(chains);
   },
   selected: function(value) {
-    let ret = value === localStorage.getItem("chain_node") ? "selected" : "";
+    let ret = value === localStorage.getItem("cur_chain") ? "selected" : "";
     return ret;
   },
   version: function() {
@@ -136,7 +136,7 @@ Template["views_dashboard"].events({
     e.preventDefault();
   },
 
-  "change select[name=chain_node]": function(e, template) {
+  "change select[name=cur_chain]": function(e, template) {
     reload_chain(e.target.value);
     reactive_node.set(e.target.value);
     reactiveAccounts.set([]);

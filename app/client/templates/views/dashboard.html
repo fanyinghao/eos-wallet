@@ -29,17 +29,6 @@
         {{/if}}
 
         {{> elements_proposal_table }} 
-
-        <div class="dapp-clear-fix"></div>
-        <div class="select-chain-container">
-            <select name="chain_node" value={{chain_node}}>
-                {{#each chain_nodes}}
-                <option value="{{this}}" {{selected this}}>
-                    {{this}}
-                </option>
-                {{/each}}
-            </select>
-        </div>
         
         <div class="dapp-clear-fix"></div>
         <div class="version-container">

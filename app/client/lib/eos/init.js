@@ -26,16 +26,17 @@ chains = {
 };
 
 eos = null;
-httpEndpoint = "";
+let cur_node = localStorage.getItem("cur_node");
+httpEndpoint = cur_node ? JSON.parse(cur_node).node : "";
 transactionMonitor = "";
 chainId = "";
-var chain_node = localStorage.getItem("chain_node");
+var cur_chain = localStorage.getItem("cur_chain");
 
-reload_chain = function(_node) {
-  localStorage.setItem("chain_node", _node);
-  let node = chains[_node];
+reload_chain = function(_endpoint) {
+  let node = chains[cur_chain];
 
-  httpEndpoint = node.httpEndpoint;
+  if (_endpoint) httpEndpoint = _endpoint;
+  if (!_endpoint && !httpEndpoint) httpEndpoint = node.httpEndpoint;
   transactionMonitor = node.transactionMonitor;
   chainId = node.chainId;
 
@@ -48,8 +49,8 @@ reload_chain = function(_node) {
   ObservableAccounts.accounts = [];
 };
 
-if (!chain_node) {
-  localStorage.setItem("chain_node", "zbeos");
-  chain_node = "zbeos";
+if (!cur_chain) {
+  localStorage.setItem("cur_chain", "zbeos");
+  cur_chain = "zbeos";
 }
-reload_chain(chain_node);
+reload_chain();
