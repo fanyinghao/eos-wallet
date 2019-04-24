@@ -50,7 +50,7 @@ Template.views_dashboard.created = function() {
       let _inserted = {};
 
       Array.prototype.forEach.call(_accounts, item => {
-        eos.getControlledAccounts(item.name).then(acc => {
+        EOS.RPC.history_get_controlled_accounts(item.name).then(acc => {
           acc.controlled_accounts.forEach(_name => {
             if (!keystore.Get(_name) && !_inserted[_name]) {
               let _acc = {

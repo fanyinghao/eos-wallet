@@ -106,7 +106,7 @@ Returns a string, given an account anme
 **/
 Helpers.getAccountByName = function(name) {
   return new Promise((resolve, reject) => {
-    eos.getAccount(name).then(
+    EOS.RPC.get_account(name).then(
       account => {
         resolve(account);
       },
@@ -277,7 +277,7 @@ Helpers.formatTransactionBalance = function(value, exchangeRates, unit) {
 };
 
 Helpers.getActions = (name, pos, offset, callback) => {
-  eos.getActions(name, pos, offset).then(res => {
+  EOS.RPC.history_get_actions(name, pos, offset).then(res => {
     callback(
       res.actions
         .filter(item => {
@@ -339,7 +339,7 @@ Helpers.getProposals = account => {
   let keys = Helpers.getActiveAccounts(account);
 
   let func = keys.map(key =>
-    eos.getTableRows({
+    EOS.RPC.get_table_rows({
       json: true,
       code: "eosio.msig",
       scope: key,
@@ -377,7 +377,7 @@ Helpers.copyAddress = element => {
 
 Helpers.getLatestProposals = name => {
   return new Promise((resolve, reject) => {
-    eos.getActions(name, -1, -100).then(
+    EOS.RPC.history_get_actions(name, -1, -100).then(
       res => {
         resolve(
           res.actions
@@ -395,15 +395,15 @@ Helpers.getLatestProposals = name => {
                 action => {
                   try {
                     action.origin_data = Fcbuffer.fromBuffer(
-                      eos.fc.abiCache.abi(action.account).structs[action.name],
+                      EOS.API.getCachedAbi(action.account).structs[action.name],
                       Buffer.from(action.data, "hex")
                     );
                     return action;
                   } catch (e) {
                     // Abi 'eosio.xxxx' is not cached
-                    eos.getAbi(action.account).then(res => {
+                    EOS.RPC.get_abi(action.account).then(res => {
                       action.origin_data = Fcbuffer.fromBuffer(
-                        eos.fc.abiCache.abi(action.account).structs[
+                        EOS.API.getCachedAbi(action.account).structs[
                           action.name
                         ],
                         Buffer.from(action.data, "hex")
@@ -431,22 +431,20 @@ Helpers.getLatestProposals = name => {
 
 Helpers.getApprovals = name => {
   return new Promise((resolve, reject) => {
-    eos
-      .getTableRows({
-        json: true,
-        code: "eosio.msig",
-        scope: name,
-        table: "approvals",
-        limit: 0
-      })
-      .then(
-        res => {
-          resolve(res.rows);
-        },
-        err => {
-          reject(err);
-        }
-      );
+    EOS.RPC.get_table_rows({
+      json: true,
+      code: "eosio.msig",
+      scope: name,
+      table: "approvals",
+      limit: 0
+    }).then(
+      res => {
+        resolve(res.rows);
+      },
+      err => {
+        reject(err);
+      }
+    );
   });
 };
 

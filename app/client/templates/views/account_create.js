@@ -132,7 +132,7 @@ Template["views_account_create"].events({
 
           TemplateVar.set("sending", true);
 
-          eos.getAccount(accountName).then(
+          EOS.RPC.get_account(accountName).then(
             account => {
               TemplateVar.set(template, "sending", false);
 
@@ -208,7 +208,7 @@ Template["views_account_create"].events({
 
           TemplateVar.set("sending", true);
 
-          eos.getKeyAccounts(publicKey).then(
+          EOS.RPC.history_get_key_accounts(publicKey).then(
             accounts => {
               TemplateVar.set(template, "sending", false);
 
@@ -220,7 +220,7 @@ Template["views_account_create"].events({
               }
 
               accounts.account_names.forEach(name => {
-                eos.getAccount(name).then(_account => {
+                EOS.RPC.get_account(name).then(_account => {
                   let _tmp_pub = {};
                   let _tmp_priv = {};
                   _account.permissions.forEach(item => {
@@ -237,11 +237,13 @@ Template["views_account_create"].events({
                   keystore.SetKey(name, password, _tmp_priv, _tmp_pub);
                 });
 
-                eos.getControlledAccounts(name).then(_accounts => {
-                  _accounts.controlled_accounts.forEach(_name => {
-                    if (!keystore.Get(_name)) keystore.SetAccount(_name);
-                  });
-                });
+                EOS.RPC.history_get_controlled_accounts(name).then(
+                  _accounts => {
+                    _accounts.controlled_accounts.forEach(_name => {
+                      if (!keystore.Get(_name)) keystore.SetAccount(_name);
+                    });
+                  }
+                );
               });
 
               EthElements.Modal.show(

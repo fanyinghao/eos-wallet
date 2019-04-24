@@ -1,4 +1,4 @@
-Eos = require("eosjs");
+const { Api, JsonRpc } = require("eosjs");
 const { observableAccounts } = require("./observableAccounts");
 ObservableAccounts = observableAccounts;
 
@@ -25,7 +25,7 @@ chains = {
   }
 };
 
-eos = null;
+EOS = {};
 let cur_node = localStorage.getItem("cur_node");
 httpEndpoint = cur_node ? JSON.parse(cur_node).node : "";
 transactionMonitor = "";
@@ -40,11 +40,11 @@ reload_chain = function(_endpoint) {
   transactionMonitor = node.transactionMonitor;
   chainId = node.chainId;
 
-  eos = Eos({
-    httpEndpoint: httpEndpoint,
-    chainId: chainId,
-    verbose: false
-  });
+  const rpc = new JsonRpc(httpEndpoint);
+  EOS = {
+    RPC: rpc,
+    API: new Api({ rpc, chainId })
+  };
 
   ObservableAccounts.accounts = [];
 };

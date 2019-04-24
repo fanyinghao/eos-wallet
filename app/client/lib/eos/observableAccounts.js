@@ -21,7 +21,7 @@ function refresh(account) {
     if (item) {
       account.publicKey = item.publicKey;
     }
-    eos.getAccount(account.account_name).then(
+    EOS.RPC.get_account(account.account_name).then(
       _account => {
         _account.account_name = account.account_name;
         _account._id = account.account_name;
@@ -31,7 +31,7 @@ function refresh(account) {
         _account.multiSig_perm = _getPerms(_account);
         _account = extend({}, account, _account);
 
-        eos.getCurrencyBalance("eosio.token", account.account_name).then(
+        EOS.RPC.get_currency_balance("eosio.token", account.account_name).then(
           res => {
             if (res.length > 0) {
               _account.eosBalance = {
