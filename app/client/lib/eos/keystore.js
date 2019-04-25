@@ -1,5 +1,5 @@
 import { SecureStorage } from "../../lib/eosjs-SecureStorage/lib";
-
+const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const STORGE_ID = "EOS_ACCOUNT_";
 
 export function SetKey(accountName, password, privateKey, publicKey) {
@@ -46,13 +46,12 @@ export function SignProvider(accountName, password, permission) {
   const storage = new SecureStorage({ id: STORGE_ID + chainId });
   let sensitive = storage.get(accountName, password).sensitive;
   if (!sensitive) throw new Error("wrong password");
-  let provider = ({ sign, buf }) =>
-    sign(
-      buf,
-      typeof sensitive.privateKey === "string"
-        ? sensitive.privateKey
-        : sensitive.privateKey[permission]
-    );
+  debugger;
+  let provider = new JsSignatureProvider([
+    typeof sensitive.privateKey === "string"
+      ? sensitive.privateKey
+      : sensitive.privateKey[permission]
+  ]);
   return provider;
 }
 
