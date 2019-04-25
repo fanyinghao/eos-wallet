@@ -1,5 +1,4 @@
-const keystore = require("../../lib/eos/keystore");
-Eos = require("eosjs");
+const { Api } = require("eosjs");
 /**
 Template Controllers
 
@@ -454,51 +453,80 @@ Template["views_send"].events({
         TemplateVar.set(template, "sending", true);
 
         try {
-          const _eos = Eos({
-            httpEndpoint: httpEndpoint,
-            chainId: chainId,
-            signProvider: signProvider,
-            verbose: false
+          const api = new Api({
+            rpc: EOS.RPC,
+            signatureProvider: signProvider
           });
-
-          _eos
-            .transaction(tr => {
-              tr.newaccount(
-                {
-                  creator: selectedAccount.account_name,
-                  name: _name,
-                  owner: _owner,
-                  active: _active
-                },
-                {
-                  authorization: `${selectedAccount.account_name}@${permission}`
-                }
-              );
-
-              tr.buyram(
-                {
-                  payer: selectedAccount.account_name,
-                  receiver: _name,
-                  quant: "0.6295 EOS"
-                },
-                {
-                  authorization: `${selectedAccount.account_name}@${permission}`
-                }
-              );
-
-              tr.delegatebw(
-                {
-                  from: selectedAccount.account_name,
-                  receiver: _name,
-                  stake_net_quantity: "0.0050 EOS",
-                  stake_cpu_quantity: "0.0400 EOS",
-                  transfer: 0
-                },
-                {
-                  authorization: `${selectedAccount.account_name}@${permission}`
-                }
-              );
-            })
+          const _auth = [
+            {
+              actor: selectedAccount.account_name,
+              permission: permission
+            }
+          ];
+          api
+            .transact(
+              {
+                actions: [
+                  {
+                    action: "eosio",
+                    name: "newaccount",
+                    authorization: _auth,
+                    data: {
+                      creator: selectedAccount.account_name,
+                      name: _name,
+                      owner: {
+                        threshold: 1,
+                        keys: [
+                          {
+                            key: _owner,
+                            weight: 1
+                          }
+                        ],
+                        accounts: [],
+                        waits: []
+                      },
+                      active: {
+                        threshold: 1,
+                        keys: [
+                          {
+                            key: _active,
+                            weight: 1
+                          }
+                        ],
+                        accounts: [],
+                        waits: []
+                      }
+                    }
+                  },
+                  {
+                    account: "eosio",
+                    name: "buyram",
+                    authorization: _auth,
+                    data: {
+                      payer: selectedAccount.account_name,
+                      receiver: _name,
+                      quant: "0.6295 EOS"
+                    }
+                  },
+                  {
+                    account: "eosio",
+                    name: "delegatebw",
+                    authorization: _auth,
+                    data: {
+                      from: selectedAccount.account_name,
+                      receiver: _name,
+                      stake_net_quantity: "0.0050 EOS",
+                      stake_cpu_quantity: "0.0400 EOS",
+                      transfer: false
+                    }
+                  }
+                ]
+              },
+              {
+                blocksBehind: 3,
+                expireSeconds: 30
+              }
+            )
             .then(onSuccess, onError);
         } catch (e) {
           Helpers.handleError(e);
