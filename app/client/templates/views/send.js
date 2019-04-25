@@ -538,45 +538,67 @@ Template["views_send"].events({
         TemplateVar.set(template, "sending", true);
 
         try {
-          const _eos_app = Eos({
-            httpEndpoint: httpEndpoint,
-            chainId: chainId,
-            signProvider: signProvider,
-            verbose: false
+          const api = new Api({
+            rpc: EOS.RPC,
+            signatureProvider: signProvider
           });
+          const _auth = {
+            actor: selectedAccount.account_name,
+            permission: permission
+          };
 
-          _eos_app.contract("eosio.msig").then(msig => {
-            msig
-              .approve(
-                _proposer,
-                _name,
-                {
-                  actor: selectedAccount.account_name,
-                  permission: permission
-                },
-                {
-                  broadcast: true,
-                  authorization: `${selectedAccount.account_name}@${permission}`
-                }
-              )
-              .then(tx => {
-                msig
-                  .exec(_proposer, _name, selectedAccount.account_name, {
-                    broadcast: true,
-                    authorization: `${
-                      selectedAccount.account_name
-                    }@${permission}`
-                  })
-                  .then(
-                    exec_tx => {
-                      onSuccess(exec_tx);
-                    },
-                    () => {
-                      onSuccess(tx);
+          api
+            .transact(
+              {
+                actions: [
+                  {
+                    account: "eosio.msig",
+                    name: "approve",
+                    authorization: [_auth],
+                    data: {
+                      proposer: _proposer,
+                      name: _name,
+                      level: _auth
                     }
-                  );
-              }, onError);
-          });
+                  }
+                ]
+              },
+              {
+                blocksBehind: 3,
+                expireSeconds: 30
+              }
+            )
+            .then(tx => {
+              api
+                .transact(
+                  {
+                    actions: [
+                      {
+                        account: "eosio.msig",
+                        name: "exec",
+                        authorization: [_auth],
+                        data: {
+                          proposer: _proposer,
+                          name: _name,
+                          executer: selectedAccount.account_name
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    blocksBehind: 3,
+                    expireSeconds: 30
+                  }
+                )
+                .then(
+                  exec_tx => {
+                    onSuccess(exec_tx);
+                  },
+                  () => {
+                    onSuccess(tx);
+                  }
+                );
+            });
         } catch (e) {
           Helpers.handleError(e);
         }
