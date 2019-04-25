@@ -1,6 +1,4 @@
-const keystore = require('../../lib/eos/keystore');
-const http = require('../../lib/helpers/http');
-Eos = require('eosjs');
+const http = require("../../lib/helpers/http");
 /**
 Template Controllers
 
@@ -15,14 +13,14 @@ The add user template
 */
 
 // Set basic variables
-Template['views_settings'].onCreated(function() {});
+Template["views_settings"].onCreated(function() {});
 
 var reactive_nodes = new ReactiveVar({});
 var reactive_custom_nodes = new ReactiveVar(
-  JSON.parse(localStorage.getItem('custom_nodes'))
+  JSON.parse(localStorage.getItem("custom_nodes"))
 );
 var reactive_cur_node = new ReactiveVar(
-  JSON.parse(localStorage.getItem('cur_node'))
+  JSON.parse(localStorage.getItem("cur_node"))
 );
 
 Template.views_settings.onRendered(function() {
@@ -41,8 +39,8 @@ Template.views_settings.onRendered(function() {
         Array.prototype.forEach.call(custom_nodes, (item, index, arr) => {
           http
             .ping({
-              url: item.node + '/v1/history/get_actions',
-              method: 'post'
+              url: item.node + "/v1/history/get_actions",
+              method: "post"
             })
             .then(tls => {
               arr[index].tls = tls;
@@ -53,7 +51,7 @@ Template.views_settings.onRendered(function() {
       Array.prototype.forEach.call(data, item => {
         http
           .get({
-            url: item.url + '/bp.json'
+            url: item.url + "/bp.json"
           })
           .then(
             res => {
@@ -69,8 +67,8 @@ Template.views_settings.onRendered(function() {
                   : node.api_endpoint;
                 http
                   .ping({
-                    url: url + '/v1/history/get_actions',
-                    method: 'post'
+                    url: url + "/v1/history/get_actions",
+                    method: "post"
                   })
                   .then(tls => {
                     nodes[item.owner].tls = tls;
@@ -88,7 +86,7 @@ Template.views_settings.onRendered(function() {
   });
 });
 
-Template['views_settings'].helpers({
+Template["views_settings"].helpers({
   nodes: function() {
     let nodes = reactive_nodes.get();
     let custom_nodes = reactive_custom_nodes.get();
@@ -102,12 +100,12 @@ Template['views_settings'].helpers({
   }
 });
 
-Template['views_settings'].events({
-  'click tr': function(e) {
+Template["views_settings"].events({
+  "click tr": function(e) {
     if (!this.node) return;
     reactive_cur_node.set({ owner: this.owner, node: this.node });
     localStorage.setItem(
-      'cur_node',
+      "cur_node",
       JSON.stringify({ owner: this.owner, node: this.node })
     );
     reload_chain(this.node);
@@ -116,31 +114,31 @@ Template['views_settings'].events({
     e,
     template
   ) {
-    TemplateVar.set('new_node', e.currentTarget.value);
+    TemplateVar.set("new_node", e.currentTarget.value);
   },
-  'click button.dapp-block-button': function(e, template) {
+  "click button.dapp-block-button": function(e, template) {
     let custom_nodes = reactive_custom_nodes.get();
-    let new_ndoe = TemplateVar.get('new_node');
+    let new_ndoe = TemplateVar.get("new_node");
 
     if (!new_ndoe) return;
 
     if (!custom_nodes) custom_nodes = [];
-    TemplateVar.set(template, 'sending', true);
+    TemplateVar.set(template, "sending", true);
 
     http
       .ping({
-        url: new_ndoe + '/v1/history/get_actions',
-        method: 'post'
+        url: new_ndoe + "/v1/history/get_actions",
+        method: "post"
       })
       .then(tls => {
-        template.$('input[name="addNode"]').val('');
-        TemplateVar.set(template, 'new_node', '');
+        template.$('input[name="addNode"]').val("");
+        TemplateVar.set(template, "new_node", "");
 
         let node = { owner: new_ndoe, node: new_ndoe, tls: tls };
         custom_nodes.unshift(node);
-        localStorage.setItem('custom_nodes', JSON.stringify(custom_nodes));
+        localStorage.setItem("custom_nodes", JSON.stringify(custom_nodes));
         reactive_custom_nodes.set(custom_nodes);
-        TemplateVar.set(template, 'sending', false);
+        TemplateVar.set(template, "sending", false);
       });
   }
 });
