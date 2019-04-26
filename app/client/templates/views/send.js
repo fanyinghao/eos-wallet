@@ -348,7 +348,7 @@ Template["views_send"].events({
       };
 
       // The function to send the transaction
-      var sendFunds = function(
+      var sendFunds = async function(
         _to,
         _amount,
         _memo,
@@ -361,35 +361,40 @@ Template["views_send"].events({
 
         try {
           if (!isMultiSig) {
-            const _eos = Eos({
-              httpEndpoint: httpEndpoint,
-              chainId: chainId,
-              signProvider: signProvider,
-              verbose: false
+            const api = new Api({
+              rpc: EOS.RPC,
+              signatureProvider: signProvider
             });
-            _eos
-              .transfer(
-                selectedAccount.account_name,
-                _to,
-                _amount,
-                _memo || "transfer",
+            const _auth = [
+              {
+                actor: selectedAccount.account_name,
+                permission: permission
+              }
+            ];
+            api
+              .transact(
                 {
-                  authorization: `${
-                    selectedAccount.account_name
-                  }@${permission}`,
-                  broadcast: true,
-                  sign: true
+                  actions: [
+                    {
+                      account: "eosio.token",
+                      name: "transfer",
+                      authorization: _auth,
+                      data: {
+                        from: selectedAccount.account_name,
+                        to: _to,
+                        quantity: _amount,
+                        memo: _memo
+                      }
+                    }
+                  ]
+                },
+                {
+                  blocksBehind: 3,
+                  expireSeconds: 30
                 }
               )
               .then(onSuccess, onError);
           } else {
-            const propose_eos = Eos({
-              httpEndpoint: httpEndpoint,
-              chainId: chainId,
-              signProvider: signProvider,
-              verbose: false
-            });
-
             let permissions = selectedAccount.multiSig_perm;
 
             if (!_proposer) throw new Error("i18n:wallet.accounts.noProposer");
@@ -397,51 +402,90 @@ Template["views_send"].events({
             if (!permissions || permissions.length === 0)
               throw new Error("not ready");
 
-            propose_eos.contract("eosio.msig").then(msig => {
-              eos
-                .transfer(
-                  selectedAccount.account_name,
-                  _to,
-                  _amount,
-                  _memo || "transfer",
-                  {
-                    authorization: `${selectedAccount.account_name}@active`,
-                    broadcast: false,
-                    sign: false
-                  }
-                )
-                .then(transfer => {
-                  transfer.transaction.transaction.max_net_usage_words = 0;
-                  transfer.transaction.transaction.expiration = new Date(
-                    Date.parse(new Date()) + 1000 * 60 * 60 //60mins
-                  );
-                  console.log(transfer.transaction.transaction);
-                  const proposal_name = `tr${Helpers.randomWord(false, 10)}`;
-                  msig
-                    .propose(
-                      _proposer,
-                      proposal_name,
-                      permissions,
-                      transfer.transaction.transaction,
-                      { authorization: `${_proposer}@${_permission}` }
-                    )
-                    .then(tx => {
-                      EthElements.Modal.question(
-                        {
-                          text: TAPi18n.__("wallet.send.proposeResp", {
-                            proposeName: proposal_name
-                          }),
-                          ok: function() {
-                            onSuccess(tx);
-                          }
-                        },
-                        {
-                          closeable: false
-                        }
-                      );
-                    }, onError);
-                });
+            const api = new Api({
+              rpc: EOS.RPC,
+              signatureProvider: signProvider,
+              authorityProvider: {
+                getRequiredKeys: args => args.availableKeys
+              }
             });
+            const _auth = [
+              {
+                actor: _proposer,
+                permission: _permission
+              }
+            ];
+            const transfer = await api.transact(
+              {
+                actions: [
+                  {
+                    account: "eosio.token",
+                    name: "transfer",
+                    authorization: [
+                      {
+                        actor: selectedAccount.account_name,
+                        permission: "active"
+                      }
+                    ],
+                    data: {
+                      from: selectedAccount.account_name,
+                      to: _to,
+                      quantity: _amount,
+                      memo: _memo
+                    }
+                  }
+                ]
+              },
+              {
+                blocksBehind: 3,
+                expireSeconds: Date.parse(new Date()) + 1000 * 60 * 60, //60mins
+                broadcast: false,
+                sign: false
+              }
+            );
+            const trx = api.deserializeTransaction(
+              transfer.serializedTransaction
+            );
+            console.log(trx);
+
+            const proposal_name = `tr${Helpers.randomWord(false, 10)}`;
+            api
+              .transact(
+                {
+                  actions: [
+                    {
+                      account: "eosio.msig",
+                      name: "propose",
+                      authorization: _auth,
+                      data: {
+                        proposer: _proposer,
+                        proposal_name,
+                        requested: permissions,
+                        trx: trx
+                      }
+                    }
+                  ]
+                },
+                {
+                  blocksBehind: 3,
+                  expireSeconds: 30
+                }
+              )
+              .then(tx => {
+                EthElements.Modal.question(
+                  {
+                    text: TAPi18n.__("wallet.send.proposeResp", {
+                      proposeName: proposal_name
+                    }),
+                    ok: function() {
+                      onSuccess(tx);
+                    }
+                  },
+                  {
+                    closeable: false
+                  }
+                );
+              }, onError);
           }
         } catch (e) {
           Helpers.handleError(e);

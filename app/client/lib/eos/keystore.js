@@ -46,7 +46,6 @@ export function SignProvider(accountName, password, permission) {
   const storage = new SecureStorage({ id: STORGE_ID + chainId });
   let sensitive = storage.get(accountName, password).sensitive;
   if (!sensitive) throw new Error("wrong password");
-  debugger;
   let provider = new JsSignatureProvider([
     typeof sensitive.privateKey === "string"
       ? sensitive.privateKey
