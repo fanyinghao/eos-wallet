@@ -129,7 +129,7 @@ Template.registerHelper("latestBlock", function() {
 /**
 Returns a list of accounts and wallets sorted by balance
 
-@method (latestBlock)
+@method (selectAccounts)
 **/
 Template.registerHelper("selectAccounts", function(ignoreMultiSig, range) {
   if (Object.keys(ObservableAccounts.accounts).length === 0)

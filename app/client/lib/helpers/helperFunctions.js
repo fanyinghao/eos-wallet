@@ -1,3 +1,5 @@
+const http = require("../../lib/helpers/http");
+
 const Fcbuffer = require("fcbuffer");
 
 /**
@@ -596,5 +598,21 @@ Helpers.getProducers = () => {
           reject(err);
         }
       );
+  });
+};
+
+Helpers.getTokenBalance = account_name => {
+  const params = {
+    module: "account",
+    action: "get_token_list",
+    apikey: "5cbe5a1a8fa595d02c59a252d580c7d4",
+    account: account_name
+  };
+  return http.get({
+    url:
+      "https://120.78.83.180/api?" +
+      Object.keys(params)
+        .map(key => key + "=" + params[key])
+        .join("&")
   });
 };
