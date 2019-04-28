@@ -318,6 +318,7 @@
       "showNotice": "Requires Propose MulitSig, Proposer:",
       "from": "From",
       "amount": "Amount",
+      "token": "Token",
       "tokenAmount": "Token amount",
       "memo": "Memo",
       "sendFunds": "Send funds",
@@ -336,6 +337,7 @@
       "createContract": "Create contract",
       "provideGas": "Provide gas",
       "transactionSent": "Transaction sent",
+      "addTokenContract": "Add Token Contract",
       "error": {
         "emptyWallet": "The account you want to send from is empty.",
         "notEnoughFunds": "You don't have enough funds in the account.",
@@ -442,7 +444,8 @@
         "hideContractInfo": "Hide contract info",
         "watchContractEvents": "Watch contract events",
         "execute": "Execute",
-        "yes": "Yes"
+        "yes": "Yes",
+        "add": "Add"
       },
       "error": {
         "compile": "Could not compile source code.",

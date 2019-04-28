@@ -1,0 +1,16 @@
+<template name="importContract">
+  <h1>{{{i18n 'wallet.contracts.pickContract'}}}</h1>
+  <input
+    type="textbox"
+    name="contact_add"
+    placeholder="{{i18n 'wallet.contracts.name'}}"
+  />
+  {{#if loading}} {{> spinner}} {{else}} {{#if symbol}}
+  <h2>{{symbol}}</h2>
+  {{/if}} {{/if}}
+  <hr />
+
+  <button name="btn_add" class="dapp-block-button" {{btnDisabled}}>
+    {{i18n 'wallet.contracts.buttons.add'}}
+  </button>
+</template>

@@ -310,6 +310,7 @@
       "to": "发送至",
       "from": "从",
       "showNotice": "此账号需要提案多重签名，提案者：",
+      "token": "代币",
       "amount": "数量",
       "tokenAmount": "代币数量",
       "memo": "附言",
@@ -326,6 +327,7 @@
       "createContract": "创建合约",
       "provideGas": "提供瓦斯",
       "transactionSent": "交易已发送",
+      "addTokenContract": "添加代币合约",
       "error": {
         "emptyWallet": "您的账号钱包是空的。",
         "notEnoughFunds": "您此账户并没有足够的资金。",
@@ -422,7 +424,8 @@
         "hideContractInfo": "隐藏合约信息",
         "watchContractEvents": "看合约事件",
         "execute": "执行",
-        "yes": "是"
+        "yes": "是",
+        "add": "添加"
       },
       "error": {
         "compile": "无法编译源码。",
