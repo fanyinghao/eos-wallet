@@ -298,11 +298,11 @@ Template["views_send"].events({
     TemplateVar.set("selectedBalance", { value: "0.0000" });
 
     const contract = TemplateVar.get("currentContract");
+    if (contract === "add") return;
     EOS.RPC.get_currency_balance(contract, selectedAccount.account_name).then(
       resp => {
         if (resp.length > 0) {
           const balance = resp[0];
-          console.log(balance);
           const value = balance.split(" ")[0];
           const symbol = balance.split(" ")[1];
           TemplateVar.set(template, "selectedBalance", { value, symbol });

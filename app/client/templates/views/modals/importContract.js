@@ -39,8 +39,8 @@ Template["importContract"].events({
           const symbol = resp[0].split(" ")[1];
           TemplateVar.set(template, "contract", value);
           TemplateVar.set(template, "symbol", symbol);
-          TemplateVar.set(template, "loading", false);
         }
+        TemplateVar.set(template, "loading", false);
       },
       err => {
         TemplateVar.set(template, "loading", false);
