@@ -36,6 +36,7 @@ Template["views_send"].onCreated(function() {
   // SET THE DEFAULT VARIABLES
   TemplateVar.set("amount", "0");
   TemplateVar.set("sendAll", false);
+  TemplateVar.set("currentContract", "eosio.token");
 
   if (FlowRouter.getRouteName() === "newaccount") {
     TemplateVar.set("send_type", "newaccount");
@@ -91,13 +92,15 @@ Template["views_send"].helpers({
     return isMultiSig;
   },
   selectedBalance: function() {
-    let selectedAccount = TemplateVar.get("selectedAccount");
-    let empty = { value: "0.0000", symbol: "EOS" };
-    if (!selectedAccount) return empty;
+    // let selectedAccount = TemplateVar.get("selectedAccount");
+    // const contract = TemplateVar.get("currentContract");
+    // const token = Helpers.getToken(contract);
+    // let empty = { value: "0.0000", symbol: token.symbol };
+    // if (!selectedAccount) return empty;
 
-    if (!selectedAccount.eosBalance) selectedAccount.eosBalance = empty;
+    // if (!selectedAccount.eosBalance) selectedAccount.eosBalance = empty;
 
-    return selectedAccount.eosBalance;
+    return TemplateVar.get("selectedBalance");
   },
   inputAmount: function() {
     return TemplateVar.get("amount");
@@ -145,6 +148,14 @@ Template["views_send"].helpers({
   },
   toNewAccount: function() {
     return FlowRouter.getRouteName() === "newaccount";
+  },
+  symbol: function() {
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
+    return token.symbol;
+  },
+  contract: function() {
+    return TemplateVar.get("currentContract");
   }
 });
 
@@ -155,14 +166,15 @@ Template["views_send"].events({
     @event change input.send-all
     */
   "change input.send-all": function(e) {
-    TemplateVar.set("sendAll", $(e.currentTarget)[0].checked);
-    selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account", "value")
-      ];
+    const checked = $(e.currentTarget)[0].checked;
+    TemplateVar.set("sendAll", checked);
 
-    if (selectedAccount)
-      TemplateVar.set("amount", selectedAccount.eosBalance.value);
+    if (checked) {
+      const selectedBalance = TemplateVar.get("selectedBalance");
+      if (selectedBalance) TemplateVar.set("amount", selectedBalance.value);
+    } else {
+      TemplateVar.set("amount", "0.0000");
+    }
   },
   /**
     Set the amount while typing
@@ -280,9 +292,30 @@ Template["views_send"].events({
 
     @event change select[name="dapp-select-account"]
     */
-  'change select[name="dapp-select-account"]': function(e) {
+  'change select[name="dapp-select-account"]': function(e, template) {
     let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
     TemplateVar.set("selectedAccount", selectedAccount);
+    TemplateVar.set("selectedBalance", { value: "0.0000" });
+
+    const contract = TemplateVar.get("currentContract");
+    EOS.RPC.get_currency_balance(contract, selectedAccount.account_name).then(
+      resp => {
+        if (resp.length > 0) {
+          const balance = resp[0];
+          console.log(balance);
+          const value = balance.split(" ")[0];
+          const symbol = balance.split(" ")[1];
+          TemplateVar.set(template, "selectedBalance", { value, symbol });
+        }
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  },
+  'change select[name="dapp-select-token"]': function(e, template) {
+    const contract = e.currentTarget.value;
+    TemplateVar.set(template, "currentContract", contract);
   },
   /**
     Submit the form and send the transaction!
@@ -358,6 +391,7 @@ Template["views_send"].events({
       ) {
         // show loading
         TemplateVar.set(template, "sending", true);
+        const contract = TemplateVar.get(template, "currentContract");
 
         try {
           if (!isMultiSig) {
@@ -376,7 +410,7 @@ Template["views_send"].events({
                 {
                   actions: [
                     {
-                      account: "eosio.token",
+                      account: contract,
                       name: "transfer",
                       authorization: _auth,
                       data: {
@@ -419,7 +453,7 @@ Template["views_send"].events({
               {
                 actions: [
                   {
-                    account: "eosio.token",
+                    account: contract,
                     name: "transfer",
                     authorization: [
                       {
@@ -653,6 +687,8 @@ Template["views_send"].events({
           to = TemplateVar.get("to"),
           memo = TemplateVar.get("memo"),
           sendAll = TemplateVar.get("sendAll");
+        const contract = TemplateVar.get("currentContract");
+        const token = Helpers.getToken(contract);
 
         if (!to)
           return GlobalNotification.warning({
@@ -680,8 +716,8 @@ Template["views_send"].events({
 
         amount =
           amount > 0
-            ? `${parseFloat(amount).toFixed(4)} EOS`
-            : `${parseFloat(0).toFixed(4)} EOS`;
+            ? `${parseFloat(amount).toFixed(4)} ${token.symbol}`
+            : `${parseFloat(0).toFixed(4)} ${token.symbol}`;
 
         EthElements.Modal.question(
           {

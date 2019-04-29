@@ -630,3 +630,10 @@ Helpers.getTokenCached = () => {
   });
   return token_contracts;
 };
+
+Helpers.getToken = contract => {
+  const contracts = Helpers.getTokenCached();
+  return contracts.find(item => {
+    return item.contract === contract;
+  });
+};
