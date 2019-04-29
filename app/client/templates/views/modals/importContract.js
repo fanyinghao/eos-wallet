@@ -55,13 +55,28 @@ Template["importContract"].events({
     );
   },
   'click button.dapp-block-button[name="btn_add"]': function(e, template) {
+    Array.prototype.contains = function(key) {
+      var i = this.length;
+      while (i--) {
+        if (this[i].contract === key) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     const token_contracts =
       JSON.parse(localStorage.getItem("token_contracts")) || [];
     const contract = TemplateVar.get(template, "contract");
     const symbol = TemplateVar.get(template, "symbol");
     if (contract) {
-      token_contracts.push({ contract, symbol });
-      localStorage.setItem("token_contracts", JSON.stringify(token_contracts));
+      if (!token_contracts.contains(contract)) {
+        token_contracts.push({ contract, symbol });
+        localStorage.setItem(
+          "token_contracts",
+          JSON.stringify(token_contracts)
+        );
+      }
       EthElements.Modal.hide();
     }
   }
