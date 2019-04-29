@@ -616,3 +616,17 @@ Helpers.getTokenBalance = account_name => {
         .join("&")
   });
 };
+
+Helpers.getTokenCached = () => {
+  const token_contracts =
+    JSON.parse(localStorage.getItem("token_contracts")) || [];
+  token_contracts.unshift({
+    symbol: "EOS",
+    contract: "eosio.token",
+    selected: true
+  });
+  token_contracts.push({
+    contract: "add"
+  });
+  return token_contracts;
+};

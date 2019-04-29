@@ -1,0 +1,12 @@
+<template name="eos_selectToken">
+  <div class="dapp-select-token">
+    <select name="dapp-select-token" class="{{class}}">
+      {{#each tokens}}
+      <option value="{{contract}}" {{selected}}>
+        {{balance}} {{symbol}} {{#if $eq contract "add"}} {{i18n
+        'wallet.send.addTokenContract'}} {{else}}({{contract}}){{/if}}
+      </option>
+      {{/each}}
+    </select>
+  </div>
+</template>

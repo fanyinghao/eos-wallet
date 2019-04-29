@@ -26,12 +26,6 @@ Template["importContract"].helpers({
 });
 
 Template["importContract"].events({
-  /**
-      back to dashboard
-    */
-  'click button.dapp-block-button[name="btn_back"]': function(e) {
-    FlowRouter.go("dashboard");
-  },
   'change input[name="contact_add"]': function(e, template) {
     TemplateVar.set(template, "loading", true);
     TemplateVar.set(template, "contract", "");
@@ -78,6 +72,9 @@ Template["importContract"].events({
         );
       }
       EthElements.Modal.hide();
+      if (template.data.callback) {
+        template.data.callback(contract);
+      }
     }
   }
 });
