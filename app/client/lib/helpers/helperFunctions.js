@@ -585,19 +585,14 @@ Helpers.randomWord = (randomFlag, min, max) => {
 
 Helpers.getProducers = () => {
   return new Promise((resolve, reject) => {
-    eos
-      .getProducers({
-        json: true,
-        limit: 21
-      })
-      .then(
-        res => {
-          resolve(res.rows);
-        },
-        err => {
-          reject(err);
-        }
-      );
+    EOS.RPC.get_producers(true, 21).then(
+      res => {
+        resolve(res.rows);
+      },
+      err => {
+        reject(err);
+      }
+    );
   });
 };
 
