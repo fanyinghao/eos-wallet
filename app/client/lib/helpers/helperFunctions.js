@@ -623,7 +623,8 @@ Helpers.getTokenCached = () => {
   token_contracts.unshift({
     symbol: "EOS",
     contract: "eosio.token",
-    selected: true
+    selected: true,
+    precise: 4
   });
   token_contracts.push({
     contract: "add"

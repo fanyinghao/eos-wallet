@@ -103,7 +103,10 @@ Template["views_send"].helpers({
     return TemplateVar.get("selectedBalance");
   },
   inputAmount: function() {
-    return TemplateVar.get("amount");
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
+    const amount = TemplateVar.get("amount") || "0";
+    return parseFloat(amount).toFixed(token.precise);
   },
   /**
     Return the currently selected amount
@@ -111,19 +114,19 @@ Template["views_send"].helpers({
     @method (sendTotal)
     */
   sendTotal: function() {
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
+
     if (TemplateVar.get("send_type") === "newaccount") return "0.6745";
 
     var amount = TemplateVar.get("amount"),
       sendAll = TemplateVar.get("sendAll"),
-      selectedAccount =
-        ObservableAccounts.accounts[
-          TemplateVar.getFrom(".dapp-select-account", "value")
-        ];
+      selectedBalance = TemplateVar.get("selectedBalance");
 
-    if (sendAll && selectedAccount) amount = selectedAccount.eosBalance.value;
-    if (!_.isFinite(amount)) return "0";
+    if (sendAll && selectedBalance) amount = selectedBalance.value;
+    if (!_.isFinite(amount)) return parseFloat(0).toFixed(token.precise);
 
-    return amount;
+    return parseFloat(amount).toFixed(token.precise);
   },
   proposeContent: function() {
     console.log("res");
@@ -156,6 +159,11 @@ Template["views_send"].helpers({
   },
   contract: function() {
     return TemplateVar.get("currentContract");
+  },
+  placeholder: function() {
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
+    return parseFloat(0).toFixed(token.precise);
   }
 });
 
@@ -166,6 +174,8 @@ Template["views_send"].events({
     @event change input.send-all
     */
   "change input.send-all": function(e) {
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
     const checked = $(e.currentTarget)[0].checked;
     TemplateVar.set("sendAll", checked);
 
@@ -173,7 +183,7 @@ Template["views_send"].events({
       const selectedBalance = TemplateVar.get("selectedBalance");
       if (selectedBalance) TemplateVar.set("amount", selectedBalance.value);
     } else {
-      TemplateVar.set("amount", "0.0000");
+      TemplateVar.set("amount", parseFloat(0).toFixed(token.precise));
     }
   },
   /**
@@ -185,10 +195,12 @@ Template["views_send"].events({
     e,
     template
   ) {
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
     let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, "");
     if (amount.indexOf(".") == 0) amount = "0" + amount;
     if (amount.indexOf(".") >= 0)
-      amount = amount.substring(0, amount.indexOf(".") + 5);
+      amount = amount.substring(0, amount.indexOf(".") + token.precise + 1);
     if (
       amount[amount.length - 1] === "." &&
       amount.indexOf(".") !== amount.length - 1
@@ -293,11 +305,14 @@ Template["views_send"].events({
     @event change select[name="dapp-select-account"]
     */
   'change select[name="dapp-select-account"]': function(e, template) {
+    const contract = TemplateVar.get("currentContract");
+    const token = Helpers.getToken(contract);
     let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
     TemplateVar.set("selectedAccount", selectedAccount);
-    TemplateVar.set("selectedBalance", { value: "0.0000" });
+    TemplateVar.set("selectedBalance", {
+      value: parseFloat(0).toFixed(token.precise)
+    });
 
-    const contract = TemplateVar.get("currentContract");
     if (contract === "add") return;
     EOS.RPC.get_currency_balance(contract, selectedAccount.account_name).then(
       resp => {
@@ -716,8 +731,8 @@ Template["views_send"].events({
 
         amount =
           amount > 0
-            ? `${parseFloat(amount).toFixed(4)} ${token.symbol}`
-            : `${parseFloat(0).toFixed(4)} ${token.symbol}`;
+            ? `${parseFloat(amount).toFixed(token.precise)} ${token.symbol}`
+            : `${parseFloat(0).toFixed(token.precise)} ${token.symbol}`;
 
         EthElements.Modal.question(
           {

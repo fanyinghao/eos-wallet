@@ -30,15 +30,20 @@ Template["importContract"].events({
     TemplateVar.set(template, "loading", true);
     TemplateVar.set(template, "contract", "");
     TemplateVar.set(template, "symbol", "");
+    TemplateVar.set(template, "precise", 0);
     const value = e.currentTarget.value;
     if (!value) return;
 
     EOS.RPC.get_currency_balance(value, value).then(
       resp => {
         if (resp.length > 0) {
+          const amount = resp[0].split(" ")[0];
           const symbol = resp[0].split(" ")[1];
+          const idx = amount.indexOf(".");
+          const precise = amount.length - (idx === -1 ? 0 : idx) - 1;
           TemplateVar.set(template, "contract", value);
           TemplateVar.set(template, "symbol", symbol);
+          TemplateVar.set(template, "precise", precise);
         }
         TemplateVar.set(template, "loading", false);
       },
@@ -63,9 +68,10 @@ Template["importContract"].events({
       JSON.parse(localStorage.getItem("token_contracts")) || [];
     const contract = TemplateVar.get(template, "contract");
     const symbol = TemplateVar.get(template, "symbol");
+    const precise = TemplateVar.get(template, "precise");
     if (contract) {
       if (!token_contracts.contains(contract)) {
-        token_contracts.push({ contract, symbol });
+        token_contracts.push({ contract, symbol, precise });
         localStorage.setItem(
           "token_contracts",
           JSON.stringify(token_contracts)
