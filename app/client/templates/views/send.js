@@ -191,23 +191,21 @@ Template["views_send"].events({
 
     @event keyup input[name="amount"], change input[name="amount"], input input[name="amount"]
     */
-  'keyup input[name="amount"], change input[name="amount"], input input[name="amount"]': function(
+  'keydown input[name="amount"],keyup input[name="amount"], change input[name="amount"], input input[name="amount"]': function(
     e,
     template
   ) {
     const contract = TemplateVar.get("currentContract");
     const token = Helpers.getToken(contract);
-    let amount = e.currentTarget.value.replace(/[a-zA-Z]+/g, "");
-    if (amount.indexOf(".") == 0) amount = "0" + amount;
+    let amount = e.currentTarget.value;
+    if (amount.indexOf(".") !== amount.lastIndexOf("."))
+      amount = amount.substring(0, amount.length - 1);
     if (amount.indexOf(".") >= 0)
       amount = amount.substring(0, amount.indexOf(".") + token.precise + 1);
-    if (
-      amount[amount.length - 1] === "." &&
-      amount.indexOf(".") !== amount.length - 1
-    )
+    if (amount.indexOf(".") === amount.length - 1)
       amount = amount.substring(0, amount.length - 1);
     e.currentTarget.value = amount;
-    TemplateVar.set("amount", amount.replace(",", "") || "0");
+    TemplateVar.set("amount", amount);
   },
   /** 
     Set the memo while typing
