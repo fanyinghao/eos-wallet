@@ -51,7 +51,8 @@
       <div class="col col-6 mobile-full from">
         <h3>{{i18n 'wallet.send.from'}}</h3>
 
-        {{> eos_selectAccount accounts=(selectAccounts) class='send-from' }}
+        {{> eos_selectAccount accounts=(selectAccounts) value=(selectedAccount)
+        class='send-from' }}
       </div>
 
       <div class="col col-6 mobile-full">
@@ -75,7 +76,7 @@
     <div class="row clear">
       <div class="col col-6 mobile-full amount">
         <h3>{{i18n 'wallet.send.token'}}</h3>
-        {{> eos_selectToken account=(selectedAccount) class='send-from' }}
+        {{> eos_selectToken value=(contract) }}
         <h3>{{i18n 'wallet.send.amount'}}</h3>
         {{#if TemplateVar.get "sendAll"}}
         <input
@@ -133,7 +134,7 @@
       <div class="col col-6 mobile-full from">
         <h3>{{i18n 'wallet.send.from'}}</h3>
 
-        {{> selectAccount accounts=(selectAccounts true) class='send-from'}}
+        {{> selectAccount accounts=(selectAccounts true) class='propose-from'}}
       </div>
     </div>
     <div class="dapp-clear-fix"></div>
@@ -183,7 +184,8 @@
       <div class="col col-6 mobile-full from">
         <h3>{{i18n 'wallet.send.from'}}</h3>
 
-        {{> selectAccount accounts=(selectAccounts true) class='send-from'}}
+        {{> selectAccount accounts=(selectAccounts true)
+        class='newaccount-from'}}
       </div>
       <div class="dapp-clear-fix"></div>
     </div>

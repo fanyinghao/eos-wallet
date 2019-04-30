@@ -45,17 +45,6 @@ Template["views_send"].onCreated(function() {
   }
 });
 
-function reload_from(template) {
-  if (template.view.isDestroyed) return;
-  let keys = Object.keys(ObservableAccounts.accounts).sort();
-  if (keys.length > 0) {
-    let from = FlowRouter.getParam("from");
-    if (!from) from = ObservableAccounts.accounts[keys[0]].account_name;
-    template.$('select[name="dapp-select-account"]').val(from);
-    template.$('select[name="dapp-select-account"]').trigger("change");
-  }
-}
-
 Template.views_send.onRendered(function() {
   var template = this;
 
@@ -70,8 +59,44 @@ Template.views_send.onRendered(function() {
     });
   }
 
+  template.autorun(function(c) {
+    if (template.view.isDestroyed) return;
+    let from = FlowRouter.getParam("from");
+    console.log(from);
+    if (from) {
+      TemplateVar.set(template, "selectedAccount", from);
+    }
+  });
+
   Tracker.autorun(c => {
-    reload_from(template);
+    const type = TemplateVar.get(template, "send_type");
+    const selectedAccount = TemplateVar.get(template, "selectedAccount");
+    const contract = TemplateVar.get(template, "currentContract");
+    const token = Helpers.getToken(contract);
+
+    let selected = TemplateVar.getFrom(".send-from", "value");
+    if (!selected && selectedAccount) {
+      selected = selectedAccount.account_name;
+    }
+
+    if (contract === "add" || !selected || type !== "funds") return;
+    EOS.RPC.get_currency_balance(contract, selected).then(
+      resp => {
+        if (resp.length > 0) {
+          const balance = resp[0];
+          const value = balance.split(" ")[0];
+          const symbol = balance.split(" ")[1];
+          TemplateVar.set(template, "selectedBalance", { value, symbol });
+        } else
+          TemplateVar.set(template, "selectedBalance", {
+            value: parseFloat(0).toFixed(token.precise),
+            symbol: token.symbol
+          });
+      },
+      err => {
+        console.log(err);
+      }
+    );
   });
 });
 
@@ -92,14 +117,6 @@ Template["views_send"].helpers({
     return isMultiSig;
   },
   selectedBalance: function() {
-    // let selectedAccount = TemplateVar.get("selectedAccount");
-    // const contract = TemplateVar.get("currentContract");
-    // const token = Helpers.getToken(contract);
-    // let empty = { value: "0.0000", symbol: token.symbol };
-    // if (!selectedAccount) return empty;
-
-    // if (!selectedAccount.eosBalance) selectedAccount.eosBalance = empty;
-
     return TemplateVar.get("selectedBalance");
   },
   inputAmount: function() {
@@ -250,8 +267,8 @@ Template["views_send"].events({
     @event change input[name="choose-type"]
     */
   'change input[name="choose-type"]': function(e, template) {
+    const type = e.currentTarget.value;
     TemplateVar.set("send_type", e.currentTarget.value);
-    reload_from(template);
   },
   /**
     Set the to while typing
@@ -302,7 +319,7 @@ Template["views_send"].events({
 
     @event change select[name="dapp-select-account"]
     */
-  'change select[name="dapp-select-account"]': function(e, template) {
+  'change select.send-from[name="dapp-select-account"]': function(e, template) {
     const contract = TemplateVar.get("currentContract");
     const token = Helpers.getToken(contract);
     let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
@@ -310,21 +327,6 @@ Template["views_send"].events({
     TemplateVar.set("selectedBalance", {
       value: parseFloat(0).toFixed(token.precise)
     });
-
-    if (contract === "add") return;
-    EOS.RPC.get_currency_balance(contract, selectedAccount.account_name).then(
-      resp => {
-        if (resp.length > 0) {
-          const balance = resp[0];
-          const value = balance.split(" ")[0];
-          const symbol = balance.split(" ")[1];
-          TemplateVar.set(template, "selectedBalance", { value, symbol });
-        }
-      },
-      err => {
-        console.log(err);
-      }
-    );
   },
   'change select[name="dapp-select-token"]': function(e, template) {
     const contract = e.currentTarget.value;
@@ -337,10 +339,21 @@ Template["views_send"].events({
     */
   "submit form": function(e, template) {
     let send_type = TemplateVar.get("send_type");
+    let select_class = "";
+    switch (send_type) {
+      case "funds":
+        select_class = ".send-from";
+        break;
+      case "propose":
+        select_class = ".propose-from";
+        break;
+      case "newaccount":
+        select_class = ".newaccount-from";
+        break;
+    }
+
     let selectedAccount =
-      ObservableAccounts.accounts[
-        TemplateVar.getFrom(".dapp-select-account", "value")
-      ];
+      ObservableAccounts.accounts[TemplateVar.getFrom(select_class, "value")];
     let isMultiSig = Helpers.isMultiSig(selectedAccount);
 
     if (selectedAccount && !TemplateVar.get("sending")) {

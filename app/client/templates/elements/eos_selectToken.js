@@ -11,6 +11,16 @@ The select account template
 
 Template["eos_selectToken"].onCreated(function() {
   var template = this;
+
+  if (template.data) {
+    template.autorun(function(c) {
+      if (template.data.value) {
+        TemplateVar.set("value", template.data.value);
+      } else {
+        TemplateVar.set("value", "eosio.token");
+      }
+    });
+  }
 });
 
 Template["eos_selectToken"].helpers({
@@ -19,10 +29,8 @@ Template["eos_selectToken"].helpers({
       @method (selected)
       */
   selected: function() {
-    const selected = TemplateVar.get("selected");
-    return selected === this.contract || this.selected
-      ? { selected: true }
-      : {};
+    const value = TemplateVar.get("value");
+    return value === this.contract || this.selected ? { selected: true } : {};
   },
   className: function() {
     return this.class;
