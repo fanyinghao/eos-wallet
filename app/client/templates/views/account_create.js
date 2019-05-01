@@ -113,15 +113,19 @@ Template["views_account_create"].events({
             });
 
           if (
-            accountName.length !== 12 &&
-            !eos.modules.format.isName(accountName, err => {
-              return GlobalNotification.warning({
-                content: `"${accountName}" ${err.message}`,
-                duration: 5
-              });
-            })
-          )
-            return;
+            accountName.length !== 12 //&&
+            // !eos.modules.format.isName(accountName, err => {
+            //   return GlobalNotification.warning({
+            //     content: `"${accountName}" ${err.message}`,
+            //     duration: 5
+            //   });
+            // })
+          ) {
+            return GlobalNotification.warning({
+              content: `"${accountName}" wrong`,
+              duration: 5
+            });
+          }
 
           let exists = keystore.Get(accountName);
           if (exists && exists.encryptedData)
