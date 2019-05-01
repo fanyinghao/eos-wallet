@@ -87,24 +87,24 @@
     <td class="account-name">
         <p>
             <strong>
-            {{> elements_account_link name=(origin_data.from)}}
+            {{> elements_account_link name=(data.from)}}
             </strong>
 
             <span class="arrow">→</span> 
 
-            {{#if origin_data.to}}
-                {{> elements_account_link name=(origin_data.to)}}
+            {{#if data.to}}
+                {{> elements_account_link name=(data.to)}}
             {{/if}}
         </p>
     </td>
 
     <td class="transaction-amount plus">
-        <strong>{{origin_data.quantity}}</strong>
+        <strong>{{data.quantity}}</strong>
     </td>
     
     <td class="memo">
-        {{#if origin_data.memo}}
-            <pre><strong>MEMO:</strong>{{origin_data.memo}}</pre>
+        {{#if data.memo}}
+            <pre><strong>MEMO:</strong>{{data.memo}}</pre>
         {{/if}}
     </td>
     {{/with}}

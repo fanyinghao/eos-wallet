@@ -377,58 +377,30 @@ Helpers.copyAddress = element => {
   selection.removeAllRanges();
 };
 
-Helpers.getLatestProposals = name => {
-  return new Promise((resolve, reject) => {
-    EOS.RPC.history_get_actions(name, -1, -100).then(
-      res => {
-        resolve(
-          res.actions
-            .filter(item => {
-              if (item.action_trace.act.name === "propose")
-                return (
-                  moment.utc(item.action_trace.act.data.trx.expiration) >
-                  moment.utc()
-                );
-              return false;
-            })
-            .map(item => {
-              item.action_trace.act.data.trx.actions = Array.prototype.map.call(
-                item.action_trace.act.data.trx.actions,
-                action => {
-                  try {
-                    action.origin_data = Fcbuffer.fromBuffer(
-                      EOS.API.getCachedAbi(action.account).structs[action.name],
-                      Buffer.from(action.data, "hex")
-                    );
-                    return action;
-                  } catch (e) {
-                    // Abi 'eosio.xxxx' is not cached
-                    EOS.RPC.get_abi(action.account).then(res => {
-                      action.origin_data = Fcbuffer.fromBuffer(
-                        EOS.API.getCachedAbi(action.account).structs[
-                          action.name
-                        ],
-                        Buffer.from(action.data, "hex")
-                      );
-                      return action;
-                    });
-                  }
-                }
-              );
-              return item;
-            })
-            .sort((a, b) => {
-              if (a.account_action_seq > b.account_action_seq) return -1;
-              if (a.account_action_seq < b.account_action_seq) return 1;
-              return 0;
-            })
+Helpers.getLatestProposals = async name => {
+  const res = await EOS.RPC.history_get_actions(name, -1, -100);
+  return await Promise.all(
+    res.actions
+      .filter(item => {
+        if (item.action_trace.act.name === "propose")
+          return (
+            moment.utc(item.action_trace.act.data.trx.expiration) > moment.utc()
+          );
+        return false;
+      })
+      .sort((a, b) => {
+        if (a.account_action_seq > b.account_action_seq) return -1;
+        if (a.account_action_seq < b.account_action_seq) return 1;
+        return 0;
+      })
+      .map(async item => {
+        const resp = await EOS.API.deserializeActions(
+          item.action_trace.act.data.trx.actions
         );
-      },
-      err => {
-        reject(err);
-      }
-    );
-  });
+        item.action_trace.act.data.trx.actions = resp;
+        return item;
+      })
+  );
 };
 
 Helpers.getApprovals = name => {

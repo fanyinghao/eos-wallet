@@ -62,7 +62,6 @@ Template.views_send.onRendered(function() {
   template.autorun(function(c) {
     if (template.view.isDestroyed) return;
     let from = FlowRouter.getParam("from");
-    console.log(from);
     if (from) {
       TemplateVar.set(template, "selectedAccount", from);
     }
