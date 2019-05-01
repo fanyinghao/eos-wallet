@@ -389,7 +389,7 @@
       "tradeRam": {
         "buy": "Buy RAM",
         "sell": "Sell RAM",
-        "buyRam": "RAM Purchase (in EOS)",
+        "buyRam": "RAM Purchase (in KB)",
         "sellRam": "RAM to Sell (in KB)",
         "buyButton": "BUY",
         "sellButton": "SELL",

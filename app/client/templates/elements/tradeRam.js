@@ -1,3 +1,5 @@
+const { Api } = require("eosjs");
+
 Template.tradeRam.onRendered(function() {
   this.$('input[name="to"]').focus();
 });
@@ -41,13 +43,14 @@ Template.tradeRam.events({
     }
 
     function get_eos(signProvider) {
-      const _eos = Eos({
-        httpEndpoint: httpEndpoint,
-        chainId: chainId,
-        signProvider: signProvider,
-        verbose: false
+      const api = new Api({
+        rpc: EOS.RPC,
+        signatureProvider: signProvider,
+        authorityProvider: {
+          getRequiredKeys: args => args.availableKeys
+        }
       });
-      return _eos;
+      return api;
     }
 
     var onSuccess = tr => {
@@ -98,22 +101,37 @@ Template.tradeRam.events({
 
     function buy_ram_tx(signProvider) {
       // show loading
-      let _eos = get_eos(signProvider);
+      const _eos = get_eos(signProvider);
+
+      const _auth = [
+        {
+          actor: from,
+          permission: permission
+        }
+      ];
 
       try {
         _eos
-          .transaction(tr => {
-            tr.buyram(
-              {
-                payer: from,
-                receiver: to,
-                quant: toAmount(buy_ram)
-              },
-              {
-                authorization: `${from}@${permission}`
-              }
-            );
-          })
+          .transact(
+            {
+              actions: [
+                {
+                  account: "eosio",
+                  name: "buyrambytes",
+                  authorization: _auth,
+                  data: {
+                    payer: from,
+                    receiver: to,
+                    bytes: parseInt(buy_ram) * 1024
+                  }
+                }
+              ]
+            },
+            {
+              blocksBehind: 3,
+              expireSeconds: 30
+            }
+          )
           .then(onSuccess, onError);
       } catch (e) {
         handleError(e);
@@ -122,21 +140,36 @@ Template.tradeRam.events({
 
     function sell_ram_tx(signProvider) {
       // show loading
-      let _eos = get_eos(signProvider);
+      const _eos = get_eos(signProvider);
+
+      const _auth = [
+        {
+          actor: from,
+          permission: permission
+        }
+      ];
 
       try {
         _eos
-          .transaction(tr => {
-            tr.sellram(
-              {
-                account: from,
-                bytes: parseInt(sell_bytes) * 1024
-              },
-              {
-                authorization: `${from}@${permission}`
-              }
-            );
-          })
+          .transact(
+            {
+              actions: [
+                {
+                  account: "eosio",
+                  name: "sellram",
+                  authorization: _auth,
+                  data: {
+                    account: from,
+                    bytes: parseInt(sell_bytes) * 1024
+                  }
+                }
+              ]
+            },
+            {
+              blocksBehind: 3,
+              expireSeconds: 30
+            }
+          )
           .then(onSuccess, onError);
       } catch (e) {
         handleError(e);

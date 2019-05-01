@@ -1,3 +1,5 @@
+const { Api } = require("eosjs");
+
 Template.stake.onRendered(function() {
   this.$('input[name="to"]').focus();
 });
@@ -36,13 +38,14 @@ Template.stake.events({
     }
 
     function get_eos(signProvider) {
-      const _eos = Eos({
-        httpEndpoint: httpEndpoint,
-        chainId: chainId,
-        signProvider: signProvider,
-        verbose: false
+      const api = new Api({
+        rpc: EOS.RPC,
+        signatureProvider: signProvider,
+        authorityProvider: {
+          getRequiredKeys: args => args.availableKeys
+        }
       });
-      return _eos;
+      return api;
     }
 
     var onSuccess = tr => {
@@ -92,24 +95,39 @@ Template.stake.events({
 
     function stake(signProvider) {
       // show loading
-      let _eos = get_eos(signProvider);
+      const _eos = get_eos(signProvider);
+
+      const _auth = [
+        {
+          actor: from,
+          permission: permission
+        }
+      ];
 
       try {
         _eos
-          .transaction(tr => {
-            tr.delegatebw(
-              {
-                from: from,
-                receiver: to,
-                stake_net_quantity: toAmount(stake_net),
-                stake_cpu_quantity: toAmount(stake_cpu),
-                transfer: 0
-              },
-              {
-                authorization: `${from}@${permission}`
-              }
-            );
-          })
+          .transact(
+            {
+              actions: [
+                {
+                  account: "eosio",
+                  name: "delegatebw",
+                  authorization: _auth,
+                  data: {
+                    from,
+                    receiver: to,
+                    stake_net_quantity: toAmount(stake_net),
+                    stake_cpu_quantity: toAmount(stake_cpu),
+                    transfer: false
+                  }
+                }
+              ]
+            },
+            {
+              blocksBehind: 3,
+              expireSeconds: 30
+            }
+          )
           .then(onSuccess, onError);
       } catch (e) {
         handleError(e);
@@ -118,24 +136,39 @@ Template.stake.events({
 
     function unstake(signProvider) {
       // show loading
-      let _eos = get_eos(signProvider);
+      const _eos = get_eos(signProvider);
+
+      const _auth = [
+        {
+          actor: from,
+          permission: permission
+        }
+      ];
 
       try {
         _eos
-          .transaction(tr => {
-            tr.undelegatebw(
-              {
-                from: from,
-                receiver: to,
-                unstake_net_quantity: toAmount(unstake_net),
-                unstake_cpu_quantity: toAmount(unstake_cpu),
-                transfer: 0
-              },
-              {
-                authorization: `${from}@${permission}`
-              }
-            );
-          })
+          .transact(
+            {
+              actions: [
+                {
+                  account: "eosio",
+                  name: "undelegatebw",
+                  authorization: _auth,
+                  data: {
+                    from,
+                    receiver: to,
+                    unstake_net_quantity: toAmount(unstake_net),
+                    unstake_cpu_quantity: toAmount(unstake_cpu),
+                    transfer: false
+                  }
+                }
+              ]
+            },
+            {
+              blocksBehind: 3,
+              expireSeconds: 30
+            }
+          )
           .then(onSuccess, onError);
       } catch (e) {
         handleError(e);

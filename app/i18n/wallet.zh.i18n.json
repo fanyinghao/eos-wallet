@@ -378,7 +378,7 @@
       "tradeRam": {
         "buy": "买入RAM",
         "sell": "卖出RAM",
-        "buyRam": "买入RAM数量（单位EOS）",
+        "buyRam": "买入RAM数量（单位KB）",
         "sellRam": "卖出RAM数量（单位KB）",
         "buyButton": "买入",
         "sellButton": "卖出",
