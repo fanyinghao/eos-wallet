@@ -431,43 +431,76 @@ Helpers.approveProposal = (
   onError
 ) => {
   try {
-    const _eos_app = Eos({
-      httpEndpoint: httpEndpoint,
-      chainId: chainId,
-      signProvider: signProvider,
-      verbose: false
+    const api = new Api({
+      rpc: EOS.RPC,
+      signatureProvider: signProvider,
+      authorityProvider: {
+        getRequiredKeys: args => args.availableKeys
+      }
     });
 
-    _eos_app.contract("eosio.msig").then(msig => {
-      msig
-        .approve(
-          proposer,
-          proposal,
-          {
-            actor: from,
-            permission: "active"
-          },
-          {
-            broadcast: true,
-            authorization: `${from}@active`
-          }
-        )
-        .then(tx => {
-          msig
-            .exec(proposer, proposal, from, {
-              broadcast: true,
-              authorization: `${from}@active`
-            })
-            .then(
-              exec_tx => {
-                onSuccess(exec_tx);
-              },
-              () => {
-                onSuccess(tx);
+    const _auth = [
+      {
+        actor: from,
+        permission: "active"
+      }
+    ];
+
+    api
+      .transact(
+        {
+          actions: [
+            {
+              account: "eosio.msig",
+              name: "approve",
+              authorization: _auth,
+              data: {
+                proposer,
+                proposal_name: proposal,
+                level: {
+                  actor: from,
+                  permission: "active"
+                }
               }
-            );
-        }, onError);
-    });
+            }
+          ]
+        },
+        {
+          blocksBehind: 3,
+          expireSeconds: 30
+        }
+      )
+      .then(tx => {
+        api
+          .transact(
+            {
+              actions: [
+                {
+                  account: "eosio.msig",
+                  name: "exec",
+                  authorization: _auth,
+                  data: {
+                    proposer,
+                    proposal_name: proposal,
+                    executer: from
+                  }
+                }
+              ]
+            },
+            {
+              blocksBehind: 3,
+              expireSeconds: 30
+            }
+          )
+          .then(
+            exec_tx => {
+              onSuccess(exec_tx);
+            },
+            () => {
+              onSuccess(tx);
+            }
+          );
+      }, onError);
   } catch (e) {
     Helpers.handleError(e);
   }
@@ -482,31 +515,46 @@ Helpers.unapproveProposal = (
   onError
 ) => {
   try {
-    const _eos_app = Eos({
-      httpEndpoint: httpEndpoint,
-      chainId: chainId,
-      signProvider: signProvider,
-      verbose: false
+    const api = new Api({
+      rpc: EOS.RPC,
+      signatureProvider: signProvider,
+      authorityProvider: {
+        getRequiredKeys: args => args.availableKeys
+      }
     });
 
-    _eos_app.contract("eosio.msig").then(msig => {
-      msig
-        .unapprove(
-          proposer,
-          proposal,
-          {
-            actor: from,
-            permission: "active"
-          },
-          {
-            broadcast: true,
-            authorization: `${from}@active`
-          }
-        )
-        .then(tx => {
-          onSuccess(tx);
-        }, onError);
-    });
+    const _auth = [
+      {
+        actor: from,
+        permission: "active"
+      }
+    ];
+
+    api
+      .transact(
+        {
+          actions: [
+            {
+              account: "eosio.msig",
+              name: "unapprove",
+              authorization: _auth,
+              data: {
+                proposer,
+                proposal_name: proposal,
+                level: {
+                  actor: from,
+                  permission: "active"
+                }
+              }
+            }
+          ]
+        },
+        {
+          blocksBehind: 3,
+          expireSeconds: 30
+        }
+      )
+      .then(onSuccess, onError);
   } catch (e) {
     Helpers.handleError(e);
   }

@@ -660,7 +660,7 @@ Template["views_send"].events({
                     authorization: [_auth],
                     data: {
                       proposer: _proposer,
-                      name: _name,
+                      proposal_name: _name,
                       level: _auth
                     }
                   }
