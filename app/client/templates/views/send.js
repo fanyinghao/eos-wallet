@@ -59,14 +59,6 @@ Template.views_send.onRendered(function() {
     });
   }
 
-  template.autorun(function(c) {
-    if (template.view.isDestroyed) return;
-    let from = FlowRouter.getParam("from");
-    if (from) {
-      TemplateVar.set(template, "selectedAccount", from);
-    }
-  });
-
   Tracker.autorun(c => {
     const type = TemplateVar.get(template, "send_type");
     const selectedAccount = TemplateVar.get(template, "selectedAccount");

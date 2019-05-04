@@ -11,10 +11,13 @@ The select account template
 
 Template["eos_selectAccount"].onCreated(function() {
   var template = this;
+  let from = FlowRouter.getParam("from");
   if (template.data) {
     template.autorun(function(c) {
       if (template.data.value) {
         TemplateVar.set("value", template.data.value.account_name);
+      } else if (from) {
+        TemplateVar.set("value", from);
       } else if (template.data.accounts && template.data.accounts[0]) {
         TemplateVar.set("value", template.data.accounts[0].account_name);
       }
