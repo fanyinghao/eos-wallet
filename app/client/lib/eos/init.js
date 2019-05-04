@@ -4,7 +4,7 @@ ObservableAccounts = observableAccounts;
 
 chains = {
   zbeos: {
-    httpEndpoint: "https://n4.zb.cn",
+    httpEndpoint: "https://node1.zbeos.com",
     chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
     transactionMonitor: "https://eospark.com/MainNet/tx"
   },
@@ -14,7 +14,7 @@ chains = {
     transactionMonitor: "https://tools.cryptokylin.io/#/tx"
   },
   eosasia: {
-    httpEndpoint: "https://geo.eosasia.one",
+    httpEndpoint: "https://api1.eosasia.one",
     chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
     transactionMonitor: "https://www.myeoskit.com/tx"
   },
@@ -26,8 +26,12 @@ chains = {
 };
 
 EOS = {};
-let cur_node = localStorage.getItem("cur_node");
-httpEndpoint = cur_node ? JSON.parse(cur_node).node : "";
+let cur_node = JSON.parse(localStorage.getItem("cur_node"));
+if (!cur_node) {
+  cur_node = { node: chains.eosasia.httpEndpoint, owner: "eosasia" };
+  localStorage.setItem("cur_node", JSON.stringify(cur_node));
+}
+httpEndpoint = cur_node ? cur_node.node : "";
 transactionMonitor = "";
 chainId = "";
 var cur_chain = localStorage.getItem("cur_chain");
@@ -50,7 +54,7 @@ reload_chain = function(_endpoint) {
 };
 
 if (!cur_chain) {
-  localStorage.setItem("cur_chain", "zbeos");
-  cur_chain = "zbeos";
+  localStorage.setItem("cur_chain", "eosasia");
+  cur_chain = "eosasia";
 }
 reload_chain();

@@ -55,12 +55,15 @@ Template.views_settings.onRendered(function() {
           })
           .then(
             res => {
-              let peers = JSON.parse(res).nodes.filter(i => {
-                return (
-                  (i.api_endpoint && i.api_endpoint.length > 0) ||
-                  (i.ssl_endpoint && i.ssl_endpoint.length > 0)
-                );
-              });
+              let peers = [];
+              try {
+                peers = JSON.parse(res).nodes.filter(i => {
+                  return (
+                    (i.api_endpoint && i.api_endpoint.length > 0) ||
+                    (i.ssl_endpoint && i.ssl_endpoint.length > 0)
+                  );
+                });
+              } catch (e) {}
               Array.prototype.forEach.call(peers, node => {
                 let url = node.ssl_endpoint
                   ? node.ssl_endpoint
@@ -78,7 +81,7 @@ Template.views_settings.onRendered(function() {
               });
             },
             err => {
-              console.error(err);
+              //console.error(err);
             }
           );
       });
