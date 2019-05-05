@@ -1,3 +1,3 @@
 [submodule "app/client/lib/eosjs-SecureStorage"]
 	path = app/client/lib/eosjs-SecureStorage
-	url=../../WalletTeam/eosjs-SecureStorage.git
+	url= https://github.com/fanyinghao/secure-storage-js.git
