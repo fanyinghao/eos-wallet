@@ -4,7 +4,7 @@
 
 An app for the EOS blockchain platform.
 
-[【下载】](/releases)
+[【下载】](https://github.com/fanyinghao/eos-wallet/releases)
 [【帮助文档】](Wiki.md)
 
 ## Features
