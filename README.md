@@ -1,8 +1,11 @@
 # EOS Wallet
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 An app for the EOS blockchain platform.
 
-[帮助文档](Wiki.md)
+[【下载】](/releases)
+[【帮助文档】](Wiki.md)
 
 ## Features
 
@@ -24,7 +27,7 @@ An app for the EOS blockchain platform.
 
 ### 发送事务
 
-- 转账
+- 转账，支持合约
 - 签名提案
 - 完成账户创建
 
