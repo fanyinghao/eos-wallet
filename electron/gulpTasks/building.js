@@ -1,15 +1,15 @@
-const _ = require('underscore');
-const builder = require('electron-builder');
-const del = require('del');
+const _ = require('./node_modules/underscore');
+const builder = require('./node_modules/electron-builder');
+const del = require('./node_modules/del');
 const { exec, execSync } = require('child_process');
 const fs = require('fs');
-const gulp = require('gulp');
-const babel = require('gulp-babel');
+const gulp = require('./node_modules/gulp');
+const babel = require('./node_modules/gulp-babel');
 const options = require('../gulpfile.js').options;
 const path = require('path');
-const Q = require('bluebird');
-const shell = require('shelljs');
-const version = require('../package.json').version;
+const Q = require('./node_modules/bluebird');
+const shell = require('./node_modules/shelljs');
+const version = require('../package.json.js').version;
 
 const type = options.type;
 const applicationName = 'EOS Wallet';
@@ -127,7 +127,7 @@ gulp.task('copy-i18n', () => {
 });
 
 gulp.task('build-dist', cb => {
-  const appPackageJson = _.extend({}, require('../package.json'), {
+  const appPackageJson = _.extend({}, require('../package.json.js'), {
     // eslint-disable-line global-require
     name: applicationName.replace(/\s/, ''),
     productName: applicationName,

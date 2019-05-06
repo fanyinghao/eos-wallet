@@ -4,10 +4,10 @@ strict,
 prefer-spread
 */
 
-const _ = require('underscore');
-const gulp = require('gulp');
-const minimist = require('minimist');
-const runSeq = require('run-sequence');
+const _ = require('./node_modules/underscore');
+const gulp = require('./node_modules/gulp');
+const minimist = require('./node_modules/minimist');
+const runSeq = require('./node_modules/run-sequence');
 
 // available crossplatform builds
 let platforms;
@@ -33,8 +33,11 @@ const options = minimist(args, {
 });
 
 // echo version info and usage hints
-console.log('EOS Wallet version:', require('./package.json').version);
-console.log('Electron version:', require('electron/package.json').version);
+console.log('EOS Wallet version:', require('./package.json.js').version);
+console.log(
+  'Electron version:',
+  require('./node_modules/electron/package.json.js').version
+);
 
 if (_.isEmpty(_.intersection(args, ['--wallet']))) {
   console.log('Many gulp tasks can be run in wallet mode using:  --wallet');
@@ -64,7 +67,7 @@ options.activePlatforms = _.keys(
 exports.options = options;
 
 // import gulp tasks
-require('require-dir')('./gulpTasks');
+require('./node_modules/require-dir')('./gulpTasks');
 
 gulp.task('upload-queue', gulp.series('checksums', 'upload-binaries'));
 
