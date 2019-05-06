@@ -18,7 +18,6 @@ eos-wallet/app> $ cd ../electron/ && yarn
 3.  To generate the EOS Wallet:
 
 ```bash
-eos-wallet/electron> $ yarn build:interface
 eos-wallet/electron> $ yarn build:wallet
 ```
 
