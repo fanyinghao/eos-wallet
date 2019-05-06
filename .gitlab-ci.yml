@@ -1,0 +1,29 @@
+image: meteor-base:1.0.0
+stages:
+    - build
+job1:
+    cache:
+        paths:
+            - node_modules/    
+    stage: build
+    tags:
+        - node-walletteam-runner
+    only:
+        - develop
+    before_script:
+        - git submodule sync --recursive
+        - git submodule update --init --recursive
+    script:
+        - cd app/ && npm i
+        - chmod +x ./scripts/gen.sh & ./scripts/gen.sh
+        - meteor-build-client ../build --path \"\" --settings settings.json
+        - cd ../electron/
+        - yarn
+        - yarn build:wallet --linux --win --mac
+    artifacts:
+        name: EOS Wallet
+        paths:
+            - build-interface
+            - dist_wallet/dist/*
+            - dist_wallet/release/*
+        

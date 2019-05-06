@@ -36,12 +36,12 @@ If you don't have [Meteor](https://www.meteor.com/install):
 
 Install npm dependencies:
 
-    $ cd eos-wallet/app
+    $ cd app
     $ npm install
 
 Run dev server:
 
-    $ cd eos-wallet/app
+    $ cd app
     $ meteor
 
 Navigate to http://localhost:3000
