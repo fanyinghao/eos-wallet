@@ -298,3 +298,13 @@ Template.registerHelper("parseJSON", obj => {
     .replace(/[\r\n]/g, "")
     .trim();
 });
+
+/**
+formatBalance
+
+@method formatBalance
+**/
+Template.registerHelper("formatSymbol", balance => {
+  const symbol = balance.split(" ")[1];
+  return symbol;
+});
