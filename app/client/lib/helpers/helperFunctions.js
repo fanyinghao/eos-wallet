@@ -647,10 +647,10 @@ Helpers.getTokenCached = () => {
   return token_contracts;
 };
 
-Helpers.getToken = contract => {
+Helpers.getToken = (contract, symbol) => {
   const contracts = Helpers.getTokenCached();
   return contracts.find(item => {
-    return item.contract === contract;
+    return item.contract === contract && item.symbol === symbol;
   });
 };
 

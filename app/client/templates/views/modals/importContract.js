@@ -72,10 +72,9 @@ Template["importContract"].events({
   'change input[name="selectSymbol"]': function(e) {
     const value = $(e.currentTarget)[0].value;
     TemplateVar.set("selectedSymbol", value);
-    console.log(value);
   },
   'click button.dapp-block-button[name="btn_add"]': function(e, template) {
-    const token_contracts =
+    var token_contracts =
       JSON.parse(localStorage.getItem("token_contracts")) || [];
     const contract = TemplateVar.get(template, "contract");
     const selectedSymbol = TemplateVar.get(template, "selectedSymbol");
@@ -86,11 +85,20 @@ Template["importContract"].events({
         symbol: balance.symbol,
         precise: balance.precise
       };
+
+      const idx = token_contracts.findIndex(item => {
+        return item.contract === contract && item.symbol === balance.symbol;
+      });
+
+      if (idx !== -1) {
+        token_contracts.splice(idx, 1);
+      }
+
       token_contracts.push(new_item);
       localStorage.setItem("token_contracts", JSON.stringify(token_contracts));
       EthElements.Modal.hide();
       if (template.data.callback) {
-        template.data.callback(contract);
+        template.data.callback(new_item);
       }
     }
   }

@@ -17,7 +17,7 @@ Template["eos_selectToken"].onCreated(function() {
       if (template.data.value) {
         TemplateVar.set("value", template.data.value);
       } else {
-        TemplateVar.set("value", "eosio.token");
+        TemplateVar.set("value", { contract: "eosio.token", symbol: "EOS" });
       }
     });
   }
@@ -30,7 +30,10 @@ Template["eos_selectToken"].helpers({
       */
   selected: function() {
     const value = TemplateVar.get("value");
-    return value === this.contract || this.selected ? { selected: true } : {};
+    return (value.contract === this.contract && value.symbol === this.symbol) ||
+      this.selected
+      ? { selected: true }
+      : {};
   },
   className: function() {
     return this.class;
@@ -53,7 +56,6 @@ Template["eos_selectToken"].events({
       */
   'change select[name="dapp-select-token"]': function(e, template) {
     const value = e.currentTarget.value;
-    TemplateVar.set("selected", value);
     if (value === "add") {
       EthElements.Modal.show({
         template: "importContract",
@@ -61,7 +63,7 @@ Template["eos_selectToken"].events({
           callback: added => {
             const contracts = Helpers.getTokenCached();
             TemplateVar.set(template, "contracts", contracts);
-            TemplateVar.set(template, "selected", added);
+            TemplateVar.get(template, "value", added);
           }
         }
       });

@@ -111,10 +111,16 @@
         </label>
 
         <p class="send-info">
-          {{#if TemplateVar.get "sendAll"}} {{{i18n
-          'wallet.send.texts.sendAmount' amount=selectedBalance.value
-          symbol=(symbol) }}} {{else}} {{{i18n 'wallet.send.texts.sendAmount'
-          amount=(inputAmount) symbol=(symbol) }}} {{/if}}
+          {{#if symbol}}
+            {{#if TemplateVar.get "sendAll"}} 
+              {{{i18n
+              'wallet.send.texts.sendAmount' amount=selectedBalance.value
+              symbol=(symbol) }}} 
+            {{else}} 
+              {{{i18n 'wallet.send.texts.sendAmount'
+              amount=(inputAmount) symbol=(symbol) }}} 
+            {{/if}}
+          {{/if}}
         </p>
       </div>
 

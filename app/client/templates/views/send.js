@@ -37,6 +37,7 @@ Template["views_send"].onCreated(function() {
   TemplateVar.set("amount", "0");
   TemplateVar.set("sendAll", false);
   TemplateVar.set("currentContract", "eosio.token");
+  TemplateVar.set("currentSymbol", "EOS");
 
   if (FlowRouter.getRouteName() === "newaccount") {
     TemplateVar.set("send_type", "newaccount");
@@ -63,7 +64,8 @@ Template.views_send.onRendered(function() {
     const type = TemplateVar.get(template, "send_type");
     const selectedAccount = TemplateVar.get(template, "selectedAccount");
     const contract = TemplateVar.get(template, "currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get(template, "currentSymbol");
+    const token = Helpers.getToken(contract, symbol);
 
     let selected = TemplateVar.getFrom(".send-from", "value");
     if (!selected && selectedAccount) {
@@ -71,7 +73,7 @@ Template.views_send.onRendered(function() {
     }
 
     if (contract === "add" || !selected || type !== "funds") return;
-    EOS.RPC.get_currency_balance(contract, selected).then(
+    EOS.RPC.get_currency_balance(contract, selected, symbol).then(
       resp => {
         if (resp.length > 0) {
           const balance = resp[0];
@@ -112,7 +114,8 @@ Template["views_send"].helpers({
   },
   inputAmount: function() {
     const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get("currentSymbol");
+    const token = Helpers.getToken(contract, symbol);
     const amount = TemplateVar.get("amount") || "0";
     return parseFloat(amount).toFixed(token.precise);
   },
@@ -123,7 +126,8 @@ Template["views_send"].helpers({
     */
   sendTotal: function() {
     const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get("currentSymbol");
+    const token = Helpers.getToken(contract, symbol);
 
     if (TemplateVar.get("send_type") === "newaccount") return "0.6745";
 
@@ -161,16 +165,19 @@ Template["views_send"].helpers({
     return FlowRouter.getRouteName() === "newaccount";
   },
   symbol: function() {
-    const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
-    return token.symbol;
+    const symbol = TemplateVar.get("currentSymbol");
+    return symbol;
   },
   contract: function() {
-    return TemplateVar.get("currentContract");
+    return {
+      contract: TemplateVar.get("currentContract"),
+      symbol: TemplateVar.get("currentSymbol")
+    };
   },
   placeholder: function() {
     const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get("currentSymbol");
+    const token = Helpers.getToken(contract, symbol);
     return parseFloat(0).toFixed(token.precise);
   }
 });
@@ -182,8 +189,11 @@ Template["views_send"].events({
     @event change input.send-all
     */
   "change input.send-all": function(e) {
+    console.log(e.target.form["dapp-select-token"].value);
     const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get("currentSymbol");
+    console.log(contract, symbol);
+    const token = Helpers.getToken(contract, symbol);
     const checked = $(e.currentTarget)[0].checked;
     TemplateVar.set("sendAll", checked);
 
@@ -204,7 +214,8 @@ Template["views_send"].events({
     template
   ) {
     const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get("currentSymbol");
+    const token = Helpers.getToken(contract, symbol);
     let amount = e.currentTarget.value;
     if (amount.indexOf(".") !== amount.lastIndexOf("."))
       amount = amount.substring(0, amount.length - 1);
@@ -312,7 +323,8 @@ Template["views_send"].events({
     */
   'change select.send-from[name="dapp-select-account"]': function(e, template) {
     const contract = TemplateVar.get("currentContract");
-    const token = Helpers.getToken(contract);
+    const symbol = TemplateVar.get("currentSymbol");
+    const token = Helpers.getToken(contract, symbol);
     let selectedAccount = ObservableAccounts.accounts[e.currentTarget.value];
     TemplateVar.set("selectedAccount", selectedAccount);
     TemplateVar.set("selectedBalance", {
@@ -320,8 +332,11 @@ Template["views_send"].events({
     });
   },
   'change select[name="dapp-select-token"]': function(e, template) {
-    const contract = e.currentTarget.value;
+    const target = e.currentTarget;
+    const contract = target.value;
+    const symbol = target.options[target.selectedIndex].dataset.symbol;
     TemplateVar.set(template, "currentContract", contract);
+    TemplateVar.set(template, "currentSymbol", symbol);
   },
   /**
     Submit the form and send the transaction!
@@ -705,7 +720,8 @@ Template["views_send"].events({
           memo = TemplateVar.get("memo"),
           sendAll = TemplateVar.get("sendAll");
         const contract = TemplateVar.get("currentContract");
-        const token = Helpers.getToken(contract);
+        const symbol = TemplateVar.get("currentSymbol");
+        const token = Helpers.getToken(contract, symbol);
 
         if (!to)
           return GlobalNotification.warning({
