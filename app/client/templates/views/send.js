@@ -189,10 +189,13 @@ Template["views_send"].events({
     @event change input.send-all
     */
   "change input.send-all": function(e) {
-    console.log(e.target.form["dapp-select-token"].value);
-    const contract = TemplateVar.get("currentContract");
-    const symbol = TemplateVar.get("currentSymbol");
-    console.log(contract, symbol);
+    const select = e.target.form["dapp-select-token"];
+    const contract = select.value;
+    const symbol = select.options[select.selectedIndex].dataset.symbol;
+
+    TemplateVar.set("currentContract", contract);
+    TemplateVar.set("currentSymbol", symbol);
+
     const token = Helpers.getToken(contract, symbol);
     const checked = $(e.currentTarget)[0].checked;
     TemplateVar.set("sendAll", checked);
@@ -213,8 +216,12 @@ Template["views_send"].events({
     e,
     template
   ) {
-    const contract = TemplateVar.get("currentContract");
-    const symbol = TemplateVar.get("currentSymbol");
+    const select = e.target.form["dapp-select-token"];
+    const contract = select.value;
+    const symbol = select.options[select.selectedIndex].dataset.symbol;
+
+    TemplateVar.set("currentContract", contract);
+    TemplateVar.set("currentSymbol", symbol);
     const token = Helpers.getToken(contract, symbol);
     let amount = e.currentTarget.value;
     if (amount.indexOf(".") !== amount.lastIndexOf("."))
