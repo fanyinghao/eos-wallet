@@ -117,7 +117,7 @@ Template["views_send"].helpers({
     const symbol = TemplateVar.get("currentSymbol");
     const token = Helpers.getToken(contract, symbol);
     const amount = TemplateVar.get("amount") || "0";
-    return parseFloat(amount).toFixed(token.precise);
+    return new BigNumber(amount).toFixed(token.precise);
   },
   /**
     Return the currently selected amount
@@ -138,7 +138,7 @@ Template["views_send"].helpers({
     if (sendAll && selectedBalance) amount = selectedBalance.value;
     if (!_.isFinite(amount)) return parseFloat(0).toFixed(token.precise);
 
-    return parseFloat(amount).toFixed(token.precise);
+    return new BigNumber(amount).toFixed(token.precise);
   },
   proposeContent: function() {
     console.log("res");
@@ -368,9 +368,10 @@ Template["views_send"].events({
     let selectedAccount =
       ObservableAccounts.accounts[TemplateVar.getFrom(select_class, "value")];
     let isMultiSig = Helpers.isMultiSig(selectedAccount);
+    let selectedBalance = TemplateVar.get("selectedBalance");
 
     if (selectedAccount && !TemplateVar.get("sending")) {
-      if (selectedAccount.eosBalance == 0)
+      if (!selectedBalance || new BigNumber(selectedBalance.value, 10).eq(0))
         return GlobalNotification.warning({
           content: "i18n:wallet.send.error.emptyWallet",
           duration: 2
@@ -736,18 +737,20 @@ Template["views_send"].events({
             duration: 2
           });
 
-        if (sendAll) amount = selectedAccount.eosBalance.value;
+        if (sendAll) amount = selectedBalance.value;
 
-        if (_.isEmpty(amount) || amount === "0" || !_.isFinite(amount))
+        if (
+          _.isEmpty(amount) ||
+          new BigNumber(amount, 10).eq(0) ||
+          !_.isFinite(amount)
+        )
           return GlobalNotification.warning({
             content: "i18n:wallet.send.error.noAmount",
             duration: 2
           });
 
         if (
-          new BigNumber(amount, 10).gt(
-            new BigNumber(selectedAccount.eosBalance.value, 10)
-          )
+          new BigNumber(amount, 10).gt(new BigNumber(selectedBalance.value, 10))
         )
           return GlobalNotification.warning({
             content: "i18n:wallet.send.error.notEnoughFunds",
@@ -756,7 +759,7 @@ Template["views_send"].events({
 
         amount =
           amount > 0
-            ? `${parseFloat(amount).toFixed(token.precise)} ${token.symbol}`
+            ? `${new BigNumber(amount).toFixed(token.precise)} ${token.symbol}`
             : `${parseFloat(0).toFixed(token.precise)} ${token.symbol}`;
 
         EthElements.Modal.question(
