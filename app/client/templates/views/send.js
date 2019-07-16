@@ -371,12 +371,6 @@ Template["views_send"].events({
     let selectedBalance = TemplateVar.get("selectedBalance");
 
     if (selectedAccount && !TemplateVar.get("sending")) {
-      if (!selectedBalance || new BigNumber(selectedBalance.value, 10).eq(0))
-        return GlobalNotification.warning({
-          content: "i18n:wallet.send.error.emptyWallet",
-          duration: 2
-        });
-
       let permission = "active";
       if (selectedAccount.publicKey) {
         if (selectedAccount.publicKey.owner) {
@@ -586,7 +580,7 @@ Template["views_send"].events({
               {
                 actions: [
                   {
-                    action: "eosio",
+                    account: "eosio",
                     name: "newaccount",
                     authorization: _auth,
                     data: {
