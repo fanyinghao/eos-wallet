@@ -25,6 +25,12 @@ Template["importContract"].helpers({
   btnDisabled: function() {
     const options = TemplateVar.get("options");
     const symbol = TemplateVar.get("symbol");
+    const selectedSymbol = TemplateVar.get("selectedSymbol");
+
+    if (selectedSymbol && selectedSymbol.length > 0) {
+      return {};
+    }
+
     return options && options.length > 0 && symbol != "wrong contract"
       ? {}
       : { disabled: "disabled" };
@@ -35,7 +41,7 @@ Template["importContract"].events({
   'change input[name="contact_add"]': function(e, template) {
     TemplateVar.set(template, "loading", true);
     TemplateVar.set(template, "contract", "");
-    TemplateVar.set(template, "options", []);
+    TemplateVar.set(template, "options", null);
     TemplateVar.set(template, "symbol", "");
     TemplateVar.set(template, "selectedSymbol", "");
     const value = e.currentTarget.value;
@@ -56,6 +62,9 @@ Template["importContract"].events({
         if (resp.length > 0) {
           TemplateVar.set(template, "contract", value);
           TemplateVar.set(template, "selectedSymbol", resp[resp.length - 1]);
+        } else {
+          TemplateVar.set(template, "contract", value);
+          TemplateVar.set(template, "options", null);
         }
       },
       err => {
@@ -73,17 +82,27 @@ Template["importContract"].events({
     const value = $(e.currentTarget)[0].value;
     TemplateVar.set("selectedSymbol", value);
   },
+  'change input[name="inputSymbol"]': function(e) {
+    const value = $(e.currentTarget)[0].value;
+    TemplateVar.set("selectedSymbol", value);
+  },
+  'change input[name="inputPrecise"]': function(e) {
+    const value = $(e.currentTarget)[0].value;
+    TemplateVar.set("inputPrecise", value);
+  },
   'click button.dapp-block-button[name="btn_add"]': function(e, template) {
+    debugger;
     var token_contracts =
       JSON.parse(localStorage.getItem("token_contracts")) || [];
     const contract = TemplateVar.get(template, "contract");
     const selectedSymbol = TemplateVar.get(template, "selectedSymbol");
+    const inputPrecise = TemplateVar.get(template, "inputPrecise");
     const balance = Helpers.formatBalance(selectedSymbol);
     if (contract) {
       const new_item = {
         contract,
-        symbol: balance.symbol,
-        precise: balance.precise
+        symbol: inputPrecise ? selectedSymbol.trim() : balance.symbol,
+        precise: inputPrecise ? parseInt(inputPrecise.trim()) : balance.precise
       };
 
       const idx = token_contracts.findIndex(item => {

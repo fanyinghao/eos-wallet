@@ -1,15 +1,12 @@
 <template name="importContract">
   <h1>{{{i18n 'wallet.contracts.pickContract'}}}</h1>
-  <input
-    type="textbox"
-    name="contact_add"
-    placeholder="{{i18n 'wallet.contracts.name'}}"
-  />
-  {{#if loading}} {{> spinner}} {{else}} 
-    {{#if symbol}}
-    <h2>{{symbol}}</h2>
-    {{/if}} 
-    <div class="symbol-options">
+  <input type="textbox" name="contact_add" placeholder="{{i18n 'wallet.contracts.name'}}" />
+  {{#if loading}} {{> spinner}} {{else}}
+  {{#if symbol}}
+  <h2>{{symbol}}</h2>
+  {{/if}}
+  <div class="symbol-options">
+    {{#if options}}
       {{#each options}}
       <p>
         <label>
@@ -17,8 +14,12 @@
           <span>{{formatSymbol this}}</span>
         </label>
       </p>
-      {{/each}} 
-    </div>
+      {{/each}}
+    {{else}}
+      <input name="inputSymbol" placeholder="{{i18n 'wallet.contracts.inputSymbol'}}" />
+      <input name="inputPrecise" type="number" placeholder="{{i18n 'wallet.contracts.inputPrecise'}}手动输入精度" />
+    {{/if}}
+  </div>
   {{/if}}
   <hr />
 
